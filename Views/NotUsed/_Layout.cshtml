@@ -1,0 +1,194 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Troy STS System</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.0/font/bootstrap-icons.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/STSStorage1.styles.css" asp-append-version="true" />
+
+    <style>
+        body {
+        padding-top: 100px; /* Adjust this value based on the height of your fixed header */
+        }
+    </style>
+
+</head>
+<body background-color:antiquewhite">
+    @if (ViewBag.LogInName == "Log In!")
+    {
+        <header class="fixed-top" style="height:fit-content">
+            <table width="100%" align="center" border="1" style="background-color:powderblue;">
+                <thead>
+                    <tr valign="top">
+                        <td width="20%" height="54" align="center" nowrap>
+                            <div align="left">
+                                <IMG src="~/images/Magna Int logo.jpg" width="171" height="55" />
+                            </div>
+                        </td>
+                        <td width="60%" align="center" nowrap>
+                            <h4>
+                                <font color="#000000">
+                                    Magna Powertrain<br />
+                                    Engineering and Test Services Storage Managment System
+                                </font>
+                            </h4>
+                        </td>
+                        <td width="20%">
+                            <div align="left"></div>
+                        </td>
+                    </tr>
+                </thead>
+            </table>
+
+            <nav class="navbar navbar-expand-lg navbar-light" style="background-color:powderblue;">
+                <div class="container-fluid">
+                    <button class="navbar-toggler ms-auto" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" 
+                    aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <ul class="nav nav-pills collapse navbar-collapse" id="navbarSupportedContent">
+                        <li class="nav-item">
+                            <a class="btn border border-primary rounded-3 btn-info" 
+                                    href="/Home/STSHome"> Welcome / Home</a>
+                        </li>
+                        <li class="nav-item ms-auto">
+                            <a class="btn border border-primary rounded-3 btn-info" 
+                                asp-area="" 
+                                asp-controller="Account" 
+                                asp-action="LoginDb">@ViewBag.LogInName</a>
+                        </li>
+                   </ul>
+                </div>
+            </nav>
+        </header>
+    }
+    else
+    {
+        <!-- Top Header and Menu -->
+        <header class="fixed-top" style="height:fit-content">
+            <table width="100%" align="center" border="1" style="background-color:powderblue;">
+                <thead>
+                    <tr valign="top">
+                        <td width="20%" height="54" align="center" nowrap>
+                            <div align="left">
+                                <IMG src="~/images/Magna Int logo.jpg" width="171" height="55" />
+                            </div>
+                            <div align="left" id="session-timer" style="font-weight:bold; color: #C00;"></div>
+@*                             <div>DEBUG: SessionExpiry = '@ViewBag.SessionExpiry'</div> *@
+                        </td>
+                        <td width="60%" align="center" nowrap>
+                            <h4>
+                                <font color="#000000">
+                                    Magna Powertrain<br />
+                                    Engineering and Test Services Storage Managment System
+                                </font>
+                            </h4>
+                        </td>
+                        <td width="20%">
+                            <div align="center">
+                                <span style="font-size:medium; font-weight:bold; color:midnightblue">Welcome: @ViewBag.FullName  <br />@ViewBag.RoleName </span>
+                            </div>
+                            <div align="right">
+                                <a class="nav-link" style="font-size:large; color:black" asp-controller="invUsers" asp-action="ProfileEdit" asp-route-id="@ViewBag.MyID">
+                                    Edit Profile
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                </thead>
+            </table>
+
+            <nav class="navbar navbar-expand-lg navbar-light" style="background-color:powderblue;">
+                <div class="container-fluid">
+                    <button class="navbar-toggler ms-auto" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+                    aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <ul class="nav nav-pills collapse navbar-collapse" id="navbarSupportedContent">
+                        <li class="nav-item">
+                            <a class="btn border border-primary rounded-3 btn-info" asp-area="" asp-controller="Home" asp-action="STSHome"> Welcome / Home</a>
+                        </li>
+                        <li>
+                            <a class="btn border border-primary rounded-3 btn-info" asp-area="" asp-controller="InvAddNew" asp-action="Create">Add New Item</a>
+                        </li>
+                        <li>
+                            <a class="btn border border-primary rounded-3 btn-info" asp-area="" asp-controller="ShortTerm" asp-action="ShortIndex">Short Term Storage </a>
+                        </li>
+                        <li>
+                            <a class="btn border border-primary rounded-3 btn-info" asp-area="" asp-controller="InvCustomers" asp-action="CustIndex">Customers </a>
+                        </li>
+                        <li>
+                            <a class="btn border border-primary rounded-3 btn-info" asp-area="" asp-controller="Search" asp-action="Index">Search </a>
+                        </li>
+
+                        @if (ViewBag.RoleName == "Admin")
+                        {
+                            <li class="dropdown ms-auto">
+                                <a class="text-dark btn-border btn border-primary rounded-3 btn-warning dropdown-toggle" data-bs-toggle="dropdown" href="#">Administration</a>
+                                <div class="dropdown-menu">
+                                    <a class="nav-link" asp-area="" asp-controller="InvUsers" asp-action="UserIndex">Users</a>
+                                    <a class="nav-link" asp-area="" asp-controller="InvCustomers" asp-action="CustIndex">Customers</a>
+                                    <a class="nav-link" asp-area="" asp-controller="InvClassification" asp-action="ClassIndex">Classification</a>
+                                    <a class="nav-link" asp-area="" asp-controller="InvStatus" asp-action="StatusIndex">Item Status</a>
+                                    <a class="nav-link" asp-area="" asp-controller="InvPhase" asp-action="PhaseIndex">Project Phase</a>
+                                    <a class="nav-link" asp-area="" asp-controller="InvShelf" asp-action="ShelfIndex">Shelfs</a>
+                                    <a class="nav-link" asp-area="" asp-controller="Invcheckout" asp-action="Index">Check Out</a>
+                                </div>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="btn border border-primary rounded-3 btn-info" asp-area="" asp-controller="Account" asp-action="RemoveSession">Log Out</a>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item ms-auto">
+                                <a class="btn border border-primary rounded-3 btn-info" asp-area="" asp-controller="Account" asp-action="RemoveSession">Log Out</a>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </nav>
+        </header>
+    }
+
+    <!-- Main Body -->
+    <script>
+        // Expose session expiry to JS
+        window.sessionExpiry = '@ViewBag.SessionExpiry';
+    </script>
+    <main style="padding-top: 10px; padding-bottom: 56px; height: calc(100vh - 180px); overflow-y:scroll; background-color:antiquewhite">
+@*     <main style="overflow-y:scroll; height:500px"> *@
+    <div class="mx-auto" style="width:fit-content; padding-top: 10px;">
+            @RenderBody()
+    </div>
+    </main>
+
+    @RenderSection("Scripts", required: false)
+
+    <!-- Footer -->
+    <footer class="border-top footer-sm fixed-bottom text-muted">
+        <div class="container-fluid">
+            <div class="row" style="background-color:lightgrey">
+                <div class="col-10">
+                    &copy; 2025 Magna Powertrain Corporation.  All Rights Reserved.
+                </div>
+                <div class="col-2">
+                    Date - @DateTime.Now.ToShortDateString()
+                </div>
+            </div>
+        </div>
+    </footer>
+    <!-- End of Footer -->
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/js/main.js"></script>
+
+
+</body>
+</html>
+

@@ -1,0 +1,166 @@
+﻿@model STSStorage1.Models.InvUsersModel
+
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<!-- Edit User Modal-->
+<div class="modal-header" style="background-color:cornflowerblue">
+    <h6 class="modal-title" id="exampleModalLabel">Edit User</h6>
+    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+<form asp-action="UserEdit">
+    <div class="modal-body">
+        <div class="form-horizontal">
+            @Html.AntiForgeryToken()
+
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="MyID" />
+            <div class="form-group">
+                <label asp-for="FirstName" class="control-label"></label>
+                <input asp-for="FirstName" class="form-control" />
+                <span asp-validation-for="FirstName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="LastName" class="control-label"></label>
+                <input asp-for="LastName" class="form-control" />
+                <span asp-validation-for="LastName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PhoneNum" class="control-label"></label>
+                <input asp-for="PhoneNum" class="form-control" />
+                <span asp-validation-for="PhoneNum" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="EmailAddress" class="control-label"></label>
+                <input asp-for="EmailAddress" class="form-control" />
+                <span asp-validation-for="EmailAddress" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="UserFunction" class="control-label"></label>
+                <select asp-for="UserFunction" class="form-select">
+                    <option asp-for="UserFunction" selected></option>
+                    <option value="STMgr">Short Term Manager</option>
+                    <option value="LTMgr">Long Term Manager</option>
+                </select>
+@*                 <input asp-for="UserFunction" class="form-control" /> *@
+                <span asp-validation-for="UserFunction" class="text-danger"></span>
+            </div>
+            <div class="form-group ">
+                <label asp-for="Role_Id" class="control-label"></label>
+                <select asp-for="Role_Id" class="form-control" asp-items="ViewBag.Roles"></select>
+                <span asp-validation-for="Role_Id" class="text-danger"></span>
+            </div>
+            <!-- Sets the initial Username and Password for this user -->
+            <div class="form-group">
+                <label asp-for="UserName" class="control-label"></label>
+                <input asp-for="UserName" class="form-control" />
+                <span asp-validation-for="UserName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Password" class="control-label"></label>
+                <input asp-for="Password" class="form-control" />
+                <span asp-validation-for="Password" class="text-danger"></span>
+            </div>
+
+            <div class="modal-footer">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+
+        </div>
+    </div>
+</form>
+<div>
+    <a asp-action="UserIndex" data-bs-dismiss="modal" style="text-align:left">Back to List</a>
+</div>
+
+
+
+
+
+
+@* <div class="modal-body"> *@
+   @*  <form asp-action="Edit">
+
+        <div class="form-horizontal">
+            @Html.AntiForgeryToken()
+            
+            <input type="hidden" asp-for="Id" />
+            <div class="form-group">
+                <label asp-for="Name" class="control-label"></label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Age" class="control-label"></label>
+                <input asp-for="Age" class="form-control" />
+                <span asp-validation-for="Age" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Email" class="control-label"></label>
+                <input asp-for="Email" class="form-control" />
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Experience" class="control-label"></label>
+                <input asp-for="Experience" class="form-control" />
+                <span asp-validation-for="Experience" class="text-danger"></span>
+            </div>
+        </div> *@
+@*         <div class="modal-footer">
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </div> *@
+@*     </form>
+</div> *@
+@* <div>
+    <a asp-action="Index" data-bs-dismiss="modal">Back to List</a>
+</div> *@
+
+
+
+@* <h4>Employee Data</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Id" />
+            <div class="form-group">
+                <label asp-for="Name" class="control-label"></label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Age" class="control-label"></label>
+                <input asp-for="Age" class="form-control" />
+                <span asp-validation-for="Age" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Email" class="control-label"></label>
+                <input asp-for="Email" class="form-control" />
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Experience" class="control-label"></label>
+                <input asp-for="Experience" class="form-control" />
+                <span asp-validation-for="Experience" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div> *@
+

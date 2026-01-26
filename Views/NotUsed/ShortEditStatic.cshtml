@@ -1,0 +1,219 @@
+﻿@{
+    Layout = null; // or set your _Layout if you use one
+    var inventoryRecid = (ViewData["InventoryRecid"] as string) ?? "";
+    var finalQty = (ViewData["FinalQty"] != null) ? ViewData["FinalQty"].ToString() : "42";
+    var umValue = (ViewData["UM"] != null) ? ViewData["UM"].ToString() : "EA";
+}
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>Edit Item Detail — Static Mock</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    @* Site stylesheet with namespaced .shortterm rules *@
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body class="shortterm">
+    <div class="container my-3 main-content">
+        <div class="text-center page-header">Edit Item Detail</div>
+
+        <form id="editItemForm" class="needs-validation" novalidate>
+            <input type="hidden" name="InventoryRecid" value="@inventoryRecid" />
+
+            <div class="card mb-3">
+                <div class="card-header card-header-accent">
+                    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center">
+                        <div class="d-flex gap-2 align-items-center">
+                            <!-- Update button (submits the form) -->
+                            <button type="submit" class="btn btn-outline-light btn-sm" title="Update">
+                                Update
+                            </button>
+
+                            <!-- Print button -->
+                            <button type="button" class="btn btn-light btn-sm btn-gap" onclick="window.print()" title="Print Detail">
+                                Print Detail
+                            </button>
+
+                            <!-- View Logbook button (navigates to logbook for this InventoryRecid) -->
+                            <button type="button" class="btn btn-light btn-sm btn-gap" onclick="viewLogbook()" title="View Logbook">
+                                View Logbook
+                            </button>
+                        </div>
+
+                        <div class="header-right text-sm-end text-white mt-3 mt-sm-0">
+                            <div class="header-qty">Current Qty: <span class="fw-bold ms-1">@finalQty</span></div>
+
+                            <!-- Editable UM placed under Current Qty in header -->
+                            <div class="d-flex justify-content-sm-end align-items-center mt-2">
+                                <label for="um" class="header-um-label mb-0">UM</label>
+                                <input id="um" name="UM" class="form-control form-control-sm header-um-input" value="@umValue" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-body">
+                    <div class="row gy-3">
+                        <!-- Left column: Record / Locators (UM removed from here) -->
+                        <div class="col-lg-4">
+                            <div class="mb-3">
+                                <div class="record-badge">Record Number</div>
+                                <div class="mt-2 fs-5">
+                                    <span class="inventory-id-btn">#@inventoryRecid</span>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="field-label form-label">Long Term Locator</label>
+                                <div class="form-control-plaintext">LT-001-A</div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="field-label form-label">Total Cumulative Time in Storage</label>
+                                <div class="form-control-plaintext">120 days</div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="field-label form-label">Storage Location</label>
+                                <div><span class="badge bg-success">ShortTerm</span></div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="targetDuration" class="field-label form-label">ST Target Duration (Days)</label>
+                                <input id="targetDuration" name="TargetDuration" type="number" class="form-control form-control-sm" value="180">
+                            </div>
+                        </div>
+
+                        <!-- Right column: main form -->
+                        <div class="col-lg-8">
+                            <div class="row g-3">
+                                <div class="col-md-8">
+                                    <label for="partNumber" class="field-label form-label">Part Number</label>
+                                    <input id="partNumber" name="PartNumber" class="form-control" value="PN-987654" />
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="owner" class="field-label form-label">Current Owner</label>
+                                    <select id="owner" name="OwnerIDNum" class="form-select">
+                                        <option value="0" selected>Not Defined</option>
+                                        <option value="101">Smith, John</option>
+                                        <option value="102">Doe, Jane</option>
+                                        <option value="103">Lee, Maria</option>
+                                    </select>
+                                </div>
+
+                                <div class="col-12">
+                                    <label for="partDesc" class="field-label form-label">Part Description</label>
+                                    <input id="partDesc" name="PartDescription" class="form-control" value="Example Part Description" />
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label for="modelVariant" class="field-label form-label">Model / Variant</label>
+                                    <input id="modelVariant" name="Model_Variant" class="form-control" value="Model-X / V1" />
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label for="classification" class="field-label form-label">Classification / Usage</label>
+                                    <select id="classification" name="ClassificationID" class="form-select">
+                                        <option value="0" selected>Not Defined</option>
+                                        <option value="1">A - Flight Test</option>
+                                        <option value="2">B - Production</option>
+                                    </select>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label for="revLevel" class="field-label form-label">Revision Level</label>
+                                    <input id="revLevel" name="RevLevel" class="form-control" value="R3" />
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="serialNumber" class="field-label form-label">Serial Number(s)</label>
+                                    <input id="serialNumber" name="SerialNumber" class="form-control" value="SN-0001,SN-0002" />
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label for="customer" class="field-label form-label">Customer</label>
+                                    <select id="customer" name="CustomerRecID" class="form-select">
+                                        <option value="0" selected>Not Defined</option>
+                                        <option value="200">Acme Corp</option>
+                                        <option value="201">Globex</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="programName" class="field-label form-label">Program Name</label>
+                                    <input id="programName" name="ProgramName" class="form-control" value="Project Aurora" />
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label for="firstDateIn" class="field-label form-label">First Date Into Storage</label>
+                                    <input id="firstDateIn" name="FirstDateIn" type="date" class="form-control" value="">
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="programPhase" class="field-label form-label">Program Phase</label>
+                                    <select id="programPhase" name="ProgramPhaseID" class="form-select">
+                                        <option value="1" selected>Not Defined</option>
+                                        <option value="10">Phase 1 - Design</option>
+                                        <option value="20">Phase 2 - Test</option>
+                                    </select>
+                                </div>
+
+                                <div class="col-12">
+                                    <label for="longTermReason" class="field-label form-label">Long Term Reason</label>
+                                    <textarea id="longTermReason" name="LongTermReason" class="form-control" rows="3">Reason text (if LongTerm)</textarea>
+                                </div>
+
+                                <div class="col-12">
+                                    <label for="generalComments" class="field-label form-label">General Comments</label>
+                                    <textarea id="generalComments" name="GeneralComment" class="form-control long-text">Example general comments about this item. This field will expand when longer text is provided.</textarea>
+                                </div>
+
+                            </div>
+                        </div> <!-- end right column -->
+                    </div> <!-- end inner row -->
+                </div> <!-- card-body -->
+
+                <div class="card-footer text-muted d-flex justify-content-between">
+                    <div class="small">Last modified: 2025-12-05</div>
+                    <div class="small">Copyright © 2017 Magna Powertrain Corporation</div>
+                </div>
+            </div>
+        </form>
+
+        <!-- Note: The check-in/check-out history section was intentionally omitted per your request. -->
+
+    </div>
+
+    <!-- JS: Bootstrap bundle (includes Popper) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // View logbook helper
+        function viewLogbook() {
+          const id = encodeURIComponent('@inventoryRecid');
+          // navigate to the logbook route (adjust path if your logbook route differs)
+          window.location.href = '/ShortTerm/Logbook?InventoryRecid=' + id;
+        }
+
+        // Basic client-side form validation scaffold (static mock)
+        (function () {
+          'use strict'
+          var forms = document.querySelectorAll('.needs-validation')
+          Array.prototype.slice.call(forms)
+            .forEach(function (form) {
+              form.addEventListener('submit', function (event) {
+                if (!form.checkValidity()) {
+                  event.preventDefault()
+                  event.stopPropagation()
+                } else {
+                  // In static mock: prevent submit and show an alert instead.
+                  event.preventDefault()
+                  alert('Form submit would be handled by your controller/model. This is a static mock.');
+                }
+                form.classList.add('was-validated')
+              }, false)
+            })
+        })()
+    </script>
+
+</body>
+</html>
+

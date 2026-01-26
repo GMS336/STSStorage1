@@ -1,0 +1,40 @@
+﻿@model STSStorage1.Models.InvClassificationModel
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<!-- Add New Customer Modal-->
+<div class="modal-header" style="background-color:cornflowerblue">
+    <h5 class="modal-title" id="exampleModalLabel">Add New Class</h5>
+    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+
+<div class="modal-body">
+    <form asp-action="Create">
+
+        <div class="form-horizontal" id="CreateForm">
+            @Html.AntiForgeryToken()
+
+            <div class="form-group">
+                <label asp-for="Classification" class="control-label"></label>
+                <input asp-for="Classification" class="form-control w-100" style="font-size:12px;" />
+                <span asp-validation-for="Classification" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ClassificationDescription" class="control-label"></label>
+                <input asp-for="ClassificationDescription" class="form-control w-125" style="font-size:12px;" />
+                <span asp-validation-for="ClassificationDescription" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <input type="submit" value="Create" class="btn btn-primary" />
+        </div>
+    </form>
+</div>
+
+<div>
+    <a asp-action="ClassIndex" data-bs-dismiss="modal">Back to List</a>
+</div>

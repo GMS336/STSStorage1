@@ -1,0 +1,70 @@
+﻿@model STSStorage1.Models.UserRoleViewModel
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<!-- Employee Detail Modal-->
+<div class="modal-header" style="background-color:cornflowerblue">
+    <h5 class="modal-title" id="exampleModalLabel">User Details</h5>
+    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+
+<div class="modal-body">
+    <dl class="row">
+        <dt class = "col-sm">
+            @Html.DisplayNameFor(model => model.FirstName)
+        </dt> 
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.FirstName)
+        </dd>
+    </dl>
+    <dl class="row">
+        <dt class="col-sm">
+            @Html.DisplayNameFor(model => model.LastName)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.LastName)
+        </dd>
+    </dl>
+    <dl>
+        <dt class = "col-sm">
+            @Html.DisplayNameFor(model => model.EmailAddress)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.EmailAddress)
+        </dd>
+    </dl>
+
+    <dl>
+        <dt class = "col-sm">
+            @Html.DisplayNameFor(model => model.PhoneNum)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.PhoneNum)
+        </dd>
+    </dl>
+    <dl>
+        <dt class="col-sm">
+            @Html.DisplayNameFor(model => model.RoleName)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.RoleName)
+        </dd>
+    </dl>
+    <dl>
+        <dt class="col-sm">
+            @Html.DisplayNameFor(model => model.UserFunction)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.UserFunction)
+        </dd>
+    </dl>
+</div>
+<div class="modal-footer">
+@*     <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> | *@
+    <a asp-action="UserIndex" data-bs-dismiss="modal" style="text-align:left">Back to List</a>
+</div>
+

@@ -1,0 +1,45 @@
+﻿@model STSStorage1.Models.InvCustomerModel
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<!-- Add New Customer Modal-->
+<div class="modal-header" style="background-color:cornflowerblue">
+    <h5 class="modal-title" id="exampleModalLabel">Add New Customer</h5>
+    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+<div class="modal-body">
+    <form asp-action="Create">
+        
+        <div class="form-horizontal" id="CreateForm">
+            @Html.AntiForgeryToken()
+
+            <div class="form-group">
+                <label asp-for="CustomerName" class="control-label"></label>
+                <input asp-for="CustomerName" class="form-control w-100" style="font-size:12px;" />
+                <span asp-validation-for="CustomerName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="CustomerCode" class="control-label"></label>
+                <input asp-for="CustomerCode" class="form-control w-25" style="font-size:12px;" />
+                <span asp-validation-for="CustomerCode" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="CustomerLocation" class="control-label"></label>
+                <input asp-for="CustomerLocation" class="form-control w-50" style="font-size:12px;" />
+                <span asp-validation-for="CustomerLocation" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <input type="submit" value="Create" class="btn btn-primary" />
+        </div>
+    </form>
+</div>
+
+<div>
+    <a asp-action="CustIndex" data-bs-dismiss="modal">Back to List</a>
+</div>
+

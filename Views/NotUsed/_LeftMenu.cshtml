@@ -1,0 +1,44 @@
+﻿@* <nav class="sidenav">
+    <div class="AccordionPanelContent">
+        <h5>Main Menu</h5>
+        <br />@Html.ActionLink("Home", "STSHome")
+        <br />@Html.ActionLink("About", "About")
+        <br />@Html.ActionLink("StortTermList", "STList")
+        <br />@Html.ActionLink("LongTermList", "LTList")
+        <br />@Html.ActionLink("Privacy", "Privacy")
+    </div>
+</nav> *@
+
+
+
+<div id="LeftMenu" class="Accordion" style="width:130px;">
+
+  <div class="AccordionPanel">
+    <div class="AccordionPanelTab" align="center">Inventory Menu </div>
+    <div class="AccordionPanelContent">
+        <br/>&nbsp;&nbsp;@Html.ActionLink("home", "STSHome") <br />
+        <br/>&nbsp;&nbsp;<a href="Default.asp" target="_parent">Log Off</a><br/>
+            <br />&nbsp;&nbsp;<a asp-area="" asp-controller="InventoryMasters" asp-action="Index">STS</a><br />
+        <br/>&nbsp;&nbsp;<a href="ManageInventory/ShortTerm/ShortTermEditList.asp" target="mainFrame">Short Term Storage</a><br/>
+        <br/>&nbsp;&nbsp;<a href="/ManageInventory/LongTerm/LongTermStorageList.asp" target="mainFrame">Long Term Storage</a><br />
+        <br/>&nbsp;&nbsp;<a href="CarInventoryList.asp" target="mainFrame" >Vehicle Tracking</a><br/>
+        <br/>&nbsp;&nbsp;<a href="ELabAllList.asp" target="mainFrame">Electrical Lab</a><br/>
+    <p></p></div>
+  </div>
+
+
+
+  <div class="AccordionPanel">
+    <div class="AccordionPanelTab" align="center">Admin</div>
+    <div class="AccordionPanelContent">
+        <br/>&nbsp;&nbsp;<a href="/ActiveMenu/AdminMenu.asp" target="leftFrame">Administration</a><br/>
+        <br/>&nbsp;&nbsp;<a href="#" onClick="javascript:window.open('login/changepswd.asp','chgpwd','width=350,height=250,toolbar=no,location=no,scrollbars=no')">Change Password</a><br/>
+        <br/>&nbsp;&nbsp;<a href="Default.asp" target="_parent">Log Off</a><br/>
+    </div>
+  </div>
+</div>
+<script type="text/javascript">
+<!--
+var Accordion1 = new Spry.Widget.Accordion("LeftMenu");
+//-->
+</script>

@@ -1,0 +1,215 @@
+﻿@model PaginatedList<STSStorage1.Models.InvShortTermModel>
+@using STSStorage1.Helpers
+@using STSStorage1.Models
+
+@{
+    int currentPage = ViewBag.CurrentPage ?? 1;
+    int pageSize = ViewBag.PageSize ?? 10;
+    // sort state exposed by controller (defaults)
+    string sortOrder = ViewBag.SortOrder ?? "InventoryRecid";
+    string sortDir = ViewBag.SortDir ?? "asc";
+
+    // helper to compute next direction for a column (toggle only for ProgramName for now)
+    Func<string, string> nextDirFor = col => (sortOrder == col && sortDir == "asc") ? "desc" : "asc";
+}
+
+<table style="width:100%">
+    <tr>
+        <td colspan="3"><h2 style="text-align:center">Active Short-Term Master List</h2></td>
+    </tr>
+    <tr>
+        <td><p>Data fetch time: @ViewBag.DataFetchTime ms</p></td>
+        <td><p>Items fetched: @ViewBag.ItemsCount</p></td>
+        <td><h6 style="text-align:right">Total Active Items: @Model.TotalCount</h6></td>
+    </tr>
+    <tr>
+        <td colspan="3">
+            <table class="table table-striped table-bordered d-md-table" id="MainList">
+                <thead>
+                    <tr>
+                        <th>@Html.DisplayNameFor(m => Model[0].InventoryRecid)</th>
+
+                        <th style="text-align:center">
+                            <a class="link-light" href="@Url.Action("ShortIndex", new { sortOrder = "ProgramName", sortDir = nextDirFor("ProgramName"), page = 1, pageSize = pageSize })">
+                                @Html.DisplayNameFor(model => model[0].ProgramName)
+                                @if (sortOrder == "ProgramName")
+                                {
+                                    <text> @(sortDir == "asc" ? " ▲" : " ▼")</text>
+                                }
+                            </a>
+                        </th>
+
+                        <th style="text-align:center">
+                            <a class="link-light" href="@Url.Action("ShortIndex", new { sortOrder = "ShelfRecid", sortDir = nextDirFor("ShelfRecid"), page = 1, pageSize = pageSize })">
+                                @Html.DisplayNameFor(model => model[0].ShelfName)
+                                @if (sortOrder == "ShelfRecid")
+                                {
+                                    <text> @(sortDir == "asc" ? " ▲" : " ▼")</text>
+                                }
+                            </a>
+                        </th>
+
+                        <th style="text-align:center">
+                            <a class="link-light" href="@Url.Action("ShortIndex", new { sortOrder = "BinNum", sortDir = nextDirFor("BinNum"), page = 1, pageSize = pageSize })">
+                                @Html.DisplayNameFor(model => model[0].BinNum)
+                                @if (sortOrder == "BinNum")
+                                {
+                                    <text> @(sortDir == "asc" ? " ▲" : " ▼")</text>
+                                }
+                            </a>
+                        </th>
+
+                        <th style="text-align:center">
+                            <a class="link-light" href="@Url.Action("ShortIndex", new { sortOrder = "PartNumber", sortDir = nextDirFor("PartNumber"), page = 1, pageSize = pageSize })">
+                                @Html.DisplayNameFor(model => model[0].PartNumber)
+                                @if (sortOrder == "PartNumber")
+                                {
+                                    <text> @(sortDir == "asc" ? " ▲" : " ▼")</text>
+                                }
+                            </a>
+                        </th>
+
+                        <th style="text-align:center">
+                            <a class="link-light" href="@Url.Action("ShortIndex", new { sortOrder = "PartDescription", sortDir = nextDirFor("PartDescription"), page = 1, pageSize = pageSize })">
+                                @Html.DisplayNameFor(model => model[0].PartDescription)
+                                @if (sortOrder == "PartDescription")
+                                {
+                                    <text> @(sortDir == "asc" ? " ▲" : " ▼")</text>
+                                }
+                            </a>
+                        </th>
+
+                        <th style="text-align:center">
+                            <a class="link-light" href="@Url.Action("ShortIndex", new { sortOrder = "OwnerIDNum", sortDir = nextDirFor("OwnerIDNum"), page = 1, pageSize = pageSize })">
+                                @Html.DisplayNameFor(model => model[0].Owner)
+                                @if (sortOrder == "OwnerIDNum")
+                                {
+                                    <text> @(sortDir == "asc" ? " ▲" : " ▼")</text>
+                                }
+                            </a>
+                        </th>
+
+                        <th style="text-align:center">
+                            <a class="link-light" href="@Url.Action("ShortIndex", new { sortOrder = "FinalQty", sortDir = nextDirFor("FinalQty"), page = 1, pageSize = pageSize })">
+                                @Html.DisplayNameFor(model => model[0].FinalQty)
+                                @if (sortOrder == "FinalQty")
+                                {
+                                    <text> @(sortDir == "asc" ? " ▲" : " ▼")</text>
+                                }
+                            </a>
+                        </th>
+
+                        <th style="text-align:center">
+                            <a class="link-light" href="@Url.Action("ShortIndex", new { sortOrder = "DateIn", sortDir = nextDirFor("DateIn"), page = 1, pageSize = pageSize })">
+                                @Html.DisplayNameFor(model => model[0].DateIn)
+                                @if (sortOrder == "DateIn")
+                                {
+                                    <text> @(sortDir == "asc" ? " ▲" : " ▼")</text>
+                                }
+                            </a>
+                        </th>
+
+                        <th style="text-align:center">
+                            <a class="link-light" href="@Url.Action("ShortIndex", new { sortOrder = "CurrDuration", sortDir = nextDirFor("CurrDuration"), page = 1, pageSize = pageSize })">
+                                @Html.DisplayNameFor(model => model[0].CurrDuration)
+                                @if (sortOrder == "CurrDuration")
+                                {
+                                    <text> @(sortDir == "asc" ? " ▲" : " ▼")</text>
+                                }
+                            </a>
+                        </th>
+                        <th align="center">Notify Owner</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>
+@*                                 <a style="cursor:pointer;"
+                                   class="btn-sm btn-link bi-pencil"
+                                   onclick="RenderActions('/ShortTerm/ShortEdit/' + @item.InventoryRecid)"> 
+                                </a> *@
+                                @* <a asp-controller="ShortTerm" asp-action="Edit" asp-route-id="@item.InventoryRecid">@item.InventoryRecid</a> *@
+                                <a asp-controller="ShortTerm"
+                                   asp-action="ShortEdit"
+                                   asp-route-id="@item.InventoryRecid"
+                                   class="btn btn-link p-0"
+                                   title="Edit record @item.InventoryRecid">
+                                    @item.InventoryRecid
+                                </a>
+                            </td>
+                            <td>@item.ProgramName</td>
+                            <td>@item.ShelfName</td>
+                            <td>@item.BinNum</td>
+                            <td>@item.PartNumber</td>
+                            <td>@item.PartDescription</td>
+                            <td>@item.Owner</td>
+                            <td>@item.FinalQty</td>
+                            <td>@item.DateIn?.ToString("MM/dd/yyyy")</td>
+                            <td>@item.CurrDuration <small>- days</small></td>
+                            <td>
+                                <a style="cursor:pointer;" class="btn-sm btn-link bi-envelope fs-4" data-bs-toggle="modal" onclick="RenderActions('/ShortTerm/EmailOwner/' + @item.InventoryRecid)" data-bs-target="#modalCreate" title="Email owner"></a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </td>
+    </tr>
+</table>
+
+@if (Model.TotalPages > 1)
+{
+    <div class="paging-bar">
+        @* Paging navigation *@
+        <nav>
+            <ul class="pagination pagination-sm mb-0">
+                <li class="page-item @(Model.HasPreviousPage ? "" : "disabled")">
+                    <a class="page-link" href="@Url.Action("ShortIndex", new { sortOrder = sortOrder, sortDir = sortDir, page = 1, pageSize = pageSize })" title="First page">&laquo;</a>
+                </li>
+                <li class="page-item @(Model.HasPreviousPage ? "" : "disabled")">
+                    <a class="page-link" href="@Url.Action("ShortIndex", new { sortOrder = sortOrder, sortDir = sortDir, page = currentPage - 1, pageSize = pageSize })" title="Previous page">&lt;</a>
+                </li>
+                <li class="page-item disabled">
+                    <span class="page-link px-1" style="min-width: 75px">Page @currentPage of @Model.TotalPages</span>
+                </li>
+                <li class="page-item @(Model.HasNextPage ? "" : "disabled")">
+                    <a class="page-link" href="@Url.Action("ShortIndex", new { sortOrder = sortOrder, sortDir = sortDir, page = currentPage + 1, pageSize = pageSize })" title="Next page">&gt;</a>
+                </li>
+                <li class="page-item @(Model.HasNextPage ? "" : "disabled")">
+                    <a class="page-link" href="@Url.Action("ShortIndex", new { sortOrder = sortOrder, sortDir = sortDir, page = Model.TotalPages, pageSize = pageSize })" title="Last page">&raquo;</a>
+                </li>
+            </ul>
+        </nav>
+        @* Jump to page *@
+        <form method="get" asp-action="ShortIndex" class="d-inline-block" style="margin-bottom:0;">
+            <label for="pageJump" class="me-1">Jump to:</label>
+            <input type="number" id="pageJump" name="page" min="1" max="@Model.TotalPages" value="@currentPage" class="form-control form-control-sm d-inline-block" style="width:60px; display:inline-block;" />
+            <input type="hidden" name="pageSize" value="@pageSize" />
+            <input type="hidden" name="sortOrder" value="@sortOrder" />
+            <input type="hidden" name="sortDir" value="@sortDir" />
+            <button type="submit" class="btn btn-primary btn-sm ms-1 px-2">Go</button>
+        </form>
+        @* Records per page selector *@
+        <form method="get" asp-action="ShortIndex" class="d-inline-block" style="margin-bottom:0;">
+            <label class="me-1" for="pageSizeSelect">Records per page:</label>
+            <select name="pageSize" id="pageSizeSelect" onchange="this.form.submit()" class="form-select form-select-sm d-inline-block" style="width:70px; display:inline-block;">
+                @foreach (var size in new int[] { 5, 10, 20, 50, 100 })
+                {
+                    if (size == pageSize)
+                    {
+                        <option value="@size" selected="selected">@size</option>
+                    }
+                    else
+                    {
+                        <option value="@size">@size</option>
+                    }
+                }
+            </select>
+            <input type="hidden" name="page" value="@currentPage" />
+            <input type="hidden" name="sortOrder" value="@sortOrder" />
+            <input type="hidden" name="sortDir" value="@sortDir" />
+        </form>
+    </div>
+}

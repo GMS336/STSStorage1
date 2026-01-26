@@ -1,0 +1,149 @@
+﻿@model IEnumerable<STSStorage1.Models.UserRoleViewModel>
+
+@{
+    ViewBag.Title = "Users";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div id="fletter" style="text-align:center">
+    <h3 >View Inventory System Access List:</h3>
+</div>
+<!-- Button trigger modal -->
+<button type="button" class="btn btn-sm btn-success" data-bs-toggle="modal" onclick="RenderActions('/InvUsers/UserCreate')" data-bs-target="#modalCreate">
+    Add New User
+</button>
+
+
+<!-- show the User list -->
+<TABLE width="100%" border="0" align="center" cellpadding="0" cellspacing="0">
+    <tr bgcolor="#CCCCCC" class="stp-bigblue">
+        <td align="center" style="width:3.84%;"><A Href="#record-A">A</A></td>
+        <td align="center" style="width:3.84%;"><A Href="#record-B">B</A></td>
+        <td align="center" style="width:3.84%;"><A Href="#record-C">C</A></td>
+        <td align="center" style="width:3.84%;"><A Href="#record-D">D</A></td>
+        <td align="center" style="width:3.84%;"><A Href="#record-E">E</A></td>
+        <td align="center" style="width:3.84%;"><A Href="#record-F">F</A></td>
+        <td align="center" style="width:3.84%;"><A Href="#record-G">G</A></td>
+        <td align="center" style="width:3.84%;"><A Href="#record-H">H</A></td>
+        <td align="center" style="width:3.84%;"><A Href="#record-I">I</A></td>
+        <td align="center" style="width:3.84%;"><A Href="#record-J">J</A></td>
+        <td align="center" style="width:3.84%;"><A Href="#record-K">K</A></td>
+        <td align="center" style="width:3.84%;"><A Href="#record-L">L</A></td>
+        <td align="center" style="width:3.84%;"><A Href="#record-M">M</A></td>
+        <td align="center" style="width:3.84%;"><A Href="#record-N">N</A></td>
+        <td align="center" style="width:3.84%;"><A Href="#record-O">O</A></td>
+        <td align="center" style="width:3.84%;"><A Href="#record-P">P</A></td>
+        <td align="center" style="width:3.84%;"><A Href="#record-Q">Q</A></td>
+        <td align="center" style="width:3.84%;"><A Href="#record-R">R</A></td>
+        <td align="center" style="width:3.84%;"><A Href="#record-S">S</A></td>
+        <td align="center" style="width:3.84%;"><A Href="#record-T">T</A></td>
+        <td align="center" style="width:3.84%;"><A Href="#record-U">U</A></td>
+        <td align="center" style="width:3.84%;"><A Href="#record-V">V</A></td>
+        <td align="center" style="width:3.84%;"><A Href="#record-W">W</A></td>
+        <td align="center" style="width:3.84%;"><A Href="#record-X">X</A></td>
+        <td align="center" style="width:3.84%;"><A Href="#record-Y">Y</A></td>
+        <td align="center" style="width:3.84%;"><A Href="#record-Z">Z</A></td>
+    </tr>
+</TABLE>
+<table class="table table-striped table-bordered table-sm" id="MainList">
+    <thead class="table-dark">
+        <tr>
+            <th style="text-align:center">@Html.DisplayNameFor(model => model.MyID)</th>
+            @*             <th>@Html.DisplayNameFor(model => model.FirstName)</th> *@
+            <th style="text-align:center">@Html.ActionLink("FirstName", "UserIndex", new { sortOrder = "FirstName" }, new { @class = "link-light"})</th>
+            <th style="text-align:center">@Html.ActionLink("LastName", "UserIndex", new { sortOrder = "LastName" }, new { @class = "link-light" })</th>
+            @*             <th style="text-align:center">@Html.DisplayNameFor(model => model.LastName)</th> *@
+            <th style="text-align:center">@Html.ActionLink("UserDept", "UserIndex", new { sortOrder = "UserDept" }, new { @class = "link-light" })</th>
+            @*             <th style="text-align:center">@Html.DisplayNameFor(model => model.UserDept)</th> *@
+            <th style="text-align:center">@Html.DisplayNameFor(model => model.EmailAddress)</th>
+            <th style="text-align:center">@Html.ActionLink("RoleName", "UserIndex", new { sortOrder = "RoleName" }, new { @class = "link-light" })</th>
+            @*             <th style="text-align:center">@Html.DisplayNameFor(model => model.InventoryRole)</th> *@
+            <th style="text-align:center">@Html.ActionLink("UserFunction", "UserIndex", new { sortOrder = "UserFunction" }, new { @class = "link-light" })</th>
+            @*             <th style="text-align:center">@Html.DisplayNameFor(model => model.UserFunction)</th> *@
+            <th style="text-align:center">Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model) {
+            string fletter = @item.LastName;
+            switch(fletter){
+                case "A": fletter = "A"; break;
+                case "B": fletter = "B"; break;
+                case "C": fletter = "C"; break;
+                case "D": fletter = "D"; break;
+                case "E": fletter = "E"; break;
+                case "F": fletter = "F"; break;
+                case "G": fletter = "G"; break;
+                case "H": fletter = "H"; break;
+                case "I": fletter = "I"; break;
+                case "J": fletter = "J"; break;
+                case "K": fletter = "K"; break;
+                case "L": fletter = "L"; break;
+                case "M": fletter = "M"; break;
+                case "N": fletter = "N"; break;
+                case "O": fletter = "O"; break;
+                case "P": fletter = "P"; break;
+                case "Q": fletter = "Q"; break;
+                case "R": fletter = "R"; break;
+                case "S": fletter = "S"; break;
+                case "T": fletter = "T"; break;
+                case "U": fletter = "U"; break;
+                case "V": fletter = "V"; break;
+                case "W": fletter = "W"; break;
+                case "X": fletter = "X"; break;
+                case "Y": fletter = "Y"; break;
+                case "Z": fletter = "Z"; break;
+                default: fletter = "TOP "; break;
+            }
+            string backgroundColor = (fletter == (@item.LastName)) ? "lightblue" : "";
+            <tr style="background-color:@backgroundColor;">
+                <td id="record-@item.LastName" style="cursor:pointer" 
+                data-bs-toggle="modal" onclick="RenderActions('/InvUsers/UserDetails/' + @item.MyID)"
+                data-bs-target="#modalCreate">@Html.DisplayFor(modelItem => item.MyID)</td>
+                <td>@Html.DisplayFor(modelItem => item.FirstName)</td>
+                <td>
+                    @{if (fletter == (@item.LastName)) {
+                            <span class="fw-bold text-danger"> @Html.DisplayFor(modelItem => item.LastName) </span>
+                        }
+                        else
+                        {
+                             @Html.DisplayFor(modelItem => item.LastName)
+                        }
+                    }
+                 </td>
+            
+            <td>@Html.DisplayFor(modelItem => item.UserDept)</td>
+            <td>@Html.DisplayFor(modelItem => item.EmailAddress)</td>
+            <td>@Html.DisplayFor(modelItem => item.RoleName)</td>
+
+
+            <td>
+                    @{if (fletter == (@item.LastName))
+                        {
+                            <a href="#fletter">Back To TOP</a>
+                        }
+                        else
+                        {
+                            @Html.DisplayFor(modelItem => item.UserFunction)
+                        }
+                    }
+           </td>
+            
+            <td>
+            @* <a class="btn-sm btn-link bi-info" data-bs-toggle="modal" onclick="RenderActions('/InvUsers/UserDetails/' + @item.MyID)" data-bs-target="#modalCreate"></a> *@
+                <a style="cursor:pointer;" class="btn-sm btn-link bi-pencil" data-bs-toggle="modal" onclick="RenderActions('/InvUsers/UserEdit/' + @item.MyID)" data-bs-target="#modalCreate"></a>
+                <a style="cursor:pointer;" class="btn-sm btn-link bi-trash" data-bs-toggle="modal" onclick="RenderActions('/InvUsers/UserDelete/' + @item.MyID)" data-bs-target="#modalCreate"></a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
+
+<div id="modalCreate" class="modal fade" role="dialog" data-backdrop="false">
+    <div class="modal-dialog">
+        <div class="modal-content modal-sm">
+            <div id="OpenDialog" class="modal-body">
+            </div>
+        </div>
+    </div>
+</div>
+

@@ -1,0 +1,80 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - New STS System</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/master.css" asp-append-version="true" />
+</head>
+
+<body>
+    <!-- Header -->
+    <header>
+        <nav class="navbar navbar-center bg-light">
+            <TABLE width="100%" align="center">
+                <TR valign="top">
+                    <TD width="18%" height="54" align="center" nowrap>
+
+                        <DIV align="left">
+                            <IMG src="~/images/Magna Int logo.jpg" width="171" height="55" />
+                        </DIV>
+                    </TD>
+                    <TD width="82%" align="center" nowrap>
+                        <H4>
+                            <FONT color="#000000">
+                                Magna Powertrain<BR />
+                                Engineering and Test Services Storage Managment System
+                            </FONT>
+                        </H4>
+                    </TD>
+                </TR>
+            </TABLE>
+        </nav>
+    </header>
+    <!-- End of Header -->
+
+    <!-- Left Sidebar Navigation -->
+    <nav class="sidenav">
+        <ul>
+            <h5>Main Menu</h5></br>
+            <li>@Html.ActionLink("Home", "STSHome")</li>
+            <li>@Html.ActionLink("About", "About")</li>
+            <li>@Html.ActionLink("StortTermList", "STList")</li>
+            <li>@Html.ActionLink("LongTermList", "LTList")</li>
+            <li>@Html.ActionLink("Privacy", "Privacy")</li>
+        </ul>
+    </nav>
+    <!-- End of Left Sidebar -->
+
+    <!-- Content Body -->
+    <div class="container, mb-sm-1">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+    <!-- End of Content Body -->
+
+    <!-- Footer -->
+
+    <footer class="border-top footer text-muted">
+      <table width="100%" height="100%" style="vertical-align: bottom;"  border="0" cellspacing="0" align="left" cellpadding="0"  >
+        <tr>
+          <td width="85%" bgcolor="#e0e0e0" class="Field-Heading">
+              <div align="center">Copyright © 2017 Magna Powertrain Corporation.  All Rights Reserved.</div>
+          </td>
+          <td bgcolor="#e0e0e0" class="Field-Heading">
+              <div align="center">Date - @DateTime.Now.ToShortDateString()</div>
+          </td>
+        </tr>
+      </table>
+    </footer>
+    <!-- End of Footer -->
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

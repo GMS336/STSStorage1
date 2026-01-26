@@ -1,0 +1,81 @@
+﻿@model STSStorage1.Models.UserRoleViewModel
+
+
+@{
+    ViewData["Title"] = "Delete";
+}
+
+<!-- Delete Employee Modal-->
+
+<h5>Are you sure you want to delete this User?</h5>
+    <hr />
+    <!-- Add New Employee Modal-->
+<div class="modal-header" style="background-color:cornflowerblue">
+    <h6 class="modal-title" id="exampleModalLabel">Delete User</h6>
+    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+
+<div class="modal-body">
+    <dl class="row">
+        <dt class = "col-sm">
+            @Html.DisplayNameFor(model => model.FirstName)
+        </dt> 
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.FirstName)
+        </dd>
+    </dl>
+    <dl class="row">
+        <dt class="col-sm">
+            @Html.DisplayNameFor(model => model.LastName)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.LastName)
+        </dd>
+    </dl>
+    <dl>
+        <dt class = "col-sm">
+            @Html.DisplayNameFor(model => model.EmailAddress)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.EmailAddress)
+        </dd>
+    </dl>
+
+    <dl>
+        <dt class = "col-sm">
+            @Html.DisplayNameFor(model => model.PhoneNum)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.PhoneNum)
+        </dd>
+    </dl>
+    <dl>
+        <dt class="col-sm">
+            @Html.DisplayNameFor(model => model.UserFunction)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.UserFunction)
+        </dd>
+    </dl>
+    <dl>
+        <dt class="col-sm">
+            @Html.DisplayNameFor(model => model.RoleName)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.RoleName)
+        </dd>
+    </dl>
+</div>
+<div class="modal-footer">
+    <form asp-action="Delete">
+        @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="MyID" />
+        <input type="submit" value="Delete" class="btn btn-danger" />
+    </form>
+</div>
+<div>
+    <a asp-action="UserIndex" data-bs-dismiss="modal">Back to List</a>
+</div>
+

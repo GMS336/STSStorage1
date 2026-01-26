@@ -1,0 +1,137 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Troy STS System</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.0/font/bootstrap-icons.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    @* <link rel="stylesheet" href="~/STSStorage1.styles.css" asp-append-version="true" /> *@
+</head>
+<body>
+    @{
+        var isLogin = ViewBag.LogInName == "Log In!";
+    }
+    <div>
+        <!-- Fixed Header Section -->
+        <header class="header-fixed">
+            <!-- Logo and Title Row -->
+            <div class="header-logo d-flex align-items-center justify-content-between px-3 py-2">
+                <div>
+                    <img src="~/images/Magna Int logo.jpg" width="171" height="55" alt="Logo" />
+                </div>
+                <div class="flex-grow-1 text-center">
+                    <h4 class="m-0 fw-bold" style="color: #000;">
+                        Magna Powertrain<br />
+                        Engineering and Test Services Storage Management System
+                    </h4>
+                </div>
+                <div class="text-end">
+                    @if (!isLogin)
+                    {
+                        <span style="font-size:medium; font-weight:bold; color:midnightblue">
+                            Welcome: @ViewBag.FullName<br />@ViewBag.RoleName 
+                        </span>
+                    }
+                </div>
+            </div>
+            <!-- Controls Bar -->
+            <div class="header-bar">
+                @if (isLogin)
+                {
+                    <a class=" sidebar-btn btn btn-sm header-btn" asp-area="" asp-controller="Account" asp-action="LoginDb">@ViewBag.LogInName</a>
+                }
+                else
+                {
+                    <a class="sidebar-btn btn btn-sm header-btn" asp-controller="invUsers" asp-action="ProfileEdit" asp-route-id="@ViewBag.MyID">
+                        Edit Profile
+                    </a>
+                    <a class="sidebar-btn btn btn-sm header-btn" asp-controller="Account" asp-action="RemoveSession">Log Out</a>
+                }
+            </div>
+        </header>
+
+        <!-- Main Layout: Sidebar + Content -->
+        <div class="main-content-wrap">
+            <!-- Sidebar/Menu: vertical navigation -->
+            <nav class="sidebar d-flex flex-column p-3">
+                <ul class="nav nav-pills flex-column flex-grow-1">
+                    <li class="nav-item">
+                        <a class="sidebar-btn btn"  asp-area="" asp-controller="Home" asp-action="STSHome">Welcome / Home</a>
+                    </li>
+                    @if (!isLogin)
+                    {
+                        <li class="nav-item">
+                            <a class="sidebar-btn btn"  asp-area="" asp-controller="InvAddNew" asp-action="Create">Add New Item</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="sidebar-btn btn"  asp-area="" asp-controller="ShortTerm" asp-action="ShortIndex">Short Term Storage</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="sidebar-btn btn"  asp-area="" asp-controller="LongTerm" asp-action="LongIndex">Long Term Storage</a>
+                        </li>
+                        // temp link for testing.
+                        <li class="nav-item">
+                            <a class="sidebar-btn btn" asp-area="" asp-controller="ShortTerm" asp-action="ShortEdit" asp-route-id="8442">Item detail</a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="sidebar-btn btn"  asp-area="" asp-controller="Search" asp-action="Index">Search</a>
+                        </li>
+                        @if (ViewBag.RoleName == "Admin")
+                        {
+                            <li class="nav-item dropdown mt-3">
+                                <a class="sidebar-btn btn dropdown-toggle" data-bs-toggle="dropdown" href="#">Administration</a>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" asp-area="" asp-controller="InvUsers" asp-action="UserIndex">Users</a></li>
+                                    <li><a class="dropdown-item" asp-area="" asp-controller="InvCustomers" asp-action="CustIndex">Customers</a></li>
+                                    <li><a class="dropdown-item" asp-area="" asp-controller="InvClassification" asp-action="ClassIndex">Classification</a></li>
+                                    <li><a class="dropdown-item" asp-area="" asp-controller="InvStatus" asp-action="StatusIndex">Item Status</a></li>
+                                    <li><a class="dropdown-item" asp-area="" asp-controller="InvPhase" asp-action="PhaseIndex">Project Phase</a></li>
+                                    <li><a class="dropdown-item" asp-area="" asp-controller="InvShelf" asp-action="ShelfIndex">Shelfs</a></li>
+                                    <li><a class="dropdown-item" asp-area="" asp-controller="Invcheckout" asp-action="Index">Check Out</a></li>
+                                </ul>
+                            </li>
+                        }
+                    }
+                </ul>
+
+                <div class="mt-auto" id="session-timer" style="font-weight:bold; color: #C00;"></div>
+            </nav>
+
+            <!-- Main Content -->
+            <main class="main-content">
+                <script>
+                    window.sessionExpiry = '@ViewBag.SessionExpiry';
+                </script>
+                <div class="mx-auto" style="width:fit-content;/*  margin-top: 126px; */">
+                    @RenderBody()
+                </div>
+            </main>
+        </div>
+
+        @RenderSection("Scripts", required: false)
+
+        <!-- Footer -->
+        <footer class="fixed-footer border-top text-muted bg-light py-2">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-10">
+                        &copy; 2025 Magna Powertrain Corporation.  All Rights Reserved.
+                    </div>
+                    <div class="col-2 text-end">
+                        Date - @DateTime.Now.ToShortDateString()
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/js/main.js"></script>
+</body>
+</html>
+

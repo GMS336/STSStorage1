@@ -1,0 +1,47 @@
+﻿@model STSStorage1.Models.InvCustomerModel
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<!-- Customer Detail Modal-->
+<div class="modal-header" style="background-color:cornflowerblue">
+    <h5 class="modal-title" id="exampleModalLabel">Customer Details</h5>
+    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+
+<div class="modal-body">
+    <dl class="row">
+        <dt class = "col-sm">
+            @Html.DisplayNameFor(model => model.CustomerName)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.CustomerName)
+        </dd>
+    </dl>
+    <dl>
+        <dt class = "col-sm">
+            @Html.DisplayNameFor(model => model.CustomerCode)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.CustomerCode)
+        </dd>
+    </dl>
+    <dl>
+        <dt class = "col-sm">
+            @Html.DisplayNameFor(model => model.CustomerLocation)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.CustomerLocation)
+        </dd>
+    </dl>
+</div>
+<div class="modal-footer">
+@*     <a asp-action="Edit" asp-route-id="@Model?.CustomerRecID">Edit</a> | *@
+    <a asp-action="CustIndex" data-bs-dismiss="modal">Back to List</a>
+</div>
+
+
+

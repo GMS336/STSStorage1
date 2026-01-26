@@ -1,0 +1,506 @@
+/* Global HTML and Body Reset */
+html {
+    font-size: 14px;
+    position: relative;
+    min-height: 100%;
+}
+
+@media (min-width: 768px) {
+    html {
+        font-size: 16px;
+    }
+}
+
+/* Body: keep global default (antiquewhite). Per-page shortterm background is namespaced below as body.shortterm */
+body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow-x: hidden;
+    background-color: antiquewhite;
+    margin-bottom: 40px;
+}
+
+    /* Per-page ShortTerm page background:
+   Apply by adding class="shortterm" to the <body> or to a top-level wrapper element.
+   Example: <body class="shortterm"> or <div class="shortterm"> ... </div> */
+    body.shortterm {
+        background-color: #fff9e6;
+    }
+
+/* Focus Styles for Accessibility */
+.btn:focus,
+.btn:active:focus,
+.btn-link.nav-link:focus,
+.form-control:focus,
+.form-check-input:focus {
+    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+}
+
+/* HEADER: Fixed at Top */
+.header-fixed {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1050;
+    width: 100%;
+}
+
+.header-logo {
+    background-color: powderblue;
+}
+
+.header-bar {
+    background-color: #81bbfa;
+    border-bottom: 1px solid #dee2e6;
+    min-height: 52px;
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+/* Universal Layout: Sidebar + Main Content under header */
+.main-content-wrap {
+    display: flex;
+    min-height: 0; /* Let it shrink */
+    /*min-height: calc(100vh - 56px);*/ /* Consider footer height if fixed */
+    margin-top: 126px; /* Match full header height */
+}
+
+/* SIDEBAR: sticky, vertical menu */
+.sidebar {
+    width: 240px;
+    min-width: 180px;
+    height: calc(100vh - 165px); /* Adjust as needed for compactness */
+    position: sticky;
+    top: 126px;
+    background-color: #e3f2fd;
+    border-right: 1px solid #ddd;
+    overflow-y: auto;
+    padding: 12px 0 0 0; /* Compact padding */
+    padding-bottom: 56px;
+}
+
+/* Sidebar Button Style (always with light green background) */
+.sidebar-btn,
+.sidebar-btn.btn {
+    display: block;
+    width: 100%;
+    margin-bottom: 8px;
+    padding: 8px 16px;
+    background-color: #90ee90 !important; /* Light green, always visible */
+    color: #145c11 !important; /* Dark green text */
+    border-radius: 18px;
+    border: 1px solid #6ad46a; /* Slight green border */
+    font-weight: 500;
+    text-align: left;
+    transition: background 0.15s, color 0.15s;
+    box-shadow: none;
+}
+
+    /* Sidebar Button hover/focus */
+    .sidebar-btn:hover,
+    .sidebar-btn:focus,
+    .sidebar-btn.btn:hover,
+    .sidebar-btn.btn:focus {
+        background-color: #6ad46a !important; /* Slightly darker on hover/focus */
+        color: #072f09 !important; /* Even darker text */
+        text-decoration: none;
+    }
+
+/* Remove default bg & border for other nav links/buttons in sidebar */
+.sidebar .nav-link,
+.sidebar .btn,
+.sidebar .dropdown-toggle {
+    font-size: 1rem;
+    margin-bottom: 4px;
+    padding-top: 6px;
+    padding-bottom: 6px;
+    background: none;
+    border: none;
+    box-shadow: none;
+}
+
+    .sidebar .nav-link.active,
+    .sidebar .btn.active {
+        font-weight: bold;
+        background: #fff;
+        border: none;
+    }
+
+/* Header Bar Buttons (small, aligned right, sidebar button style) */
+.header-bar .header-btn,
+.sidebar-btn.btn-sm,
+.header-btn.btn-sm {
+    display: inline-block;
+    width: auto;
+    min-width: 0;
+    padding: 4px 12px;
+    font-size: 0.95rem;
+    line-height: 1.3;
+    margin-left: 6px;
+    margin-right: 0;
+    text-align: center;
+    background-color: #90ee90 !important; /* Ensures small header buttons match menu */
+    color: #145c11 !important;
+    border-radius: 18px;
+    border: 1px solid #6ad46a;
+    font-weight: 500;
+    box-shadow: none;
+    transition: background 0.15s, color 0.15s;
+}
+
+    .header-bar .header-btn:hover,
+    .header-bar .header-btn:focus,
+    .sidebar-btn.btn-sm:hover,
+    .sidebar-btn.btn-sm:focus,
+    .header-btn.btn-sm:hover,
+    .header-btn.btn-sm:focus {
+        background-color: #6ad46a !important;
+        color: #072f09 !important;
+        text-decoration: none;
+    }
+
+/* Main Content Area: fluid, scrolls only as actually needed */
+.main-content {
+    flex: 1 1 auto;
+    padding: 0 25px 20px 25px;
+    background-color: antiquewhite;
+    min-height: 0;
+    height: auto;
+    overflow-y: visible; /* Only scroll for true overflow */
+}
+
+    /* Remove unwanted top margin from first heading/paragraph */
+    .main-content h1:first-child,
+    .main-content h2:first-child,
+    .main-content h3:first-child,
+    .main-content p:first-child {
+        margin-top: 0 !important;
+    }
+
+/* Footer: fixed at bottom */
+.fixed-footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1040;
+    background: #f8f9fa;
+}
+
+/* Inventory ID Button Styles */
+.inventory-id-btn {
+    display: inline-block;
+    background-color: #fff;
+    color: #0b5132;
+    border: 1px solid #cfeccc;
+    padding: 2px 6px;
+    border-radius: 4px;
+    text-decoration: none;
+    cursor: pointer;
+    line-height: 1;
+}
+
+    .inventory-id-btn:hover {
+        background-color: #d4f2d4;
+        text-decoration: none;
+    }
+
+    .inventory-id-btn:focus {
+        outline: 3px solid rgba(11,81,50,0.25);
+        outline-offset: 2px;
+        box-shadow: 0 0 0 3px rgba(11,81,50,0.08);
+    }
+
+/* Generic text input style */
+.mytextinput {
+    font-size: max(12px, 1em);
+    font-family: inherit;
+    padding: 0.25em 0.5em;
+    background-color: #fff;
+    border: 3px solid var(--input-border, #ccc);
+    border-radius: 5px;
+}
+
+/* General Button Style */
+.button-Style {
+    border-radius: 32px;
+    background-color: #0dfd11;
+    border-color: #0dfd11;
+}
+
+/* Consolidated ShortIndex Table & Paging Styles */
+#MainList {
+    background-color: #fff !important;
+}
+
+    #MainList.table-striped tbody tr:nth-of-type(odd) {
+        background-color: #fff !important;
+    }
+
+    #MainList.table-striped tbody tr:nth-of-type(even) {
+        background-color: #C0E4C6 !important;
+    }
+
+    #MainList thead th {
+        background-color: #6E411A !important;
+        color: #fff;
+        text-align: center;
+    }
+
+    #MainList td, #MainList th {
+        text-align: center;
+        vertical-align: middle;
+        padding-top: 2px !important;
+        padding-bottom: 2px !important;
+        padding-left: 8px !important;
+        padding-right: 8px !important;
+        font-size: 0.95em;
+    }
+
+    #MainList tr {
+        height: 24px !important;
+    }
+
+/* Compact paging bar */
+.paging-bar {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 12px;
+    font-size: 0.95em;
+    margin-top: 10px;
+    flex-wrap: wrap;
+}
+
+    .paging-bar select,
+    .paging-bar input[type="number"],
+    .paging-bar button,
+    .paging-bar .pagination .page-link {
+        font-size: 0.94em !important;
+        padding: 3px 10px;
+        height: 30px;
+    }
+
+    .paging-bar label {
+        margin-right: 4px;
+        font-weight: 500;
+        font-size: 0.94em;
+    }
+
+    .paging-bar .pagination {
+        margin-bottom: 0;
+    }
+
+/* --- Namespaced ShortTerm styles (apply only when wrapper/body has class "shortterm") --- */
+
+/* Accent header used on cards and panels (from standalone styles) */
+.shortterm .card-header-accent {
+    background: linear-gradient(90deg,#00d1ff,#009ad6);
+    color: #fff;
+    padding: .75rem 1rem;
+}
+
+/* Page header style from standalone */
+.shortterm .page-header {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 1rem 0;
+}
+
+/* Ensure header content aligns nicely on smaller screens (namespaced) */
+@media (max-width: 575.98px) {
+    .shortterm .card-header-accent {
+        text-align: left;
+    }
+
+    .shortterm .header-right {
+        margin-top: .5rem;
+        text-align: left;
+    }
+}
+
+/* text box 3d effect*/
+/* place this after bootstrap.css */
+.badge.three-d-textbox {
+    display: inline-block;
+    min-width: 12ch; /* at least space for 25 characters */
+    background: linear-gradient(#fafafa, #e9e9e9);
+    color: #000;
+    padding: .25rem .5rem;
+    border-radius: 6px;
+    border: 1px solid #cfcfcf;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.9), 0 3px 0 rgba(0,0,0,0.06);
+    font-weight: 500;
+    line-height: 1;
+    vertical-align: middle;
+    box-sizing: border-box; /* make padding included in width */
+    white-space: nowrap; /* keep on one line */
+    overflow: hidden;
+    text-overflow: ellipsis; /* if text exceeds width */
+}
+
+
+/* Various font types, sizes and decorations for standard use throughout website*/
+
+.Label-Heading {
+    font-size: 12pt;
+    font-weight: bold;
+}
+.Label-Heading-Black {
+    font-size: 12pt;
+    font-weight: bolder;
+    color: #000000;
+}
+
+.STP-Heading-Black {
+    font-size: 14pt;
+    font-weight: bold;
+    color: #000000;
+}
+
+.Label-Heading-Blue {
+    font-size: 12pt;
+    font-weight: bolder;
+    color: #0066FF;
+}
+
+/* light yellow readonly input, fixed to ~25 characters width */
+.form-control.stp-lightyellow {
+    background-color: #FFFFCC; /* light yellow */
+    color: #000; /* black text */
+    /*width: 25ch;*/ /* target width based on character width */
+    max-width: 100%; /* never overflow container on small screens */
+    box-sizing: border-box; /* include padding & border in width calculation */
+    min-height: 2.25rem; /* ensures same visual height as typical bootstrap input */
+    vertical-align: middle;
+    white-space: nowrap; /* keep single-line */
+}
+/* make the informational span look and size like a Bootstrap input,
+   but keep background yellow and allow text selection/focus for accessibility */
+.readonly-display {
+    background-color: #FFFFCC; /* your yellow */
+    border: 1px solid #ced4da; /* match .form-control border */
+    border-radius: .25rem;
+    padding: .375rem .75rem; /* match .form-control spacing */
+    line-height: 1.5;
+    display: block; /* full width like inputs */
+    min-height: calc(1.5em + .75rem + 2px); /* match typical input height */
+    color: inherit;
+    user-select: text; /* let user copy text */
+}
+
+
+/* Small helpers and form/field labels (namespaced) */
+.shortterm .long-text {
+    min-height: 160px;
+}
+
+.shortterm .record-badge {
+    font-size: .95rem;
+    font-weight: 600;
+    background: #f8f9fa;
+    padding: .5rem;
+    border-radius: .25rem;
+    color: #000;
+}
+
+.shortterm .field-label-bold {
+    font-weight: 600;
+}
+
+.shortterm .btn-gap {
+    margin-left: .5rem;
+}
+
+/* Header quantity area helpers (namespaced) */
+.shortterm .header-qty {
+    line-height: 1;
+}
+
+.shortterm .header-um-label {
+    color: rgba(255,255,255,0.9);
+    margin-right: .5rem;
+    font-weight: 600;
+    font-size: .85rem;
+}
+
+.shortterm .header-um-input {
+    width: 5.25rem;
+}
+
+/* Small visual utility for record headers (namespaced) */
+.shortterm .page-header + .record-badge {
+    margin-left: 0.5rem;
+    vertical-align: middle;
+}
+
+/* Print: shortterm page single-page, include colors/backgrounds */
+@media print {
+    /* hide everything by default */
+    body * {
+        visibility: hidden !important;
+    }
+
+    /* show only the edit form and its children */
+    #editItemForm, #editItemForm * {
+        visibility: visible !important;
+    }
+
+    /* place the form at the top-left of the printed page */
+    #editItemForm {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        margin: 0;
+        padding: 6mm; /* small inner padding on printed page */
+        box-shadow: none !important; /* remove shadows that may print oddly */
+        background: white;
+        -webkit-print-color-adjust: exact; /* request printing of colors in WebKit */
+        print-color-adjust: exact; /* standard-ish property */
+        color-adjust: exact;
+        /* Reduce font-size/line-height to help fit to one page (tweak as needed) */
+        font-size: 12px;
+        line-height: 1.05;
+        /* Prevent breaking the form across pages */
+        break-inside: avoid;
+        page-break-inside: avoid;
+        zoom: 1.00; /* tweak between 1.0 and ~0.80 as needed */
+    }
+
+        /* Compact spacing for form controls inside the printed form */
+        #editItemForm .card,
+        #editItemForm .card-body,
+        #editItemForm .card-header,
+        #editItemForm .row,
+        #editItemForm .col-*-* {
+            margin: 0;
+            padding: 0.15rem !important;
+        }
+
+        /* Make headings slightly smaller */
+        #editItemForm .page-header {
+            font-size: 1.1rem;
+            margin-bottom: .25rem;
+        }
+
+        /* Reduce inputs, selects and textareas visuals */
+        #editItemForm .form-control,
+        #editItemForm .form-control-plaintext {
+            font-size: 12px;
+            padding: .15rem .35rem;
+        }
+}
+/* End of namespaced shortterm styles */
+
+
+/* REMOVE OLD/UNUSED STYLES:
+   .sidenav, .mybody, .content are omitted; 
+   use only the .sidebar and .main-content classes as specified by your layout markup.
+*/
+
+/* -- End of consolidated CSS file -- */

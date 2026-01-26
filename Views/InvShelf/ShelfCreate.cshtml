@@ -1,0 +1,49 @@
+﻿@model STSStorage1.Models.InvShelfModel
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<!-- Add New Shelf Modal-->
+<div class="modal-header" style="background-color:cornflowerblue">
+    <h5 class="modal-title" id="exampleModalLabel">Add New Shelf</h5>
+    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+
+<div class="modal-body">
+    <form asp-action="Create">
+
+        <div class="form-horizontal" id="CreateForm">
+            @Html.AntiForgeryToken()
+
+            <div class="form-group">
+                <label asp-for="ShelfName" class="control-label"></label>
+                <input asp-for="ShelfName" class="form-control w-100" style="font-size:12px;" />
+                <span asp-validation-for="ShelfName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ShelfDescription" class="control-label"></label>
+                <input asp-for="ShelfDescription" class="form-control w-125" style="font-size:12px;" />
+                <span asp-validation-for="ShelfDescription" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="StorageLocationSite" class="control-label"></label>
+                <select asp-for="StorageLocationSite" class="form-select">
+                    <option asp-for="StorageLocationSite" selected></option>
+                    <option value="ShortTerm">ShortStorage</option>
+                    <option value="LongTerm">LongStorage</option>
+                </select>
+                <span asp-validation-for="StorageLocationSite" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <input type="submit" value="Create" class="btn btn-primary" />
+        </div>
+    </form>
+</div>
+
+<div>
+    <a asp-action="ShelfIndex" data-bs-dismiss="modal">Back to List</a>
+</div>

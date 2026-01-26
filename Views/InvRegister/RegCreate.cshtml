@@ -1,0 +1,142 @@
+﻿@model STSStorage1.Models.InvUsersModel
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<style>
+    /* Scoped styles for the RegCreate partial to handle sizing and responsive typography */
+    .regcreate-wrapper {
+        max-width: 760px;
+        width: min(92vw, 760px); /* shrink to viewport on small windows */
+        margin: 12px auto; /* center inside modal */
+        background-color: lightblue;
+        border-radius: 6px;
+        padding: 18px;
+    }
+
+    /* Make the overall text scale moderately on very large/small windows.
+           Uses clamp so size is bounded and responsive. */
+    .regcreate-wrapper {
+        font-size: clamp(14px, 1.0vw, 16px);
+    }
+
+        /* Labels one size smaller */
+        .regcreate-wrapper label {
+            font-size: 0.95em;
+        }
+
+        /* Inputs slightly smaller than default but responsive */
+        .regcreate-wrapper input.form-control,
+        .regcreate-wrapper select.form-select {
+            font-size: clamp(13px, 0.9vw, 15px);
+        }
+
+    /* Remove any extra margins inside modal body so it hugs the wrapper */
+    #modalRegCreate .modal-body .regcreate-wrapper {
+        display: block;
+    }
+
+    /* Ensure the two-name columns collapse to stacked layout beneath md breakpoint */
+    @@media (max-width: 767.98px) {
+        .regcreate-wrapper {
+            padding: 14px;
+            font-size: 15px;
+        }
+    }
+</style>
+
+<div class="regcreate-wrapper">
+    <form asp-action="Create">
+        @Html.AntiForgeryToken()
+
+        <div class="d-flex align-items-start mb-3">
+            <h2 class="text-primary text-center flex-grow-1 mb-0" style="letter-spacing:1px; font-size:1.25rem;">Create New Login</h2>
+
+            <!-- Close icon on the right -->
+            <button type="button" class="btn border-0 rounded-circle p-1 ms-3"
+                    style="background-color:#fff; color:#222; width:36px; height:36px; display:inline-flex; align-items:center; justify-content:center;"
+                    data-bs-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true" style="font-size:1.1rem; line-height:1; font-weight:bold;">&times;</span>
+            </button>
+        </div>
+
+        <p class="mb-3" style="padding:10px; border-radius:4px;">
+            Please supply the following information. You will be notified by Email with a User ID, Password and level
+            of access granted. You may also contact the IT department to Register.
+        </p>
+
+        <!-- First and Last name on same row; will collapse under md -->
+        <div class="row mb-3">
+            <div class="col-md-6 mb-2">
+                <div class="form-group">
+                    <label asp-for="FirstName" class="control-label"></label>
+                    <input asp-for="FirstName" class="form-control rounded-2" />
+                    <span asp-validation-for="FirstName" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="col-md-6 mb-2">
+                <div class="form-group">
+                    <label asp-for="LastName" class="control-label"></label>
+                    <input asp-for="LastName" class="form-control rounded-2" />
+                    <span asp-validation-for="LastName" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Other fields on separate rows -->
+        <div class="row mb-3">
+            <div class="col-12 mb-2">
+                <div class="form-group">
+                    <label asp-for="EmailAddress" class="control-label"></label>
+                    <input asp-for="EmailAddress" class="form-control" />
+                    <span asp-validation-for="EmailAddress" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-12 mb-2">
+                <div class="form-group">
+                    <label asp-for="PhoneNum" class="control-label"></label>
+                    <input asp-for="PhoneNum" class="form-control" />
+                    <span asp-validation-for="PhoneNum" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-12 mb-2">
+                <div class="form-group">
+                    <label asp-for="UserDept" class="control-label"></label>
+                    <input asp-for="UserDept" class="form-control" />
+                    <span asp-validation-for="UserDept" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-12 mb-2">
+                <div class="form-group">
+                    <label asp-for="InventoryRole" class="control-label"></label>
+                    <select asp-for="InventoryRole" class="form-select">
+                        <option asp-for="InventoryRole" selected></option>
+                        <option value="User">User</option>
+                    </select>
+                    <span asp-validation-for="InventoryRole" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Back to Login on the left, Submit on the right (same row) -->
+        <div class="row mt-3">
+            <div class="col-6 d-flex align-items-center">
+                <a asp-action="/Account/LoginDB/" data-bs-dismiss="modal" class="link-secondary">Back to Login</a>
+            </div>
+            <div class="col-6 text-end">
+                <input type="submit" value="Create Login" class="btn btn-primary px-4" />
+            </div>
+        </div>
+    </form>
+</div>

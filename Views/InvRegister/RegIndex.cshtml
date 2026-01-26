@@ -1,0 +1,97 @@
+﻿@model IEnumerable<STSStorage1.Models.InvRegisterModel>
+
+@{
+    ViewBag.Title = "Register";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h3 class="align-center">Registraion Data</h3>
+
+<!-- Button trigger modal -->
+<button type="button" class="btn btn-sm btn-success" data-bs-toggle="modal" onclick="RenderActions('/InvRegister/RegCreate')" data-bs-target="#modalCreate">
+    Register New User
+</button>
+
+
+<!-- show the User list -->
+<TABLE width="100%" border="0" align="center" cellpadding="0" cellspacing="0">
+    <tr bgcolor="#CCCCCC" class="stp-bigblue">
+        <td><div align="center"><A Href="#record-A">A</A></div></td>
+        <td><div align="center"><A Href="#record-B">B</A></div></td>
+        <td><div align="center"><A Href="#record-C">C</A></div></td>
+        <td><div align="center"><A Href="#record-D">D</A></div></td>
+        <td><div align="center"><A Href="#record-E">E</A></div></td>
+        <td><div align="center"><A Href="#record-F">F</A></div></td>
+        <td><div align="center"><A Href="#record-G">G</A></div></td>
+        <td><div align="center"><A Href="#record-H">H</A></div></td>
+        <td><div align="center"><A Href="#record-I">I</A></div></td>
+        <td><div align="center"><A Href="#record-J">J</A></div></td>
+        <td><div align="center"><A Href="#record-K">K</A></div></td>
+        <td><div align="center"><A Href="#record-L">L</A></div></td>
+        <td><div align="center"><A Href="#record-M">M</A></div></td>
+        <td><div align="center"><A Href="#record-N">N</A></div></td>
+        <td><div align="center"><A Href="#record-O">O</A></div></td>
+        <td><div align="center"><A Href="#record-P">P</A></div></td>
+        <td><div align="center"><A Href="#record-Q">Q</A></div></td>
+        <td><div align="center"><A Href="#record-R">R</A></div></td>
+        <td><div align="center"><A Href="#record-S">S</A></div></td>
+        <td><div align="center"><A Href="#record-T">T</A></div></td>
+        <td><div align="center"><A Href="#record-U">U</A></div></td>
+        <td><div align="center"><A Href="#record-V">V</A></div></td>
+        <td><div align="center"><A Href="#record-W">W</A></div></td>
+        <td><div align="center"><A Href="#record-X">X</A></div></td>
+        <td><div align="center"><A Href="#record-Y">Y</A></div></td>
+        <td><div align="center"><A Href="#record-Z">Z</A></div></td>
+    </tr>
+</TABLE>
+<table class="table table-striped table-bordered table-sm" id="MainList">
+    <thead class="table-dark">
+        <tr>
+            <th style="text-align:center">@Html.DisplayNameFor(model => model.MyID)</th>
+@*             <th>@Html.DisplayNameFor(model => model.FirstName)</th> *@
+            <th style="text-align:center">@Html.ActionLink("FirstName", "RegIndex", new { sortOrder = "FirstName" }, new { @class = "link-light"})</th>
+            <th style="text-align:center">@Html.ActionLink("LastName", "RegIndex", new { sortOrder = "LastName" }, new { @class = "link-light" })</th>
+@*             <th style="text-align:center">@Html.DisplayNameFor(model => model.LastName)</th> *@
+            <th style="text-align:center">@Html.ActionLink("UserDept", "RegIndex", new { sortOrder = "UserDept" }, new { @class = "link-light" })</th>
+@*             <th style="text-align:center">@Html.DisplayNameFor(model => model.UserDept)</th> *@
+            <th style="text-align:center">@Html.DisplayNameFor(model => model.EmailAddress)</th>
+            <th style="text-align:center">@Html.ActionLink("InventoryRole", "RegIndex", new { sortOrder = "InventoryRole" }, new { @class = "link-light" })</th>
+@*             <th style="text-align:center">@Html.DisplayNameFor(model => model.InventoryRole)</th> *@
+            <th style="text-align:center">@Html.ActionLink("UserFunction", "RegIndex", new { sortOrder = "UserFunction" }, new { @class = "link-light" })</th>
+@*             <th style="text-align:center">@Html.DisplayNameFor(model => model.UserFunction)</th> *@
+            <th style="text-align:center">Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td id="record-@item.LastName">@Html.DisplayFor(modelItem => item.MyID)</td>
+            <td>@Html.DisplayFor(modelItem => item.FirstName)</td>
+            <td>@Html.DisplayFor(modelItem => item.LastName)</td>
+            <td>@Html.DisplayFor(modelItem => item.UserDept)</td>
+            <td>@Html.DisplayFor(modelItem => item.EmailAddress)</td>
+            <td>@Html.DisplayFor(modelItem => item.InventoryRole)</td>
+            <td>@Html.DisplayFor(modelItem => item.UserFunction)</td>
+            <td>
+
+
+            <button class="btn-sm btn-link bi-info" data-bs-toggle="modal" onclick="RenderActions('/InvUsers/UserDetails/' + @item.MyID)" data-bs-target="#modalCreate"></button>
+            <button class="btn-sm btn-link bi-pencil" data-bs-toggle="modal" onclick="RenderActions('/InvUsers/UserEdit/' + @item.MyID)" data-bs-target="#modalCreate"></button>
+            <button class="btn-sm btn-link bi-trash" data-bs-toggle="modal" onclick="RenderActions('/InvUsers/UserDelete/' + @item.MyID)" data-bs-target="#modalCreate"></button>
+
+           
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
+
+<div id="modalCreate" class="modal fade" role="dialog" data-backdrop="false">
+    <div class="modal-dialog">
+        <div class="modal-content modal-sm">
+            <div id="OpenDialog" class="modal-body">
+            </div>
+        </div>
+    </div>
+</div>
+

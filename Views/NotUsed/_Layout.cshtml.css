@@ -1,0 +1,75 @@
+﻿/* Please see documentation at https://learn.microsoft.com/aspnet/core/client-side/bundling-and-minification
+for details on configuring this project to bundle and minify static web assets. */
+
+
+body {
+    background-color: antiquewhite;
+}
+
+.header-fixed {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1050;
+    width: 100%;
+}
+
+.header-logo {
+    background-color: powderblue;
+}
+
+.header-bar {
+    background: #0094ff;
+    border-bottom: 1px solid #dee2e6;
+    min-height: 52px;
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+/* The total header height is 108px: 56px logo + 52px bar */
+.main-content-wrap {
+    display: flex;
+    min-height: calc(100vh - 56px); /* Footer */
+    margin-top: 126px;
+}
+
+.sidebar {
+    width: 240px;
+    min-width: 180px;
+    height: calc(100vh - 160px);
+    position: sticky;
+    top: 126px;
+    background-color: #e3f2fd;
+    border-right: 1px solid #ddd;
+    overflow-y: auto;
+    padding-bottom: 56px;
+}
+
+    .sidebar .nav-link.active, .sidebar .btn.active {
+        font-weight: bold;
+        background: #fff;
+    }
+
+    .sidebar .nav-link, .sidebar .btn {
+        margin-bottom: 6px;
+    }
+
+.main-content {
+    flex: 1 1 auto;
+    padding: 0 25px 20px 25px;
+    background-color: antiquewhite;
+    min-height: 0; /* or remove if not needed */
+    overflow-y: visible; /* instead of auto */
+}
+
+.fixed-footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1040;
+}
+

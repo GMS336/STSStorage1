@@ -1,0 +1,55 @@
+﻿@model STSStorage1.Models.InvShelfModel
+
+@{
+    ViewData["Title"] = "ShelfEdit";
+}
+
+<h5>Shelf Data</h5>
+<hr />
+<!-- Edit Customer Modal-->
+<div class="modal-header" style="background-color:cornflowerblue">
+    <h6 class="modal-title" id="exampleModalLabel">Edit Shelf</h6>
+    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+<form asp-action="ShelfEdit">
+    <div class="modal-body">
+        <div class="form-horizontal">
+            @Html.AntiForgeryToken()
+
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="ShelfRecid" />
+            <div class="form-group">
+                <label asp-for="ShelfName" class="control-label"></label>
+                <input asp-for="ShelfName" class="form-control" />
+                <span asp-validation-for="ShelfName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ShelfDescription" class="control-label"></label>
+                <input asp-for="ShelfDescription" class="form-control" />
+                <span asp-validation-for="ShelfDescription" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="StorageLocationSite" class="control-label"></label>
+                <select asp-for="StorageLocationSite" class="form-select">
+                    <option selected>StorageLocationSite</option>
+                    <option value=""></option>
+                    <option value="ShortTerm">Short Term</option>
+                    <option value="LongTerm">Long Term</option>
+                </select>
+                <span asp-validation-for="StorageLocationSite" class="text-danger"></span>
+            </div>
+            <div class="modal-footer">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+
+        </div>
+    </div>
+</form>
+
+<div>
+    <a asp-action="ShelfIndex" data-bs-dismiss="modal" style="text-align:left">Back to List</a>
+
+</div>
+

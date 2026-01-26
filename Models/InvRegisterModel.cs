@@ -1,0 +1,57 @@
+﻿using Microsoft.EntityFrameworkCore.Metadata.Internal;
+
+using System.ComponentModel.DataAnnotations;
+
+namespace STSStorage1.Models
+{
+    // User class
+    public class InvRegisterModel
+    {
+        // this is the record number that is the auto
+
+        [Display(Name = "Employee ID")]
+        [Key]
+        public int MyID { get; set; }
+
+        [Display(Name = "First Name")]
+        public string? FirstName { get; set; }
+
+        [Display(Name = "Last Name")]
+        public string? LastName { get; set; }
+
+        [Display(Name = "Phone Number")]
+        [DataType(DataType.PhoneNumber)]
+        public string? PhoneNum { get; set; }
+
+        [Display(Name = "Plant Location")]
+        public string? UserPlant { get; set; }
+
+        [Display(Name = "Function")]
+        public string? UserFunction { get; set; }
+
+        [Display(Name = "Home Deptartment")]
+        public string? UserDept { get; set; }
+
+        [Display(Name = "Inventory Role")]
+        public string? InventoryRole { get; set; }
+
+        [Display(Name = "User Email")]
+        [DataType(DataType.EmailAddress)]
+        public string? EmailAddress { get; set; }
+
+        //-- This part is for Login Credentials. Use Password for User ID
+
+        [Display(Name = "Username")]
+        public string? UserName { get; set; }
+
+        [DataType(DataType.Password)]
+        [Display(Name = "Password")]
+        public string? Password { get; set; }
+
+        //--------------------------------------------------------------
+        public static implicit operator string(InvRegisterModel v)
+        {
+            throw new NotImplementedException();
+        }
+    }
+}

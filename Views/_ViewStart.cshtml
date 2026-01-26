@@ -1,0 +1,29 @@
+﻿@{
+    Layout = "_Layout";
+}
+@{
+    // Retrieving value from session
+    var UserName = Context.Session.GetString("UserName");
+
+        if (UserName == null)
+        {
+            // If the session variable is null, set it to a default value
+            UserName = "Log In!";
+        }
+
+        // shows the user name
+        ViewBag.LogInName = UserName;
+
+
+    var FullName = Context.Session.GetString("FullName");  // shows the full name
+    ViewBag.FullName = FullName;
+
+    var RoleName = Context.Session.GetString("RoleName"); // show the name of the role
+    ViewBag.RoleName = RoleName;
+
+    int ? MyID = Context.Session.GetInt32("MyID"); // show the current user ID after login
+    ViewBag.MyID = MyID;
+
+
+
+}

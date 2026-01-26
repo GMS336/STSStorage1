@@ -1,0 +1,79 @@
+﻿<nav class="sidenav">
+    <div>
+        <h5>Main Menu</h5>
+        <@Html.ActionLink("Home", "STSHome")
+        <ul>
+        <li>@Html.ActionLink("About", "About")</li>
+            <li>@Html.ActionLink("StortTermList", "STList")</li>
+            <li>@Html.ActionLink("LongTermList", "LTList")</li>
+            <li>@Html.ActionLink("Privacy", "Privacy")</li>
+        </ul>
+    </div>
+</nav>
+
+
+    <style>
+        body {
+            margin: 0;
+        }
+
+        ul {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+            width: 5%;
+            background-color: #f1f1f1;
+            position: fixed;
+            height: 50%;
+            overflow: auto;
+        }
+
+        li a {
+            display: block;
+            color: #000000;
+            padding: 8px 16px;
+            text-decoration: none;
+        }
+
+            li a.active {
+                background-color: #04AA6D;
+                color: white;
+            }
+
+            li a:hover:not(.active) {
+                background-color: #555;
+                color: white;
+            }
+    </style>
+
+
+@* <div id="LeftMenu" class="Accordion" style="width:130px;">
+
+  <div class="AccordionPanel">
+    <div class="AccordionPanelTab" align="center">Inventory Menu </div>
+    <div class="AccordionPanelContent">
+        <br/>&nbsp;&nbsp;@Html.ActionLink("home", "About") <br />
+        <br/>&nbsp;&nbsp;<a href="Default.asp" target="_parent">Log Off</a><br/>
+        <br/>&nbsp;&nbsp;<a href="ManageInventory/ShortTerm/ShortTermEditList.asp" target="mainFrame">Short Term Storage</a><br/>
+        <br/>&nbsp;&nbsp;<a href="/ManageInventory/LongTerm/LongTermStorageList.asp" target="mainFrame">Long Term Storage</a><br />
+        <br/>&nbsp;&nbsp;<a href="CarInventoryList.asp" target="mainFrame" >Vehicle Tracking</a><br/>
+        <br/>&nbsp;&nbsp;<a href="ELabAllList.asp" target="mainFrame">Electrical Lab</a><br/>
+    <p></p></div>
+  </div>
+
+
+
+  <div class="AccordionPanel">
+    <div class="AccordionPanelTab" align="center">Admin</div>
+    <div class="AccordionPanelContent">
+        <br/>&nbsp;&nbsp;<a href="/ActiveMenu/AdminMenu.asp" target="leftFrame">Administration</a><br/>
+        <br/>&nbsp;&nbsp;<a href="#" onClick="javascript:window.open('login/changepswd.asp','chgpwd','width=350,height=250,toolbar=no,location=no,scrollbars=no')">Change Password</a><br/>
+        <br/>&nbsp;&nbsp;<a href="Default.asp" target="_parent">Log Off</a><br/>
+    </div>
+  </div>
+</div>
+<script type="text/javascript">
+<!--
+var Accordion1 = new Spry.Widget.Accordion("LeftMenu");
+//-->
+</script> *@

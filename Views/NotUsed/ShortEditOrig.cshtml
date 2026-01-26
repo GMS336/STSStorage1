@@ -1,0 +1,87 @@
+﻿@model STSStorage1.Models.InvShortTermEditModel
+
+@{
+    ViewData["Title"] = "ShortEdit";
+}
+
+<form asp-action="ShortEdit" class="bg-info bg-opacity-25 border rounded shadow-sm p-4 mx-auto" style="max-width:760px; background-color:lightblue;">
+    @Html.AntiForgeryToken()
+    <input type="text" name="InventoryRecid" asp-for="InventoryRecid" />
+
+    <div class="d-flex justify-content-between align-items-start mb-3">
+        <h2 class="text-primary text-center flex-grow-1 mb-0" style="letter-spacing:1px;">Edit Short Term Record</h2>
+
+        <!-- Close button moved to top-right; navigates back to home (same behavior as original) -->
+        <a asp-controller="Home" asp-action="STSHome"
+           class="btn border-0 rounded-circle p-1"
+           style="background-color:#fff; color:#222; width:36px; height:36px; display:inline-flex; align-items:center; justify-content:center;"
+           aria-label="Close">
+            <span aria-hidden="true" style="font-size:1.25rem; line-height:1; font-weight:bold;">&times;</span>
+        </a>
+    </div>
+
+    <!-- Row 1: FirstName | LastName | Plant Location -->
+    <div class="row mb-3">
+        <div class="col-md-4 mb-2">
+            <div class="form-group">
+                <label asp-for="FirstName" class="control-label"></label>
+                <input asp-for="FirstName" class="form-control form-control-sm rounded-2" />
+                <span asp-validation-for="FirstName" class="text-danger"></span>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-2">
+            <div class="form-group">
+                <label asp-for="LastName" class="control-label"></label>
+                <input asp-for="LastName" class="form-control form-control-sm rounded-2" />
+                <span asp-validation-for="LastName" class="text-danger"></span>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-2">
+            <div class="form-group">
+                @* <label asp-for="StorageLocation" class="control-label"></label>
+                <input asp-for="StorageLocation" class="form-control form-control-sm rounded-2" />
+                <span asp-validation-for="StorageLocation" class="text-danger"></span> *@
+            </div>
+        </div>
+    </div>
+
+    <!-- Row 2: Phone number | Home Department -->
+    <div class="row mb-3">
+        <div class="col-md-6 mb-2">
+            <div class="form-group">
+                <label asp-for="PartDescription" class="control-label"></label>
+                <input asp-for="PartDescription" class="form-control form-control-sm" />
+                <span asp-validation-for="PartDescription" class="text-danger"></span>
+            </div>
+        </div>
+
+        <div class="col-md-6 mb-2">
+            <div class="form-group">
+                <label asp-for="PartNumber" class="control-label"></label>
+                <input asp-for="PartNumber" class="form-control form-control-sm" />
+                <span asp-validation-for="PartNumber" class="text-danger"></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Row 3: Email (full width) -->
+    <div class="row mb-3">
+        <div class="col-12 mb-2">
+            <div class="form-group">
+               @*  <label asp-for="CustomerRecID" class="control-label"></label>
+                <input asp-for="CustomerRecID" class="form-control" />
+                <span asp-validation-for="CustomerRecID" class="text-danger"></span> *@
+            </div>
+        </div>
+    </div>
+
+   
+    <div class="row">
+        <div class="col text-center">
+            <input type="submit" value="Save" class="btn btn-primary px-4" />
+        </div>
+    </div>
+</form>
+
