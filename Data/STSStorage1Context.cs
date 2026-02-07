@@ -29,6 +29,9 @@ namespace STSStorage1.Data
         // Edit view returns a specific record (InventoryRecid) using InvShortTermEditModel.
         public DbSet<InvShortTermEditModel> InvShortTermEdit { get; set; } = default!;
 
+        // CheckOut view uses InvCheckOutModel to retrieve checkout/checkin history from stored procedure
+        public DbSet<InvCheckOutModel> InvCheckOut { get; set; } = default!;
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             // Keyless projection for stored-proc mapping (no underlying table/view)
@@ -40,33 +43,11 @@ namespace STSStorage1.Data
                         .HasNoKey()
                         .ToView(null);
 
+            modelBuilder.Entity<InvCheckOutModel>()
+                        .HasNoKey()
+                        .ToView(null);
+
             base.OnModelCreating(modelBuilder);
         }
     }
 }
-
-// Originial code by me.
-
-
-//{
-//    public class STSStorage1Context(DbContextOptions<STSStorage1Context> options)
-//        : DbContext(options)
-
-
-////The name here represents the name of the database table or procedure that needs to be used.
-
-//{
-//    public DbSet<Models.InvCustomerModel> InventoryCustomer { get; set; } = default!;
-//    public DbSet<Models.InvClassificationModel> InventoryClassification { get; set; } = default!;
-//    public DbSet<Models.InvStatusModel> InventoryItemStatus { get; set; } = default!;
-//    public DbSet<Models.InvPhaseModel> InventoryProjectPhase { get; set; } = default!;
-//    public DbSet<Models.InvShelfModel> InventoryShelf { get; set; } = default!;
-//    public DbSet<Models.InvUsersModel> InventoryUsers { get; set; } = default!;
-//    public DbSet<Models.InvRoleModel> InventoryRole { get; set; } = default!;
-//    public DbSet<Models.LoginModel> InventoryLogin { get; set; } = default!;
-//    public DbSet<Models.InvRegisterModel> InventoryRegister { get; set; } = default!;
-
-
-//}
-//}
-

@@ -232,7 +232,41 @@ body {
     border-color: #0dfd11;
 }
 
-/* Consolidated ShortIndex Table & Paging Styles */
+/* Consolidated Table Styles - Reusable */
+/* Apply to any table with class "standard-table" */
+.standard-table {
+    background-color: #fff !important;
+}
+
+    .standard-table.table-striped tbody tr:nth-of-type(odd) {
+        background-color: #fff !important;
+    }
+
+    .standard-table.table-striped tbody tr:nth-of-type(even) {
+        background-color: #C0E4C6 !important;
+    }
+
+    .standard-table thead th {
+        background-color: #6E411A !important;
+        color: #fff;
+        text-align: center;
+    }
+
+    .standard-table td, .standard-table th {
+        text-align: center;
+        vertical-align: middle;
+        padding-top: 2px !important;
+        padding-bottom: 2px !important;
+        padding-left: 8px !important;
+        padding-right: 8px !important;
+        font-size: 0.95em;
+    }
+
+    .standard-table tr {
+        height: 24px !important;
+    }
+
+/* Legacy support - MainList ID still works for backwards compatibility */
 #MainList {
     background-color: #fff !important;
 }
@@ -350,6 +384,7 @@ body {
     font-size: 12pt;
     font-weight: bold;
 }
+
 .Label-Heading-Black {
     font-size: 12pt;
     font-weight: bolder;
@@ -439,6 +474,7 @@ body {
 }
 
 /* Print: shortterm page single-page, include colors/backgrounds */
+/* Print: shortterm page single-page, include colors/backgrounds */
 @media print {
     /* hide everything by default */
     body * {
@@ -461,8 +497,7 @@ body {
         box-shadow: none !important; /* remove shadows that may print oddly */
         background: white;
         -webkit-print-color-adjust: exact; /* request printing of colors in WebKit */
-        print-color-adjust: exact; /* standard-ish property */
-        color-adjust: exact;
+        print-color-adjust: exact; /* standard property for printing colors */
         /* Reduce font-size/line-height to help fit to one page (tweak as needed) */
         font-size: 12px;
         line-height: 1.05;

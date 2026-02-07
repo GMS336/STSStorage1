@@ -33,12 +33,9 @@
             <div class="form-group">
                 <label asp-for="StorageLocationSite" class="control-label"></label>
                 <select asp-for="StorageLocationSite" class="form-select">
-                    <option selected>StorageLocationSite</option>
-                    <option value=""></option>
                     <option value="ShortTerm">Short Term</option>
                     <option value="LongTerm">Long Term</option>
                 </select>
-                <span asp-validation-for="StorageLocationSite" class="text-danger"></span>
             </div>
             <div class="modal-footer">
                 <input type="submit" value="Save" class="btn btn-primary" />

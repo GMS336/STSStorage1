@@ -16,6 +16,19 @@
             <div class="card-header card-header-accent">
                 <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center">
                     <div class="d-flex gap-2 align-items-center">
+                        
+                        <!-- Back to List button -->
+                        <a asp-controller="ShortTerm"
+                           asp-action="ShortIndex"
+                           asp-route-page="@ViewBag.ReturnPage"
+                           asp-route-pageSize="@ViewBag.ReturnPageSize"
+                           asp-route-sortOrder="@ViewBag.ReturnSortOrder"
+                           asp-route-sortDir="@ViewBag.ReturnSortDir"
+                           class="btn btn-secondary btn-sm"
+                           title="Back to List">
+                            ← Back to List
+                        </a>
+
                         <!-- Update button (submits the inner form with id="shortEditForm") -->
                         <button type="submit" class="btn btn-light btn-sm" title="Update" form="shortEditForm">
                             Update
@@ -33,9 +46,11 @@
                         </button>
 
                         <!-- View Logbook button (navigates to logbook for this InventoryRecid) -->
-                        <button type="button" class="btn btn-light btn-sm btn-gap" onclick="viewLogbook()" title="View Logbook">
+                        <a href="@Url.Action("CheckoutLog", "CheckOut", new { inventoryRecid = Model.InventoryRecid })"
+                           class="btn btn-light btn-sm btn-gap"
+                           title="View Logbook">
                             View Logbook
-                        </button>
+                        </a>
 
                     </div>
                 </div>
@@ -44,6 +59,60 @@
 <!-- This begins the body of the card area: -->
             <form id="shortEditForm" asp-action="ShortEdit">
                 @Html.AntiForgeryToken()
+                @* Hidden fields to preserve return parameters on POST *@
+                <input type="hidden" name="returnPage" value="@ViewBag.ReturnPage" />
+                <input type="hidden" name="returnPageSize" value="@ViewBag.ReturnPageSize" />
+                <input type="hidden" name="returnSortOrder" value="@ViewBag.ReturnSortOrder" />
+                <input type="hidden" name="returnSortDir" value="@ViewBag.ReturnSortDir" />
+                
+                @* Display success/error messages using TempData *@
+@*                 @if (TempData["Success"] != null)
+                {
+                    <div class="alert alert-success alert-dismissible fade show m-3" role="alert">
+                        <strong>✓ Success!</strong> @TempData["Success"]
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                } *@
+
+                @* Backup: Display using ViewBag if TempData didn't work *@
+                @* Toast-style success message in top-right corner *@
+                @if (ViewBag.SuccessMessage != null)
+                {
+                <span class="badge bg-success text-white px-3 py-2 animate-fade" id="successBadge">
+                    ✓ @ViewBag.SuccessMessage
+                    <button type="button" class="btn-close btn-close-white btn-close-sm"
+                            onclick="document.getElementById('successBadge').remove();"
+                            aria-label="Close"
+                            style="font-size: 0.7rem;"></button>
+                </span>
+                }
+
+
+                @*use this later if necessary, debug mode only*@
+                @* Display validation errors *@
+               @*  @if (!ViewData.ModelState.IsValid && ViewData.ModelState.ErrorCount > 0)
+                {
+                    <div class="alert alert-danger alert-dismissible fade show m-3" role="alert">
+                        <strong>⚠ Error!</strong>
+                        <ul class="mb-0">
+                            @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                            {
+                                <li>@error.ErrorMessage</li>
+                            }
+                        </ul>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                }
+
+                @if (TempData["Error"] != null)
+                {
+                    <div class="alert alert-danger alert-dismissible fade show m-3" role="alert">
+                        <strong>⚠ Error!</strong> @TempData["Error"]
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                } *@
+
+
 
                 <div class="card-body">
                 <div class="row gy-3">
@@ -154,25 +223,14 @@
                                     <input asp-for="PartNumber" class="form-control" />
                                     <span asp-validation-for="PartNumber" class="text-danger"></span>
                                 </div>
-                                
 
-@*                                 <div class="col-md-4">
-                                    <label for="owner" class="form-label field-label-bold">Current Owner</label>
-                                    <select id="owner" name="OwnerIDNum" class="form-select">
-                                        @* If current owner is not one of the static options, show it first and select it *@
-                                        @* @if (Model.OwnerIDNum != 0 && Model.Owner != null
-                                             && Model.OwnerIDNum != 101 && Model.OwnerIDNum != 102 && Model.OwnerIDNum != 103)
-                                        {
-                                            <option value="@Model.OwnerIDNum" selected>Current: @Model.Owner</option>
-                                        }
-
-                                        <option value="0">Not Defined</option>
-                                        <option value="101">Smith, John</option>
-                                        <option value="102">Doe, Jane</option>
-                                        <option value="103">Lee, Maria</option>
-                                    </select> *@
-
-@*                                 </div> *@
+                                <div class="col-md-4">
+                                    <label asp-for="OwnerIDNum" class="form-label field-label-bold"></label>
+                                    <select asp-for="OwnerIDNum" asp-items="Model.OwnerOptions" class="form-select">
+                                        <option value="">-- Select Owner --</option>
+                                    </select>
+                                    <span asp-validation-for="OwnerIDNum" class="text-danger"></span>
+                                </div>
 
                                 <div class="form-group col-md-12">
                                     <label asp-for="PartDescription" class="form-label field-label-bold"></label>
@@ -186,11 +244,13 @@
                                     <span asp-validation-for="Model_Variant" class="text-danger"></span>
                                 </div>
 
-@*                                 <div class="col-md-4">
-                                    <label asp-for="ClassificationID" class="form-label field-label-bold">Classification / Usage:</label>
-                                    <select asp-for="ClassificationID" asp-items="Model.ClassificationOptions" class="form-select"></select>
+                                <div class="col-md-4">
+                                    <label asp-for="ClassificationID" class="form-label field-label-bold"></label>
+                                    <select asp-for="ClassificationID" asp-items="Model.ClassificationOptions" class="form-select">
+                                        <option value="0">-- Select Classification --</option>
+                                    </select>
                                     <span asp-validation-for="ClassificationID" class="text-danger"></span>
-                                </div> *@
+                                </div>
 
                                 <div class="form-group col-md-4">
                                     <label asp-for="RevLevel" class="form-label field-label-bold"></label>
@@ -209,20 +269,13 @@
                                     <span asp-validation-for="SerialNumber" class="text-danger"></span>
                                 </div>
 
-@*                                 <div class="col-md-6">
-                                    <label for="customer" class="form-label field-label-bold">Customer</label>
-                                    <select id="customer" name="CustomerRecID" class="form-select"> *@
-                                        @* If current customer is not one of the static options, show it first and select it *@
-@*                                         @if (Model.CustomerRecID != 0 && Model.CustomerName != null
-                                            && Model.CustomerRecID != 200 && Model.CustomerRecID != 201)
-                                        {
-                                            <option value="@Model.CustomerRecID" selected>Current: @Model.CustomerName</option>
-                                        }
-                                        <option value="0">Not Defined</option>
-                                        <option value="200">Acme Corp</option>
-                                        <option value="201">Globex</option>
+                                <div class="col-md-6">
+                                    <label asp-for="CustomerRecID" class="form-label field-label-bold"></label>
+                                    <select asp-for="CustomerRecID" asp-items="Model.CustomerOptions" class="form-select">
+                                        <option value="">-- Select Customer --</option>
                                     </select>
-                                </div> *@
+                                    <span asp-validation-for="CustomerRecID" class="text-danger"></span>
+                                </div>
                                 
                                 <div class="form-group col-md-6">
                                     <label asp-for="ProgramName" class="form-label field-label-bold"></label>
@@ -235,22 +288,14 @@
                                     <input asp-for="FirstDateIn" type="date" class="form-control" />
                                     <span asp-validation-for="FirstDateIn" class="text-danger"></span>
                                 </div>
-                                
-@*                                 <div class="col-md-6">
-                                    <label for="programPhase" class="form-label field-label-bold">Program Phase</label>
-                                    <select id="programPhase" name="ProgramPhaseID" class="form-select"> *@
-                                    @* If current Phase is not one of the static options, show it first and select it *@
-@*                                         @if (Model.ProgramPhaseID != 0 && Model.PhaseName != null
-                                        && Model.ProgramPhaseID != 100 && Model.ProgramPhaseID != 200)
-                                    {
-                                        <option value="@Model.ProgramPhaseID" selected>Current: @Model.PhaseName</option>
-                                    }
 
-                                        <option value="30">Not Defined</option>
-                                        <option value="100">Phase 1 - Design</option>
-                                        <option value="200">Phase 2 - Test</option>
+                                <div class="col-md-6">
+                                    <label asp-for="ProgramPhaseID" class="form-label field-label-bold"></label>
+                                    <select asp-for="ProgramPhaseID" asp-items="Model.PhaseOptions" class="form-select">
+                                        <option value="">-- Select Phase --</option>
                                     </select>
-                                </div> *@
+                                    <span asp-validation-for="ProgramPhaseID" class="text-danger"></span>
+                                </div>
 
                                 <div class="form-group col-md-12">
                                     <label asp-for="GeneralComment" class="form-label field-label-bold"></label>
@@ -276,6 +321,18 @@
         // simple, reliable print call — page CSS ensures only the form prints
         window.print();
     }
+    // Auto-dismiss success badge after 3 seconds
+        document.addEventListener('DOMContentLoaded', function() {
+            const successBadge = document.getElementById('successBadge');
+            if (successBadge) {
+                setTimeout(function() {
+                    successBadge.classList.add('hiding');
+                    setTimeout(function() {
+                        successBadge.remove();
+                    }, 300); // Wait for fade-out animation to complete
+                }, 3000);
+            }
+        });
 </script>
 
 

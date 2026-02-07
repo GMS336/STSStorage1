@@ -6,22 +6,19 @@
 }
 
 <div id="fletter" style="text-align:center">
-    <h3>Classification List</h3>
+    <h3>Project Phase List</h3>
 </div>
 
 <button type="button" class="btn btn-sm btn-success" data-bs-toggle="modal" onclick="RenderActions('/InvPhase/PhaseCreate')" data-bs-target="#modalCreate">
-    Add New Classification
+    Add New Project Phase
 </button>
 
-<table class="table table-striped table-bordered table-sm" ">
+<!-- show the Phase list -->
+<table class="table table-striped table-bordered d-md-table" id="MainList" style="background-color:white">
     <thead class="table-dark">
         <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.PhaseName)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.PhaseDescription)
-            </th>
+            <th>@Html.DisplayNameFor(model => model.PhaseName)</th>
+            <th>@Html.DisplayNameFor(model => model.PhaseDescription)</th>
             <th></th>
         </tr>
     </thead>
@@ -33,9 +30,7 @@
                 data-bs-target="#modalCreate">
             @Html.DisplayFor(modelItem => item.PhaseName)
             </td>
-            <td>
-            @Html.DisplayFor(modelItem => item.PhaseDescription)
-            </td>
+            <td>@Html.DisplayFor(modelItem => item.PhaseDescription)</td>
             <td>
 @*              <a style="cursor:pointer" class="bi-pencil" asp-action="ClassEdit" asp-route-id="@item.ClassificationID"></a> |
                 <a class="bi-info" asp-action="Details" asp-route-id="@item.ClassificationID"></a> |

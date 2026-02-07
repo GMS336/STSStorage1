@@ -1,6 +1,4 @@
-﻿using AspNetCoreGeneratedDocument;
-
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 
@@ -82,7 +80,7 @@ namespace STSStorage1.Controllers
                 }).ToList();
                 ViewBag.Roles = new SelectList(roles, "Value", "Text", invUsers.Role_Id);
 
-                return RedirectToAction(nameof(Views_Home_STSHome));
+                return RedirectToAction("STSHome", "Home");
             }
             return View("UserEdit", invUsers);
         }

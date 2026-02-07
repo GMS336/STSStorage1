@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 
@@ -28,8 +29,8 @@ namespace STSStorage1.Controllers
             sortOrder = string.IsNullOrWhiteSpace(sortOrder) ? "InventoryRecid" : sortOrder;
             sortDir = (sortDir ?? "asc").ToLower() == "desc" ? "desc" : "asc";
 
-            // Increase the command timeout to 4 minutes (240 seconds)
-            _context.Database.SetCommandTimeout(240);
+            // Increase the command timeout to 10 seconds
+            _context.Database.SetCommandTimeout(10);
 
             var sw = new System.Diagnostics.Stopwatch();
             sw.Start();
@@ -73,8 +74,13 @@ namespace STSStorage1.Controllers
         // __________________________________________________________________
 
         // GET: invShortTerm/Edit/5
-        public async Task<IActionResult> ShortEdit(int id)
-        {
+        public async Task<IActionResult> ShortEdit(
+            int id,
+            int? returnPage = null,
+            int? returnPageSize = null,
+            string? returnSortOrder = null,
+            string? returnSortDir = null)
+          {
             // This section gets the record from the stored procedure.
             var param = new SqlParameter("@InventoryRecid", id);
 
@@ -85,24 +91,58 @@ namespace STSStorage1.Controllers
 
             var model = rows.FirstOrDefault();
             if (model == null) return NotFound();
+            // Load Classifications for the dropdown
 
+            var classifications = await _context.InventoryClassification
+                .OrderBy(c => c.Classification)
+                .ToListAsync();
+
+            await LoadDropdownOptions(model);
+            // Store return parameters in ViewBag for the view
+            ViewBag.ReturnPage = returnPage ?? 1;
+            ViewBag.ReturnPageSize = returnPageSize ?? 10;
+            ViewBag.ReturnSortOrder = returnSortOrder ?? "InventoryRecid";
+            ViewBag.ReturnSortDir = returnSortDir ?? "asc";
             return View(model);
         }
 
         // POST: ShortTerm/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ShortEdit(InvShortTermEditModel model)
+        public async Task<IActionResult> ShortEdit(
+            InvShortTermEditModel model,
+            int? returnPage = null,
+            int? returnPageSize = null,
+            string? returnSortOrder = null,
+            string? returnSortDir = null)
         {
             // basic sanity checks
             if (model == null || model.InventoryRecid == 0)
             {
                 ModelState.AddModelError(string.Empty, "Missing record identifier.");
+
+                // Reload classifications if returning to view
+                await LoadDropdownOptions(model);
+                // Preserve return parameters
+                ViewBag.ReturnPage = returnPage ?? 1;
+                ViewBag.ReturnPageSize = returnPageSize ?? 10;
+                ViewBag.ReturnSortOrder = returnSortOrder ?? "InventoryRecid";
+                ViewBag.ReturnSortDir = returnSortDir ?? "asc";
+
                 return View(model);
+
             }
 
             if (!ModelState.IsValid)
             {
+                // Reload classifications if returning to view
+                await LoadDropdownOptions(model);
+                // Preserve return parameters
+                ViewBag.ReturnPage = returnPage ?? 1;
+                ViewBag.ReturnPageSize = returnPageSize ?? 10;
+                ViewBag.ReturnSortOrder = returnSortOrder ?? "InventoryRecid";
+                ViewBag.ReturnSortDir = returnSortDir ?? "asc";
+
                 return View(model);
             }
 
@@ -112,7 +152,7 @@ namespace STSStorage1.Controllers
                 const string sp = "EXEC dbo.spUPDATEItem " +
                                   "@InventoryRecid, @PartNumber, @PartDescription, @TargetDuration, " +
                                   "@Model_Variant, @RevLevel, @ProgramName, @UM, @SerialNumber, @UUTNumber, " +
-                                  "@FirstDateIn, @GeneralComment";
+                                  "@FirstDateIn, @GeneralComment, @ClassificationID";
 
                 var parameters = new[]
                 {
@@ -127,7 +167,8 @@ namespace STSStorage1.Controllers
                     new SqlParameter("@SerialNumber", SqlDbType.NVarChar, 100) { Value = (object)model.SerialNumber ?? DBNull.Value },
                     new SqlParameter("@UUTNumber", SqlDbType.NVarChar, 100) { Value = (object)model.UUTNumber ?? DBNull.Value },
                     new SqlParameter("@FirstDateIn", SqlDbType.DateTime2) { Value = (object)model.FirstDateIn ?? DBNull.Value },
-                    new SqlParameter("@GeneralComment", SqlDbType.NVarChar, -1) { Value = (object)model.GeneralComment ?? DBNull.Value }
+                    new SqlParameter("@GeneralComment", SqlDbType.NVarChar, -1) { Value = (object)model.GeneralComment ?? DBNull.Value },
+                    new SqlParameter("@ClassificationID", SqlDbType.Int) { Value = model.ClassificationID }
                 };
 
                 await _context.Database.ExecuteSqlInterpolatedAsync(
@@ -143,34 +184,129 @@ namespace STSStorage1.Controllers
                     @SerialNumber = {model.SerialNumber},
                     @UUTNumber = {model.UUTNumber},
                     @FirstDateIn = {model.FirstDateIn},
-                    @GeneralComment = {model.GeneralComment}");
+                    @GeneralComment = {model.GeneralComment},
+                    @ClassificationID = {model.ClassificationID},
+                    @CustomerRecID = {model.CustomerRecID},
+                    @ProgramPhaseID = {model.ProgramPhaseID},
+                    @OwnerIDNum = {model.OwnerIDNum}");
 
                 // reload the record from the DB via the keyless projection to reflect any DB-side changes
-                var param = new SqlParameter("@InventoryRecid", model.InventoryRecid);
-                var updated = await _context.InvShortTermEdit
+                // FIX: Add ToListAsync() first, then get FirstOrDefault
+                var rows = await _context.InvShortTermEdit
                     .FromSqlInterpolated($"EXEC dbo.spGETShortTermById @InventoryRecid={model.InventoryRecid}")
                     .AsNoTracking()
-                    .FirstOrDefaultAsync();
+                    .ToListAsync();  // ✅ Changed: Get all results first
+
+                var updated = rows.FirstOrDefault();  // ✅ Then get first item in memory  
+
+
+                //var param = new SqlParameter("@InventoryRecid", model.InventoryRecid);
+                //var updated = await _context.InvShortTermEdit
+                //    .FromSqlInterpolated($"EXEC dbo.spGETShortTermById @InventoryRecid={model.InventoryRecid}")
+                //    .AsNoTracking()
+                //    .FirstOrDefaultAsync();
 
                 if (updated == null)
                 {
                     return NotFound();
                 }
+                // Reload classifications for the updated view
+                await LoadDropdownOptions(updated);
+                // Preserve return parameters
+                ViewBag.ReturnPage = returnPage ?? 1;
+                ViewBag.ReturnPageSize = returnPageSize ?? 10;
+                ViewBag.ReturnSortOrder = returnSortOrder ?? "InventoryRecid";
+                ViewBag.ReturnSortDir = returnSortDir ?? "asc";
 
                 // return the DB-populated model to the view
-                TempData["Success"] = "Item updated.";
+                // Set TempData AND ViewBag (as backup)
+                //TempData["Success"] = "Record Updated";
+                ViewBag.SuccessMessage = "Record Updated";
                 return View(updated);
             }
             catch (DbUpdateException)
             {
                 ModelState.AddModelError(string.Empty, "Unable to save changes to the database.");
+                await LoadDropdownOptions(model);
+                // Preserve return parameters
+                ViewBag.ReturnPage = returnPage ?? 1;
+                ViewBag.ReturnPageSize = returnPageSize ?? 10;
+                ViewBag.ReturnSortOrder = returnSortOrder ?? "InventoryRecid";
+                ViewBag.ReturnSortDir = returnSortDir ?? "asc";
+
                 return View(model);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                ModelState.AddModelError(string.Empty, "An unexpected error occurred.");
+                ModelState.AddModelError(string.Empty, $"An unexpected error occurred. {ex.Message}");
+                await LoadDropdownOptions(model);
+                // Preserve return parameters
+                ViewBag.ReturnPage = returnPage ?? 1;
+                ViewBag.ReturnPageSize = returnPageSize ?? 10;
+                ViewBag.ReturnSortOrder = returnSortOrder ?? "InventoryRecid";
+                ViewBag.ReturnSortDir = returnSortDir ?? "asc";
                 return View(model);
             }
+        }
+
+        // Helper method to load all dropdown options
+        private async Task LoadDropdownOptions(InvShortTermEditModel model)
+        {
+            // Load Classifications
+            var classifications = await _context.InventoryClassification
+                .OrderBy(c => c.Classification)
+                .ToListAsync();
+
+            model.ClassificationOptions = new SelectList(
+                classifications,
+                "ClassificationID",      // Value field
+                "Classification",        // Display field
+                model.ClassificationID   // Selected value
+            );
+
+            // Load Customers
+            var customers = await _context.InventoryCustomer
+                .OrderBy(c => c.CustomerName)
+                .ToListAsync();
+
+            model.CustomerOptions = new SelectList(
+                customers,
+                "CustomerRecID",         // Value field
+                "CustomerName",          // Display field
+                model.CustomerRecID      // Selected value
+            );
+
+            // Load Program Phases
+            var phases = await _context.InventoryProjectPhase
+                .OrderBy(p => p.PhaseName)
+                .ToListAsync();
+
+            model.PhaseOptions = new SelectList(
+                phases,
+                "ProgramPhaseID",        // Value field
+                "PhaseName",             // Display field
+                model.ProgramPhaseID     // Selected value
+            );
+
+            // Load Owners (Users) - MyID from Users table maps to OwnerIDNum in InventoryMaster
+            var owners = await _context.InventoryUsers
+                .OrderBy(u => u.LastName)
+                .ThenBy(u => u.FirstName)
+                .ToListAsync();
+
+            // Create a combined display name for owners
+            var ownerList = owners.Select(o => new
+            {
+                MyID = o.MyID,  // Use MyID from Users table (will be saved as OwnerIDNum)
+                FullName = $"{o.LastName}, {o.FirstName}".Trim()
+            }).ToList();
+
+            model.OwnerOptions = new SelectList(
+                ownerList,
+                "MyID",                  // Value field (MyID from Users table)
+                "FullName",              // Display field (LastName, FirstName)
+                model.OwnerIDNum         // Selected value (current OwnerIDNum from InventoryMaster)
+            );
         }
     }
 }

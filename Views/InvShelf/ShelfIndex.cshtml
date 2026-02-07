@@ -10,24 +10,17 @@
 </div>
 
 <button type="button" class="btn btn-sm btn-success" data-bs-toggle="modal" onclick="RenderActions('/InvShelf/ShelfCreate')" data-bs-target="#modalCreate">
-    Add New Shelf
+    Add New Shelf Number
 </button>
 
-<table class="table table-striped table-bordered table-sm" ">
+<!-- show the Short Term Shelf list -->
+<table class="table table-striped table-bordered d-md-table" id="MainList" style="background-color:white">
     <thead class="table-dark">
         <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.ShelfRecid)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ShelfName)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ShelfDescription)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.StorageLocationSite)
-            </th>
+            <th>@Html.DisplayNameFor(model => model.ShelfRecid)</th>
+            <th>@Html.DisplayNameFor(model => model.ShelfName)</th>
+            <th>@Html.DisplayNameFor(model => model.ShelfDescription)</th>
+            <th>@Html.DisplayNameFor(model => model.StorageLocationSite)</th>
             <th></th>
         </tr>
     </thead>
@@ -40,15 +33,9 @@
                     data-bs-target="#modalCreate">
                     @Html.DisplayFor(modelItem => item.ShelfRecid)
                 </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.ShelfName)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.ShelfDescription)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.StorageLocationSite)
-                <td>
+                <td>@Html.DisplayFor(modelItem => item.ShelfName)</td>
+                <td>@Html.DisplayFor(modelItem => item.ShelfDescription)</td>
+                <td>@Html.DisplayFor(modelItem => item.StorageLocationSite)<td>
                     <a style="cursor:pointer;" class="btn-sm btn-link bi-pencil" data-bs-toggle="modal" onclick="RenderActions('/InvShelf/ShelfEdit/' + @item.ShelfRecid)" data-bs-target="#modalCreate"></a> |
                     <a style="cursor:pointer;" class="btn-sm btn-link bi-trash" data-bs-toggle="modal" onclick="RenderActions('/InvShelf/ShelfDelete/' + @item.ShelfRecid)" data-bs-target="#modalCreate"></a>
                 </td>

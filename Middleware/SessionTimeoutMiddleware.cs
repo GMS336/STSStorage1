@@ -2,7 +2,7 @@
 
 using System.Threading.Tasks;
 
-namespace MyMvcProject.Middleware
+namespace STSStorage1.Middleware
 {
     public class SessionTimeoutMiddleware
     {

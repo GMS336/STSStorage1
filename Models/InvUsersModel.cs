@@ -29,7 +29,7 @@ namespace STSStorage1.Models
         [Display(Name = "Function")]
         public string? UserFunction { get; set; }
 
-        [Display(Name = "Home Deptartment")]
+        [Display(Name = "Home Department")]
         public string? UserDept { get; set; }
 
         [Display(Name = "Inventory Role")]

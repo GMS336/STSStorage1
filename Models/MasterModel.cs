@@ -38,10 +38,10 @@ namespace STSStorage1.Models
         [Display(Name = "Unit Measure")]
         public string? UM { get; set; }
 
-        [Display(Name = "Serial NUmber")]
+        [Display(Name = "Serial Number")]
         public string? SerialNumber { get; set; }
 
-        [Display(Name = "UUT NUmber")]
+        [Display(Name = "UUT Number")]
         public string? UUTNumber { get; set; }
 
         public int? OwnerIDNum { get; set; }

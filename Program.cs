@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 
-using MyMvcProject.Middleware;
+using STSStorage1.Middleware;
 
 using STSStorage1.Data;
 
