@@ -4,49 +4,42 @@
     ViewData["Title"] = "ShelfEdit";
 }
 
-<h5>Shelf Data</h5>
-<hr />
-<!-- Edit Customer Modal-->
-<div class="modal-header" style="background-color:cornflowerblue">
-    <h6 class="modal-title" id="exampleModalLabel">Edit Shelf</h6>
-    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-        <span aria-hidden="true">&times;</span>
-    </button>
+<!-- Edit Shelf Modal -->
+<div class="modal-header">
+    <h6 class="modal-title">Edit Shelf</h6>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 </div>
+
 <form asp-action="ShelfEdit">
     <div class="modal-body">
-        <div class="form-horizontal">
-            @Html.AntiForgeryToken()
+        @Html.AntiForgeryToken()
 
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="ShelfRecid" />
-            <div class="form-group">
-                <label asp-for="ShelfName" class="control-label"></label>
-                <input asp-for="ShelfName" class="form-control" />
-                <span asp-validation-for="ShelfName" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="ShelfDescription" class="control-label"></label>
-                <input asp-for="ShelfDescription" class="form-control" />
-                <span asp-validation-for="ShelfDescription" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="StorageLocationSite" class="control-label"></label>
-                <select asp-for="StorageLocationSite" class="form-select">
-                    <option value="ShortTerm">Short Term</option>
-                    <option value="LongTerm">Long Term</option>
-                </select>
-            </div>
-            <div class="modal-footer">
-                <input type="submit" value="Save" class="btn btn-primary" />
-            </div>
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+        <input type="hidden" asp-for="ShelfRecid" />
 
+        <div class="mb-3">
+            <label asp-for="ShelfName" class="form-label"></label>
+            <input asp-for="ShelfName" class="form-control" />
+            <span asp-validation-for="ShelfName" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="ShelfDescription" class="form-label"></label>
+            <input asp-for="ShelfDescription" class="form-control" />
+            <span asp-validation-for="ShelfDescription" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="StorageLocationSite" class="form-label"></label>
+            <select asp-for="StorageLocationSite" class="form-select">
+                <option value="ShortTerm">Short Term</option>
+                <option value="LongTerm">Long Term</option>
+            </select>
         </div>
     </div>
+
+    <div class="modal-footer">
+        <input type="submit" value="Update" class="btn btn-success" />
+        <a asp-action="ShelfIndex" data-bs-dismiss="modal" class="modal-back-link">Back to List</a>
+    </div>
 </form>
-
-<div>
-    <a asp-action="ShelfIndex" data-bs-dismiss="modal" style="text-align:left">Back to List</a>
-
-</div>
-

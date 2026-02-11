@@ -79,35 +79,3 @@ namespace STSStorage1.Models
     }
 }
 
-
-
-//public int? CustomerRecID { get; set; }        
-//public int? ClassificationID { get; set; }
-
-//[Display(Name = "Storage Location")]
-//public string? StorageLocation { get; set; }        
-//public string? NotifySent { get; set; }
-//public DateTime? NotifyDate { get; set; }
-//public int? TargetDuration { get; set; }
-
-//public int? Child_InventoryRecid { get; set; }
-//public int? CheckOutRecid { get; set; }
-
-
-//public int? ItemStatusID { get; set; }
-
-
-
-
-
-
-
-// not used at this time, but may be needed later.
-//public string? Model_Variant { get; set; }
-//public string? RevLevel { get; set; }
-//public int? Balance { get; set; }
-//public string? UM { get; set; }
-//public string? SerialNumber { get; set; }
-//public string? UUTNumber { get; set; }
-//public string? GeneralComment { get; set; }
-//public int? RequestorIDNum { get; set; }

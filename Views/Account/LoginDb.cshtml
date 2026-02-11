@@ -4,133 +4,108 @@
     Layout = "_Layout";
 }
 
-<style>
-    body {
-        /* padding-top: 85px; Adjust if you have a fixed header */
-    }
-    /* Scope modal-content tweaks to this modal only so we don't affect other modals site-wide */
-    #modalRegCreate .modal-content {
-        background: transparent; /* let the partial control its own background so there's no white frame */
-        border: none;
-        box-shadow: none;
-    }
-
-    /* Ensure the dialog never forces extra width and becomes responsive */
-    #modalRegCreate .modal-dialog {
-        max-width: 100%;
-        margin: 0; /* allow inner content centering */
-    }
-</style>
-
 @if (!string.IsNullOrEmpty(ViewBag.Message))
 {
-    <div class="alert alert-warning">
+    <div class="alert alert-warning text-center">
         @ViewBag.Message
     </div>
 }
 
-<body style="background-color:bisque">
-    <header>
-        <div align="Center"><img alt="" src="/images/Magna Int logo.jpg" width="171" height="55"></div>
-        <table width="50%" border="1" align="center">
-            <tr>
-                <td height="74" align="center">
-                    <table width="100%" border="1" align="center" cellpadding="0" cellspacing="0">
-                        <tr>
-                            <td bgcolor="#e0e0e0">
-                                <div align="center">
-                                    <p class="Page-Header">
-                                        Storage and Inventory Control System<br>
-                                        Troy Office and Laboratory
-                                    </p>
-                                </div>
-                            </td>
-                        </tr>
-                    </table>
-        </table>
-    </header>
+<div class="login-page">
+    <div class="container">
+        <div class="row justify-content-center mt-5">
+            <div class="col-md-6 col-lg-5">
 
-    <form asp-action="Login">
-        <table width="50%" border="1" align="center" style="background-color:lightblue">
-            <caption class="Field-Heading">
-                @if (TempData["Message"] != null)
-                {
-                    @TempData["Message"]
-                }
-                Please log in ...
-            </caption>
-            <tr>
-                <td height="55" align="center">
-                    <div class="form-group">
-                        <label asp-for="UserName" class="control-label">User Name</label>
-                        <input class="form-control w-50" style="font-size:12px;" name="UserName" value="Mike.Smith1@magna.com" />
-                        <span asp-validation-for="UserName" class="text-danger"></span>
-                        @if (!string.IsNullOrEmpty(ViewBag.UserErrorMessage))
-                        {
-                            <p style="color: red;">@ViewBag.UserErrorMessage</p>
-                        }
+                <!-- Header Section -->
+                <div class="text-center mb-4">
+                    <img src="~/images/Magna Int logo.jpg" width="171" height="55" alt="Magna Logo" class="mb-3" />
+                    <div class="card">
+                        <div class="card-header bg-primary-custom text-white">
+                            <h5 class="mb-0">Storage and Inventory Control System</h5>
+                            <p class="mb-0 small">Troy Office and Laboratory</p>
+                        </div>
                     </div>
-                </td>
-            </tr>
-            <tr>
-                <td height="55" align="center">
-                    <div class="form-group">
-                        <label asp-for="Password" class="control-label">Password</label>
-                        <input class="form-control w-50" style="font-size:12px;" name="Password" value="MyPassword" />
-                        <span asp-validation-for="Password" class="text-danger"></span>
-                        @if (!string.IsNullOrEmpty(ViewBag.PasswordErrorMessage))
-                        {
-                            <p style="color: red;">@ViewBag.PasswordErrorMessage</p>
-                        }
-                    </div>
-                </td>
-            </tr>
-            <tr>
-                <td height="45">
-                    <div align="center">
-                        <button type="submit" class="btn btn-primary button-style">Login</button>
-                    </div>
-                </td>
-            </tr>
+                </div>
 
-            <tr>
-                <td height="45" align="center">
-                    <p class="Black14">This new Inventory control system will help to manage items in long and short term storage as well as begin the framework of managing other inventory assessts in the Troy Laboratory.<BR>
-                </td>
-            </tr>
-            <tr>
-                <td height="45" align="center">
-                    <ul class="list-unstyled">
-                        <li class="btn-group-sm no-bullets">
-                            <button type="button" class="btn btn-sm btn-light" data-bs-toggle="modal"
-                                    onclick="RenderActions('/InvRegister/RegCreate')" data-bs-target="#modalRegCreate" style="color:red">
-                                Request Access
-                            </button>
-                            <a class="btn btn-light" asp-area="" asp-controller="Home" asp-action="STSHome" style="color:red">Forgot Login</a>
-                        </li>
-                    </ul>
-                </td>
-            </tr>
-        </table>
-    </form>
-</body>
+                <!-- Login Form -->
+                <div class="card login-container">
+                    <div class="card-body">
+                        <h5 class="text-center mb-4">
+                            @if (TempData["Message"] != null)
+                            {
+                                <span>@TempData["Message"]</span>
+                            }
+                            Please log in...
+                        </h5>
 
-<!-- Updated modal container:
-     - Removed modal-xl so the dialog does not force a larger white frame than the content.
-     - Use modal-fullscreen-sm-down so it becomes fullscreen on small screens.
-     - Use modal-dialog-centered and modal-dialog-scrollable so content is centered and scrolls when tall.
-     - Scoped CSS at top makes modal-content transparent so the partial's background matches exactly (no white ring).
--->
-<div id="modalRegCreate" class="modal fade" role="dialog" data-bs-backdrop="false" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-fullscreen-sm-down">
-        <div class="modal-content">
-            <div id="OpenDialog" class="modal-body p-0">
-                <!-- RegCreate partial will be injected here by RenderActions -->
+                        <form asp-action="Login">
+                            <!-- Username Field -->
+                            <div class="mb-3">
+                                <label asp-for="UserName" class="form-label">User Name</label>
+                                <input asp-for="UserName" class="form-control" name="UserName" value="Mike.Smith1@magna.com" />
+                                <span asp-validation-for="UserName" class="text-danger"></span>
+                                @if (!string.IsNullOrEmpty(ViewBag.UserErrorMessage))
+                                {
+                                    <div class="alert alert-danger mt-2 py-2">@ViewBag.UserErrorMessage</div>
+                                }
+                            </div>
+
+                            <!-- Password Field -->
+                            <div class="mb-3">
+                                <label asp-for="Password" class="form-label">Password</label>
+                                <input asp-for="Password" type="password" class="form-control" name="Password" value="MyPassword" />
+                                <span asp-validation-for="Password" class="text-danger"></span>
+                                @if (!string.IsNullOrEmpty(ViewBag.PasswordErrorMessage))
+                                {
+                                    <div class="alert alert-danger mt-2 py-2">@ViewBag.PasswordErrorMessage</div>
+                                }
+                            </div>
+
+                            <!-- Login Button -->
+                            <div class="d-grid mb-3">
+                                <button type="submit" class="btn btn-primary btn-lg">Login</button>
+                            </div>
+
+                            <!-- Information Section -->
+                            <div class="alert alert-info">
+                                <p class="small mb-0">
+                                    This new Inventory control system will help to manage items in long and short term storage
+                                    as well as begin the framework of managing other inventory assets in the Troy Laboratory.
+                                </p>
+                            </div>
+
+                            <!-- Action Links -->
+                            <div class="d-flex justify-content-around mt-3">
+                                <button type="button" class="btn btn-outline-primary btn-sm"
+                                        data-bs-toggle="modal"
+                                        onclick="RenderActions('/InvRegister/RegCreate')"
+                                        data-bs-target="#modalRegCreate">
+                                    Request Access
+                                </button>
+                                <a class="btn btn-outline-secondary btn-sm" asp-controller="Home" asp-action="STSHome">
+                                    Forgot Login
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
+<!-- Modal for Registration -->
+<div id="modalRegCreate" class="modal fade" role="dialog" data-backdrop="false">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div id="OpenDialog" class="modal-body"></div>
+        </div>
+    </div>
+</div>
 
-
-
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script src="~/js/main.js"></script>
+}

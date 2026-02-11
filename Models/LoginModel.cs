@@ -27,10 +27,5 @@ namespace STSStorage1.Models
         [Required(ErrorMessage = "Please enter Password!")]
         public string? Password { get; set; }
 
-
-        public static implicit operator string(LoginModel v)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

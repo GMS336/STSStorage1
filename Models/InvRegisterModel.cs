@@ -48,10 +48,5 @@ namespace STSStorage1.Models
         [Display(Name = "Password")]
         public string? Password { get; set; }
 
-        //--------------------------------------------------------------
-        public static implicit operator string(InvRegisterModel v)
-        {
-            throw new NotImplementedException();
-        }
     }
 }
