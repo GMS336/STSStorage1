@@ -30,20 +30,20 @@ namespace STSStorage1.Middleware
             // Redirect to login page if the session is invalid
             if (context.Session.GetString("UserName") == null)
             {
-                // Check if the user has already seen the welcome page (using session or cookie)
-                if (context.Session.GetString("WelcomeShown") == null)
-                {
-                    // First time ever: show welcome page and set flag
-                    context.Session.SetString("WelcomeShown", "true");
-                    context.Response.Redirect("/Home/STSHome");
-                    return;
-                }
-                else
-                {
+                //// Check if the user has already seen the welcome page (using session or cookie)
+                //if (context.Session.GetString("WelcomeShown") == null)
+                //{
+                //    // First time ever: show welcome page and set flag
+                //    context.Session.SetString("WelcomeShown", "true");
+                //    context.Response.Redirect("/Home/STSHome");
+                //    return;
+                //}
+                //else
+                //{
                     // Not the first time: show login page (maybe session expired)
                     context.Response.Redirect("/Account/LoginDb?timeout=true");
                     return;
-                }
+                //}
             }
 
             // Allow request to proceed if session is valid
