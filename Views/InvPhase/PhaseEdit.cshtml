@@ -4,40 +4,35 @@
     ViewData["Title"] = "PhaseEdit";
 }
 
-<h5>Phase Data</h5>
-<hr />
-
 <!-- Edit Phase Modal -->
 <div class="modal-header">
-    <h6 class="modal-title" id="exampleModalLabel">Edit Phase</h6>
+    <h6 class="modal-title">Edit Phase</h6>
     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 </div>
 
 <form asp-action="PhaseEdit">
     <div class="modal-body">
-        <div class="form-horizontal">
-            @Html.AntiForgeryToken()
+        @Html.AntiForgeryToken()
 
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="ProgramPhaseID" />
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+        <input type="hidden" asp-for="ProgramPhaseID" />
 
-            <div class="mb-3">
-                <label asp-for="PhaseName" class="form-label"></label>
-                <input asp-for="PhaseName" class="form-control" />
-                <span asp-validation-for="PhaseName" class="text-danger"></span>
-            </div>
+        <div class="mb-3">
+            <label asp-for="PhaseName" class="form-label"></label>
+            <input asp-for="PhaseName" class="form-control" />
+            <span asp-validation-for="PhaseName" class="text-danger"></span>
+        </div>
 
-            <div class="mb-3">
-                <label asp-for="PhaseDescription" class="form-label"></label>
-                <input asp-for="PhaseDescription" class="form-control" />
-                <span asp-validation-for="PhaseDescription" class="text-danger"></span>
-            </div>
+        <div class="mb-3">
+            <label asp-for="PhaseDescription" class="form-label"></label>
+            <input asp-for="PhaseDescription" class="form-control" />
+            <span asp-validation-for="PhaseDescription" class="text-danger"></span>
         </div>
     </div>
 
     <div class="modal-footer">
-        <input type="submit" value="Save" class="btn btn-primary" />
-        <a asp-action="PhaseIndex" class="btn btn-secondary" data-bs-dismiss="modal">Back to List</a>
+        <input type="submit" value="Update" class="btn btn-success" />
+        <a asp-action="PhaseIndex" data-bs-dismiss="modal" class="modal-back-link">Back to List</a>
     </div>
 </form>
 

@@ -4,42 +4,34 @@
     ViewData["Title"] = "ClassEdit";
 }
 
-<h5>Classification Data</h5>
-<hr />
-<!-- Edit Customer Modal-->
-<div class="modal-header" style="background-color:cornflowerblue">
-    <h6 class="modal-title" id="exampleModalLabel">Edit Classification</h6>
-    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-        <span aria-hidden="true">&times;</span>
-    </button>
+<!-- Edit Classification Modal -->
+<div class="modal-header">
+    <h6 class="modal-title">Edit Classification</h6>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 </div>
+
 <form asp-action="ClassEdit">
     <div class="modal-body">
-        <div class="form-horizontal">
-            @Html.AntiForgeryToken()
+        @Html.AntiForgeryToken()
 
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="ClassificationID" />
-            <div class="form-group">
-                <label asp-for="Classification" class="control-label"></label>
-                <input asp-for="Classification" class="form-control" />
-                <span asp-validation-for="Classification" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="ClassificationDescription" class="control-label"></label>
-                <input asp-for="ClassificationDescription" class="form-control" />
-                <span asp-validation-for="ClassificationDescription" class="text-danger"></span>
-            </div>
-            <div class="modal-footer">
-                <input type="submit" value="Save" class="btn btn-primary" />
-            </div>
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+        <input type="hidden" asp-for="ClassificationID" />
 
+        <div class="mb-3">
+            <label asp-for="Classification" class="form-label"></label>
+            <input asp-for="Classification" class="form-control" />
+            <span asp-validation-for="Classification" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="ClassificationDescription" class="form-label"></label>
+            <input asp-for="ClassificationDescription" class="form-control" />
+            <span asp-validation-for="ClassificationDescription" class="text-danger"></span>
         </div>
     </div>
+
+    <div class="modal-footer">
+        <input type="submit" value="Update" class="btn btn-success" />
+        <a asp-action="ClassIndex" data-bs-dismiss="modal" class="modal-back-link">Back to List</a>
+    </div>
 </form>
-
-<div>
-    <a asp-action="ClassIndex" data-bs-dismiss="modal" style="text-align:left">Back to List</a>
-
-</div>
-

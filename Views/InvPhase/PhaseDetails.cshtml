@@ -4,33 +4,22 @@
     ViewData["Title"] = "Details";
 }
 
-<!-- Customer Detail Modal-->
-<div class="modal-header" style="background-color:cornflowerblue">
-    <h5 class="modal-title" id="exampleModalLabel">Phase Details</h5>
-    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-        <span aria-hidden="true">&times;</span>
-    </button>
+<!-- Phase Details Modal -->
+<div class="modal-header">
+    <h5 class="modal-title">Phase Details</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 </div>
 
 <div class="modal-body">
     <dl class="row">
-        <dt class="col-sm">
-            @Html.DisplayNameFor(model => model.PhaseName)
-        </dt>
-        <dd class="col-sm-30">
-            @Html.DisplayFor(model => model.PhaseName)
-        </dd>
-    </dl>
-    <dl>
-        <dt class="col-sm">
-            @Html.DisplayNameFor(model => model.PhaseDescription)
-        </dt>
-        <dd class="col-sm-30">
-            @Html.DisplayFor(model => model.PhaseDescription)
-        </dd>
+        <dt class="col-sm-4">@Html.DisplayNameFor(model => model.PhaseName)</dt>
+        <dd class="col-sm-8">@Html.DisplayFor(model => model.PhaseName)</dd>
+
+        <dt class="col-sm-4">@Html.DisplayNameFor(model => model.PhaseDescription)</dt>
+        <dd class="col-sm-8">@Html.DisplayFor(model => model.PhaseDescription)</dd>
     </dl>
 </div>
+
 <div class="modal-footer">
-    @*     <a asp-action="Edit" asp-route-id="@Model?.CustomerRecID">Edit</a> | *@
-    <a asp-action="PhaseIndex" data-bs-dismiss="modal">Back to List</a>
+    <a asp-action="PhaseIndex" data-bs-dismiss="modal" class="modal-back-link">Back to List</a>
 </div>
