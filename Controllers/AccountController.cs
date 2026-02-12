@@ -17,21 +17,20 @@ namespace STSStorage1.Controllers
 
         public IActionResult LoginDb(bool timeout = false)
         {
-            // Check if there was actually a session before (meaning this is a real timeout)
-            var hadSession = Request.Cookies.ContainsKey(".AspNetCore.Session") ||
-                             HttpContext.Session.Keys.Any();
+            // Check if this is a redirect from another page (not first app load)
+            var referer = Request.Headers["Referer"].ToString();
+            var isRedirectFromApp = !string.IsNullOrEmpty(referer) &&
+                                    !referer.Contains("/Account/LoginDb", StringComparison.OrdinalIgnoreCase) &&
+                                    !referer.Contains("/Account/Login", StringComparison.OrdinalIgnoreCase);
 
-            // Only show timeout message if there was actually a session that expired
-            if (timeout && hadSession)
+            // Only show timeout message if redirected from another page AND timeout flag is true
+            if (timeout && isRedirectFromApp)
             {
-                HttpContext.Session.Clear();
                 ViewBag.Message = "Your session has ended or timed out. Please log in again.";
             }
-            else
-            {
-                // First time visit or explicit login button click - no message
-                HttpContext.Session.Clear();
-            }
+
+            // Always clear session when arriving at login page
+            HttpContext.Session.Clear();
 
             return View();
         }
@@ -63,6 +62,9 @@ namespace STSStorage1.Controllers
                 return View("LoginDb");
             }
 
+            // Clear any old session data before setting new session
+            HttpContext.Session.Clear();
+
             // Fetch the RoleName using the RoleId
             var role = _context.InventoryRole.SingleOrDefault(r => r.RoleId == user.Role_Id);
 
@@ -91,7 +93,7 @@ namespace STSStorage1.Controllers
 
         public IActionResult RemoveSession()
         {
-            // Clear session
+            // Clear session and return to login view
             HttpContext.Session.Clear();
             return View("LoginDb");
         }
@@ -101,7 +103,7 @@ namespace STSStorage1.Controllers
             // Clear the session (log the user out)
             HttpContext.Session.Clear();
 
-            // Redirect to the login page
+            // Redirect to the login page (no timeout message)
             return RedirectToAction("LoginDb");
         }
     }
