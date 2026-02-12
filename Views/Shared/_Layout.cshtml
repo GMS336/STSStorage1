@@ -11,7 +11,9 @@
 </head>
 <body>
     @{
-        var isLogin = ViewBag.LogInName == "Log In!";
+        var isLoginPage = Context.Request.Path.StartsWithSegments("/Account/LoginDb") ||
+        Context.Request.Path.StartsWithSegments("/Account/Login") ||
+        ViewBag.LogInName == "Log In!";
     }
     <div>
         <!-- Fixed Header Section -->
@@ -28,7 +30,7 @@
                     </h4>
                 </div>
                 <div class="text-end">
-                    @if (!isLogin)
+                    @if (!isLoginPage)
                     {
                         <span style="font-size:medium; font-weight:bold; color:midnightblue">
                             Welcome: @ViewBag.FullName<br />@ViewBag.RoleName 
@@ -38,7 +40,7 @@
             </div>
             <!-- Controls Bar -->
             <div class="header-bar">
-                @if (isLogin)
+                @if (isLoginPage)
                 {
                     <a class=" sidebar-btn btn btn-sm header-btn" asp-area="" asp-controller="Account" asp-action="LoginDb">@ViewBag.LogInName</a>
                 }
@@ -60,7 +62,7 @@
                     <li class="nav-item">
                         <a class="sidebar-btn btn"  asp-area="" asp-controller="Home" asp-action="STSHome">Welcome / Home</a>
                     </li>
-                    @if (!isLogin)
+                    @if (!isLoginPage)
                     {
                         <li class="nav-item">
                             <a class="sidebar-btn btn"  asp-area="" asp-controller="InvAddNew" asp-action="Create">Add New Item</a>
