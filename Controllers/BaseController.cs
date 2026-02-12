@@ -13,7 +13,7 @@ namespace STSStorage1.Controllers
             if (!string.IsNullOrEmpty(loginTimeStr) && DateTime.TryParse(loginTimeStr, null, System.Globalization.DateTimeStyles.RoundtripKind, out var loginTime))
             {
                 // Set timeout to match your session timeout (e.g., 20 mins)
-                var sessionTimeout = TimeSpan.FromMinutes(20);
+                var sessionTimeout = TimeSpan.FromMinutes(1);
                 var sessionExpiry = loginTime.Add(sessionTimeout);
                 ViewBag.SessionExpiry = sessionExpiry.ToUniversalTime().ToString("o");
             }
