@@ -15,6 +15,8 @@ namespace STSStorage1.Controllers
             _logger = logger;
         }
 
+
+
         [AllowAnonymous] // <-- This allows anyone to view this action,
                          // even if the rest of the app requires auth
         public IActionResult STSHome()

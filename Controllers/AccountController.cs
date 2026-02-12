@@ -17,11 +17,22 @@ namespace STSStorage1.Controllers
 
         public IActionResult LoginDb(bool timeout = false)
         {
-            // Check if the timeout query parameter is true
-            if (timeout)
+            // Check if there was actually a session before (meaning this is a real timeout)
+            var hadSession = Request.Cookies.ContainsKey(".AspNetCore.Session") ||
+                             HttpContext.Session.Keys.Any();
+
+            // Only show timeout message if there was actually a session that expired
+            if (timeout && hadSession)
             {
+                HttpContext.Session.Clear();
                 ViewBag.Message = "Your session has ended or timed out. Please log in again.";
             }
+            else
+            {
+                // First time visit or explicit login button click - no message
+                HttpContext.Session.Clear();
+            }
+
             return View();
         }
 
