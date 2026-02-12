@@ -36,6 +36,7 @@ namespace STSStorage1.Controllers
                     ViewBag.FullName = fullName;
                     ViewBag.RoleName = roleName;
                     ViewBag.LogInName = null; // Not showing login button
+                    ViewBag.MyID = HttpContext.Session.GetInt32("MyID");
                 }
                 else
                 {
@@ -58,6 +59,7 @@ namespace STSStorage1.Controllers
                 ViewBag.SessionExpiry = sessionExpiry.ToUniversalTime().ToString("o");
                 ViewBag.FullName = fullName;
                 ViewBag.RoleName = roleName;
+                ViewBag.MyID = HttpContext.Session.GetInt32("MyID");
             }
             else
             {
