@@ -17,14 +17,8 @@ namespace STSStorage1.Controllers
 
         public IActionResult LoginDb(bool timeout = false)
         {
-            // Check if this is a redirect from another page (not first app load)
-            var referer = Request.Headers["Referer"].ToString();
-            var isRedirectFromApp = !string.IsNullOrEmpty(referer) &&
-                                    !referer.Contains("/Account/LoginDb", StringComparison.OrdinalIgnoreCase) &&
-                                    !referer.Contains("/Account/Login", StringComparison.OrdinalIgnoreCase);
-
-            // Only show timeout message if redirected from another page AND timeout flag is true
-            if (timeout && isRedirectFromApp)
+            // Show timeout message if timeout parameter is true
+            if (timeout)
             {
                 ViewBag.Message = "Your session has ended or timed out. Please log in again.";
             }
@@ -103,7 +97,7 @@ namespace STSStorage1.Controllers
             // Clear the session (log the user out)
             HttpContext.Session.Clear();
 
-            // Redirect to the login page
+            // Redirect to the login page (no timeout message)
             return RedirectToAction("LoginDb");
         }
     }
