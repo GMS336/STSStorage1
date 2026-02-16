@@ -15,7 +15,8 @@ namespace STSStorage1.Controllers
         {
             _context = context;
         }
-        [AllowAnonymous]  // Add this attribute
+
+        [AllowAnonymous]
         public IActionResult LoginDb(bool timeout = false)
         {
             // Show timeout message if timeout parameter is true
@@ -113,21 +114,22 @@ namespace STSStorage1.Controllers
                 message = "Session timer reset"
             });
         }
-        [AllowAnonymous]  // Add this attribute
+
+        [AllowAnonymous]
         public IActionResult RemoveSession()
         {
             // Clear session and return to login view
             HttpContext.Session.Clear();
             return View("LoginDb");
         }
-        
-        [AllowAnonymous]  // Add this attribute
+
+        [AllowAnonymous]
         public IActionResult Logout()
         {
             // Clear the session (log the user out)
             HttpContext.Session.Clear();
 
-            // Redirect to the login page (no timeout message)
+            // Return login view directly (no redirect) to ensure session is cleared
             return View("LoginDb");
         }
     }
