@@ -87,7 +87,7 @@ namespace STSStorage1.Controllers
 
         public IActionResult RemoveSession()
         {
-            // Clear session
+            // Clear session and return to login view
             HttpContext.Session.Clear();
             return View("LoginDb");
         }
@@ -102,4 +102,3 @@ namespace STSStorage1.Controllers
         }
     }
 }
-

@@ -35,8 +35,8 @@ namespace STSStorage1.Controllers
                     ViewBag.SessionExpiry = sessionExpiry.ToUniversalTime().ToString("o");
                     ViewBag.FullName = fullName;
                     ViewBag.RoleName = roleName;
-                    ViewBag.LogInName = null; // Not showing login button
                     ViewBag.MyID = HttpContext.Session.GetInt32("MyID");
+                    ViewBag.LogInName = userName; // Set to username when logged in
                 }
                 else
                 {
@@ -44,7 +44,8 @@ namespace STSStorage1.Controllers
                     ViewBag.SessionExpiry = null;
                     ViewBag.FullName = null;
                     ViewBag.RoleName = null;
-                    ViewBag.LogInName = "Log In!";
+                    ViewBag.MyID = null;
+                    ViewBag.LogInName = "Log In!"; // Set to "Log In!" when not logged in
                 }
 
                 return;
@@ -60,10 +61,15 @@ namespace STSStorage1.Controllers
                 ViewBag.FullName = fullName;
                 ViewBag.RoleName = roleName;
                 ViewBag.MyID = HttpContext.Session.GetInt32("MyID");
+                ViewBag.LogInName = userName; // Set to username when logged in
             }
             else
             {
                 ViewBag.SessionExpiry = null;
+                ViewBag.FullName = null;
+                ViewBag.RoleName = null;
+                ViewBag.MyID = null;
+                ViewBag.LogInName = "Log In!"; // Set to "Log In!" when not logged in
             }
         }
     }

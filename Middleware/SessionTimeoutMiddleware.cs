@@ -21,7 +21,7 @@ namespace STSStorage1.Middleware
                 context.Request.Path.StartsWithSegments("/InvRegister/RegCreate", StringComparison.OrdinalIgnoreCase) ||
                 context.Request.Path.StartsWithSegments("/InvRegister/ForgotPassword", StringComparison.OrdinalIgnoreCase) ||
                 context.Request.Path.StartsWithSegments("/Account/Logout", StringComparison.OrdinalIgnoreCase) ||
-                context.Request.Path.StartsWithSegments("/Home/STSHome", StringComparison.OrdinalIgnoreCase)) // Exception for STSHome
+                context.Request.Path.StartsWithSegments("/Home/STSHome", StringComparison.OrdinalIgnoreCase))
             {
                 await _next(context);
                 return;
@@ -30,7 +30,20 @@ namespace STSStorage1.Middleware
             // Redirect to login page if the session is invalid
             if (context.Session.GetString("UserName") == null)
             {
-                context.Response.Redirect("/Account/LoginDb?timeout=true");
+                // Only redirect with timeout=true if NOT coming from root path
+                // This prevents the middleware from adding timeout on initial app load
+                var isRootPath = context.Request.Path == "/" || string.IsNullOrEmpty(context.Request.Path.Value);
+
+                if (isRootPath)
+                {
+                    // First load - redirect without timeout parameter
+                    context.Response.Redirect("/Account/LoginDb");
+                }
+                else
+                {
+                    // Session expired while on another page - redirect with timeout
+                    context.Response.Redirect("/Account/LoginDb?timeout=true");
+                }
                 return;
             }
 
