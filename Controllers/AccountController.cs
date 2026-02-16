@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 using STSStorage1.Data;
@@ -14,7 +15,7 @@ namespace STSStorage1.Controllers
         {
             _context = context;
         }
-
+        [AllowAnonymous]  // Add this attribute
         public IActionResult LoginDb(bool timeout = false)
         {
             // Show timeout message if timeout parameter is true
@@ -85,20 +86,49 @@ namespace STSStorage1.Controllers
             return RedirectToAction("STSHome", "Home");
         }
 
+        [HttpPost]
+        public IActionResult ResetSessionTimer()
+        {
+            // Check if user is logged in
+            var userName = HttpContext.Session.GetString("UserName");
+
+            if (string.IsNullOrEmpty(userName))
+            {
+                // No session, return failure
+                return Json(new { success = false, message = "No active session" });
+            }
+
+            // Update LoginTime to current time (resets the session timer)
+            var newLoginTime = DateTime.UtcNow;
+            HttpContext.Session.SetString("LoginTime", newLoginTime.ToString("o"));
+
+            // Calculate new expiry time (1 minute from now)
+            var sessionTimeout = TimeSpan.FromMinutes(1);
+            var newExpiry = newLoginTime.Add(sessionTimeout);
+
+            return Json(new
+            {
+                success = true,
+                newExpiry = newExpiry.ToString("o"),
+                message = "Session timer reset"
+            });
+        }
+        [AllowAnonymous]  // Add this attribute
         public IActionResult RemoveSession()
         {
             // Clear session and return to login view
             HttpContext.Session.Clear();
             return View("LoginDb");
         }
-
+        
+        [AllowAnonymous]  // Add this attribute
         public IActionResult Logout()
         {
             // Clear the session (log the user out)
             HttpContext.Session.Clear();
 
             // Redirect to the login page (no timeout message)
-            return RedirectToAction("LoginDb");
+            return View("LoginDb");
         }
     }
 }
