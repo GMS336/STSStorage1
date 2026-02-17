@@ -10,15 +10,30 @@ namespace STSStorage1.Controllers
         {
             base.OnActionExecuting(context);
 
+            // Get action name FIRST
+            var actionName = context.ActionDescriptor.RouteValues["action"];
+
+            // Check if this is a logout/session clearing action
+            var isLogoutAction = actionName == "Logout" || actionName == "RemoveSession" || actionName == "LoginDb";
+
+            // IMMEDIATELY clear session for logout actions BEFORE any other logic
+            if (isLogoutAction)
+            {
+                HttpContext.Session.Clear();
+            }
+
             // Check if the action has [AllowAnonymous] attribute
             var allowAnonymous = context.ActionDescriptor.EndpointMetadata
                 .Any(m => m is AllowAnonymousAttribute);
 
-            // Get session data
+            // Get session data (will be empty for logout actions now)
             var loginTimeStr = HttpContext.Session.GetString("LoginTime");
             var userName = HttpContext.Session.GetString("UserName");
             var fullName = HttpContext.Session.GetString("FullName");
             var roleName = HttpContext.Session.GetString("RoleName");
+
+            // Debug logging
+            System.Diagnostics.Debug.WriteLine($"BaseController.OnActionExecuting - Action: {actionName}, AllowAnonymous: {allowAnonymous}, UserName: {userName}");
 
             // Check if user is actually logged in
             bool isLoggedIn = !string.IsNullOrEmpty(userName);

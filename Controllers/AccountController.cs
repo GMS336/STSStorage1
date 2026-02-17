@@ -126,8 +126,16 @@ namespace STSStorage1.Controllers
         [AllowAnonymous]
         public IActionResult Logout()
         {
+            // Debug: Log session state BEFORE clearing
+            var userNameBefore = HttpContext.Session.GetString("UserName");
+            System.Diagnostics.Debug.WriteLine($"Logout called - UserName BEFORE clear: {userNameBefore}");
+
             // Clear the session (log the user out)
             HttpContext.Session.Clear();
+
+            // Debug: Log session state AFTER clearing
+            var userNameAfter = HttpContext.Session.GetString("UserName");
+            System.Diagnostics.Debug.WriteLine($"Logout called - UserName AFTER clear: {userNameAfter}");
 
             // Return login view directly (no redirect) to ensure session is cleared
             return View("LoginDb");
