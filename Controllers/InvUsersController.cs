@@ -1,7 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.CodeAnalysis.Text;
 using Microsoft.EntityFrameworkCore;
 
 using STSStorage1.Data;
@@ -16,10 +14,10 @@ namespace STSStorage1.Controllers
         //_______________________________________________________________________
         // GET: InvUsers/ProfileEdit/5
         /// <summary>
-        ///   intellisence comment
+        /// Loads the profile edit page for the specified user
         /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
+        /// <param name="id">User ID</param>
+        /// <returns>ProfileEdit view with user data</returns>
         public async Task<IActionResult> ProfileEdit(int? id)
         {
             if (id == null)
@@ -33,13 +31,26 @@ namespace STSStorage1.Controllers
                 return NotFound();
             }
 
-            return View("ProfileEdit", invUsers);
+            // FIX: Fetch and populate the role name for display in the view
+            var role = await _context.InventoryRole
+                .FirstOrDefaultAsync(r => r.RoleId == invUsers.Role_Id);
 
+            if (role != null)
+            {
+                ViewBag.RoleName = role.RoleName;
+            }
+            else
+            {
+                ViewBag.RoleName = "Not Assigned";
+            }
+
+            return View("ProfileEdit", invUsers);
         }
 
-        // POST: EmployeesController/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        // POST: InvUsers/ProfileEdit/5
+        /// <summary>
+        /// Saves profile edits for the specified user
+        /// </summary>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ProfileEdit(int id, [Bind("MyID,FirstName,LastName,EmailAddress,PhoneNum,UserPlant,UserFunction,UserDept,UserName,Password,Role_Id")]
@@ -56,6 +67,9 @@ namespace STSStorage1.Controllers
                 {
                     _context.Update(invUsers);
                     await _context.SaveChangesAsync();
+
+                    // Success - redirect to home
+                    return RedirectToAction(nameof(HomeController.STSHome), "Home");
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -68,64 +82,63 @@ namespace STSStorage1.Controllers
                         throw;
                     }
                 }
-
-                return RedirectToAction(nameof(HomeController.STSHome), "Home");
             }
+
+            // FIX: If validation fails, re-fetch the role name before returning to view
+            var role = await _context.InventoryRole
+                .FirstOrDefaultAsync(r => r.RoleId == invUsers.Role_Id);
+
+            if (role != null)
+            {
+                ViewBag.RoleName = role.RoleName;
+            }
+            else
+            {
+                ViewBag.RoleName = "Not Assigned";
+            }
+
             return View("ProfileEdit", invUsers);
         }
 
-
-
-
-
-
-
-
-
-
-
-
         // __________________________________________________________________
-        // GET: UsersController
+        // GET: InvUsers/UserIndex
+        /// <summary>
+        /// Displays list of all users with their roles
+        /// </summary>
         public async Task<IActionResult> UserIndex(string? sortOrder)
-        //{
-        //    return View(await _context.InventoryUsers.ToListAsync());
-        //}
         {
-            // Join Employee table with Role table
+            // Join User table with Role table
             var userRoles = await (from user in _context.InventoryUsers
-                                       join role in _context.InventoryRole
-                                       on user.Role_Id equals role.RoleId // Replace with actual FK and PK
-                                       select new UserRoleViewModel
-                                       {
-                                           MyID = user.MyID, // Replace with Employee PK
-                                           FirstName = user.FirstName, // Replace with Employee Name property
-                                           LastName = user.LastName,
-                                           EmailAddress = user.EmailAddress,
-                                           UserFunction = user.UserFunction,
-                                           UserDept = user.UserDept,
-                                           RoleName = role.RoleName // Replace with Role Name property
-                                       }).ToListAsync();
-
+                                   join role in _context.InventoryRole
+                                   on user.Role_Id equals role.RoleId
+                                   select new UserRoleViewModel
+                                   {
+                                       MyID = user.MyID,
+                                       FirstName = user.FirstName,
+                                       LastName = user.LastName,
+                                       EmailAddress = user.EmailAddress,
+                                       UserFunction = user.UserFunction,
+                                       UserDept = user.UserDept,
+                                       RoleName = role.RoleName
+                                   }).ToListAsync();
 
             // Apply sorting based on the sortOrder parameter
-            // Suggested type of user input
             switch (sortOrder)
             {
                 case "FirstName":
-                    userRoles = (List<UserRoleViewModel>)userRoles.OrderBy(u => u.FirstName).ToList();
+                    userRoles = userRoles.OrderBy(u => u.FirstName).ToList();
                     break;
                 case "UserFunction":
-                    userRoles = (List<UserRoleViewModel>)userRoles.OrderByDescending(u => u.UserFunction).ToList();
+                    userRoles = userRoles.OrderByDescending(u => u.UserFunction).ToList();
                     break;
                 case "UserDept":
-                    userRoles = (List<UserRoleViewModel>)userRoles.OrderBy(u => u.UserDept).ToList();
+                    userRoles = userRoles.OrderBy(u => u.UserDept).ToList();
                     break;
                 case "RoleName":
-                    userRoles = (List<UserRoleViewModel>)userRoles.OrderBy(u => u.RoleName).ToList();
+                    userRoles = userRoles.OrderBy(u => u.RoleName).ToList();
                     break;
                 default:
-                    userRoles = (List<UserRoleViewModel>)userRoles.OrderBy(u => u.LastName).ToList();
+                    userRoles = userRoles.OrderBy(u => u.LastName).ToList();
                     break;
             }
 
@@ -133,7 +146,10 @@ namespace STSStorage1.Controllers
         }
 
         // __________________________________________________________________
-        // GET: InvUsers/Details/5
+        // GET: InvUsers/UserDetails/5
+        /// <summary>
+        /// Shows detailed information for a specific user
+        /// </summary>
         public async Task<IActionResult> UserDetails(int? id)
         {
             if (id == null)
@@ -141,24 +157,22 @@ namespace STSStorage1.Controllers
                 return NotFound();
             }
 
-            // Join Employee with Role to fetch RoleName
+            // Join User with Role to fetch RoleName
             var employeeDetail = await (from user in _context.InventoryUsers
                                         join role in _context.InventoryRole
-                                        on user.Role_Id equals role.RoleId // Replace with actual FK and PK
+                                        on user.Role_Id equals role.RoleId
+                                        where user.MyID == id
                                         select new UserRoleViewModel
                                         {
-                                            MyID = user.MyID, // Replace with Employee PK
-                                            FirstName = user.FirstName, // Replace with Employee Name property
+                                            MyID = user.MyID,
+                                            FirstName = user.FirstName,
                                             LastName = user.LastName,
                                             EmailAddress = user.EmailAddress,
                                             UserFunction = user.UserFunction,
                                             UserDept = user.UserDept,
-                                            RoleName = role.RoleName // Replace with Role Name property
+                                            RoleName = role.RoleName
                                         }).FirstOrDefaultAsync();
 
-
-            //var invUsers = await _context.InventoryUsers
-            //    .FirstOrDefaultAsync(m => m.MyID == id);
             if (employeeDetail == null)
             {
                 return NotFound();
@@ -168,29 +182,29 @@ namespace STSStorage1.Controllers
         }
 
         // __________________________________________________________________
-        // GET: InvUsers/Create
+        // GET: InvUsers/UserCreate
+        /// <summary>
+        /// Shows the create new user form
+        /// </summary>
         public IActionResult UserCreate()
         {
-
+            // Populate roles dropdown for create form
             IEnumerable<SelectListItem> roles = _context.InventoryRole
-            .Select(c => new SelectListItem
-            {
-                Value = c.RoleId.ToString(),
-                Text = c.RoleName
-            });
+                .Select(c => new SelectListItem
+                {
+                    Value = c.RoleId.ToString(),
+                    Text = c.RoleName
+                });
 
-            // Pass the categories to the ViewBag
             ViewBag.Roles = roles;
-
-            // Return the Create view
-
 
             return PartialView();
         }
 
-        // POST: EmployeesController/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        // POST: InvUsers/Create
+        /// <summary>
+        /// Creates a new user in the database
+        /// </summary>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("MyID,FirstName,LastName,EmailAddress,PhoneNum,UserPlant,UserFunction,UserDept,UserName,Password,Role_Id")]
@@ -203,17 +217,24 @@ namespace STSStorage1.Controllers
                 return RedirectToAction(nameof(UserIndex));
             }
 
-            // Repopulate the dropdown in case of validation error
-            ViewBag.Roles = _context.InventoryRole.Select(c => new SelectListItem
-            {
-                Value = c.RoleId.ToString(),
-                Text = c.RoleName
-            }).ToList();
+            // If validation fails, re-populate the roles dropdown
+            IEnumerable<SelectListItem> roles = _context.InventoryRole
+                .Select(c => new SelectListItem
+                {
+                    Value = c.RoleId.ToString(),
+                    Text = c.RoleName
+                }).ToList();
+
+            ViewBag.Roles = roles;
 
             return View(invUsers);
         }
-//____________________________________________________________________________________________
-        // GET: InvUsers/Edit/5
+
+        //____________________________________________________________________________________________
+        // GET: InvUsers/UserEdit/5
+        /// <summary>
+        /// Shows the edit form for a specific user (Admin use)
+        /// </summary>
         public async Task<IActionResult> UserEdit(int? id)
         {
             if (id == null)
@@ -228,24 +249,22 @@ namespace STSStorage1.Controllers
             }
 
             // Populate the dropdown list with roles
-            // Fetch roles for the dropdown
             var roles = _context.InventoryRole.Select(r => new
             {
-                Value = r.RoleId,     // Role ID (Foreign Key)
-                Text = r.RoleName   // Role Name
+                Value = r.RoleId,
+                Text = r.RoleName
             }).ToList();
 
-            // Create a SelectList and set the selected value to the employee's RoleId
+            // Create a SelectList and set the selected value to the user's RoleId
             ViewBag.Roles = new SelectList(roles, "Value", "Text", invUsers.Role_Id);
 
-
             return PartialView("UserEdit", invUsers);
-
         }
 
-        // POST: EmployeesController/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        // POST: InvUsers/UserEdit/5
+        /// <summary>
+        /// Saves edits for a specific user (Admin use)
+        /// </summary>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> UserEdit(int id, [Bind("MyID,FirstName,LastName,EmailAddress,PhoneNum,UserPlant,UserFunction,UserDept,UserName,Password,Role_Id")]
@@ -262,6 +281,8 @@ namespace STSStorage1.Controllers
                 {
                     _context.Update(invUsers);
                     await _context.SaveChangesAsync();
+
+                    return RedirectToAction(nameof(UserIndex));
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -274,54 +295,60 @@ namespace STSStorage1.Controllers
                         throw;
                     }
                 }
-                // If ModelState is invalid, re-populate the dropdown list for the view
-                var roles = _context.InventoryRole.Select(r => new
-                {
-                    Value = r.RoleId,
-                    Text = r.RoleName
-                }).ToList();
-                ViewBag.Roles = new SelectList(roles, "Value", "Text", invUsers.Role_Id);
-
-                return RedirectToAction(nameof(UserIndex));
             }
+
+            // FIX: If ModelState is invalid, re-populate the dropdown list for the view
+            var roles = _context.InventoryRole.Select(r => new
+            {
+                Value = r.RoleId,
+                Text = r.RoleName
+            }).ToList();
+            ViewBag.Roles = new SelectList(roles, "Value", "Text", invUsers.Role_Id);
+
             return View("UserEdit", invUsers);
         }
 
-//________________________________________________________________________________________
-        // GET: EmployeesController/Delete/5
+        //________________________________________________________________________________________
+        // GET: InvUsers/UserDelete/5
+        /// <summary>
+        /// Shows confirmation dialog for deleting a user
+        /// </summary>
         public async Task<IActionResult> UserDelete(int? id)
         {
             if (id == null)
             {
                 return NotFound();
             }
-            // Join Employee with Role to fetch RoleName
-            var UserDelete = await (from invuser in _context.InventoryUsers
-                                        join invrole in _context.InventoryRole
-                                        on invuser.Role_Id equals invrole.RoleId // Replace with actual FK and PK
-                                    where invuser.MyID == id // Match the employee by ID
-                                    select new UserRoleViewModel
-                                        {
-                                            MyID = invuser.MyID, // Replace with Employee PK
-                                            FirstName = invuser.FirstName, // Replace with Employee Name property
-                                            LastName = invuser.LastName,
-                                            EmailAddress = invuser.EmailAddress,
-                                            PhoneNum = invuser.PhoneNum,
-                                            UserFunction = invuser.UserFunction,
-                                            UserDept = invuser.UserDept,
-                                            RoleName = invrole.RoleName // Replace with Role Name property
-                                        }).FirstOrDefaultAsync();
 
-          
-            if (UserDelete == null)
+            // Join User with Role to fetch RoleName for display
+            var userToDelete = await (from invuser in _context.InventoryUsers
+                                      join invrole in _context.InventoryRole
+                                      on invuser.Role_Id equals invrole.RoleId
+                                      where invuser.MyID == id
+                                      select new UserRoleViewModel
+                                      {
+                                          MyID = invuser.MyID,
+                                          FirstName = invuser.FirstName,
+                                          LastName = invuser.LastName,
+                                          EmailAddress = invuser.EmailAddress,
+                                          PhoneNum = invuser.PhoneNum,
+                                          UserFunction = invuser.UserFunction,
+                                          UserDept = invuser.UserDept,
+                                          RoleName = invrole.RoleName
+                                      }).FirstOrDefaultAsync();
+
+            if (userToDelete == null)
             {
                 return NotFound();
             }
 
-            return PartialView(UserDelete);
+            return PartialView(userToDelete);
         }
 
-        // POST: EmployeesController/Delete/5
+        // POST: InvUsers/Delete/5
+        /// <summary>
+        /// Deletes the specified user from the database
+        /// </summary>
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int MyID)
@@ -330,12 +357,15 @@ namespace STSStorage1.Controllers
             if (invUsers != null)
             {
                 _context.InventoryUsers.Remove(invUsers);
+                await _context.SaveChangesAsync();
             }
 
-            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(UserIndex));
         }
 
+        /// <summary>
+        /// Helper method to check if a user exists in the database
+        /// </summary>
         private bool InvUserExists(int id)
         {
             return _context.InventoryUsers.Any(e => e.MyID == id);

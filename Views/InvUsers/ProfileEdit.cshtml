@@ -101,9 +101,11 @@
             <div class="form-group">
                 <label asp-for="Password" class="control-label"></label>
                 <div class="input-group">
-                    <input asp-for="Password" type="password" class="form-control" id="profilePassword" />
+                    <!-- CHANGE: Use type="text" instead of type="password" so value displays -->
+                    <input asp-for="Password" type="text" class="form-control" id="profilePassword" />
                     <button class="btn btn-outline-secondary" type="button" id="toggleProfilePassword" tabindex="-1">
-                        <i class="bi bi-eye" id="profilePasswordIcon"></i>
+                        <!-- Start with eye-slash since password is visible -->
+                        <i class="bi bi-eye-slash" id="profilePasswordIcon"></i>
                     </button>
                 </div>
                 <span asp-validation-for="Password" class="text-danger"></span>
@@ -132,10 +134,16 @@
     }
     <script>
         // Toggle password visibility for profile edit
-        document.getElementById('toggleProfilePassword').addEventListener('click', function () {
-            const passwordInput = document.getElementById('profilePassword');
-            const passwordIcon = document.getElementById('profilePasswordIcon');
+        const passwordInput = document.getElementById('profilePassword');
+        const passwordIcon = document.getElementById('profilePasswordIcon');
+        const toggleButton = document.getElementById('toggleProfilePassword');
 
+        // Hide password on page load
+        passwordInput.type = 'password';
+        passwordIcon.classList.remove('bi-eye-slash');
+        passwordIcon.classList.add('bi-eye');
+
+        toggleButton.addEventListener('click', function () {
             if (passwordInput.type === 'password') {
                 passwordInput.type = 'text';
                 passwordIcon.classList.remove('bi-eye');
