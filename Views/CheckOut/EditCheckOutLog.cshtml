@@ -6,7 +6,7 @@
 }
 
 <div class="modal-header">
-    <h5 class="modal-title">Edit CheckOut Log Entry</h5>
+    <h5 class="modal-title">Edit CheckOut Log Entry - Record #@checkOutRecid</h5>
     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 </div>
 
@@ -16,6 +16,18 @@
     <input type="hidden" asp-for="InventoryRecid" />
 
     <div class="modal-body">
+        @if (ViewData.ModelState.ErrorCount > 0)
+        {
+            <div class="alert alert-danger">
+                <ul class="mb-0">
+                    @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                    {
+                        <li>@error.ErrorMessage</li>
+                    }
+                </ul>
+            </div>
+        }
+
         <div class="row">
             <!-- Left Column -->
             <div class="col-md-6">
@@ -70,7 +82,7 @@
             <div class="col-md-6">
                 <div class="mb-3">
                     <label asp-for="LocationHistory" class="form-label">Location History</label>
-                    <input asp-for="LocationHistory" class="form-control" />
+                    <input asp-for="LocationHistory" class="form-control" maxlength="50" />
                     <span asp-validation-for="LocationHistory" class="text-danger"></span>
                 </div>
 
@@ -88,7 +100,7 @@
 
                 <div class="mb-3">
                     <label asp-for="WONum" class="form-label">Work Order Number</label>
-                    <input asp-for="WONum" class="form-control" />
+                    <input asp-for="WONum" class="form-control" maxlength="25" />
                     <span asp-validation-for="WONum" class="text-danger"></span>
                 </div>
 
@@ -107,6 +119,17 @@
                     <span asp-validation-for="OilCheck" class="text-danger"></span>
                 </div>
 
+                <div class="mb-3">
+                    <label asp-for="LTStorageNum" class="form-label">LT Storage Number</label>
+                    <input asp-for="LTStorageNum" class="form-control" maxlength="50" />
+                    <span asp-validation-for="LTStorageNum" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Full Width Comment Fields -->
+        <div class="row">
+            <div class="col-12">
                 <div class="mb-3">
                     <label asp-for="CommentsStored" class="form-label">Comments - Stored</label>
                     <textarea asp-for="CommentsStored" class="form-control" rows="3"></textarea>
@@ -127,9 +150,3 @@
         <button type="submit" class="btn btn-primary">Save Changes</button>
     </div>
 </form>
-
-@section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
-}

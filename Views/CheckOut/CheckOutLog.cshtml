@@ -73,7 +73,7 @@
                                 <td style="text-align: left;">
                                     <a href="#" class="btn btn-link p-0"
                                        data-bs-toggle="modal"
-                                       onclick="RenderActions('/CheckOut/EditCheckOutLog/@inventoryRecid/' + @item.CheckOutRecid); return false;"
+                                       onclick="RenderActions('/CheckOut/EditCheckOutLog?checkOutRecid=' + @item.CheckOutRecid); return false;"
                                        data-bs-target="#modalEditCheckOut"
                                        title="Edit CheckOut Record @item.CheckOutRecid">
                                         @item.CheckOutRecid

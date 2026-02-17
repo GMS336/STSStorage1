@@ -164,7 +164,7 @@ namespace STSStorage1.Controllers
         /// <summary>
         /// Displays the edit form for a specific checkout log entry in a modal
         /// </summary>
-        public async Task<IActionResult> EditCheckOutLog(int inventoryRecid, int checkOutRecid)
+        public async Task<IActionResult> EditCheckOutLog(int checkOutRecid)
         {
             if (checkOutRecid <= 0)
             {
@@ -186,7 +186,6 @@ namespace STSStorage1.Controllers
                 return NotFound("CheckOut record not found");
             }
 
-            ViewBag.InventoryRecid = inventoryRecid;
             ViewBag.CheckOutRecid = checkOutRecid;
 
             return PartialView("~/Views/CheckOut/EditCheckOutLog.cshtml", item);
@@ -211,7 +210,7 @@ namespace STSStorage1.Controllers
                     int? itemStatusId = null;
                     if (!string.IsNullOrEmpty(model.ItemStatus))
                     {
-                        var statusRecord = await _context.InvItemStatus
+                        var statusRecord = await _context.InventoryItemStatus
                             .Where(s => s.ItemStatus == model.ItemStatus)
                             .FirstOrDefaultAsync();
                         itemStatusId = statusRecord?.ItemStatusID;
