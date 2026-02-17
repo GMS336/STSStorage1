@@ -95,12 +95,17 @@
         </div>
     </div>
 
-    <!-- Password & RoleName (no change) -->
+    <!-- Password & RoleName with Toggle -->
     <div class="row mb-3">
         <div class="col-md-9 mb-2">
             <div class="form-group">
                 <label asp-for="Password" class="control-label"></label>
-                <input asp-for="Password" class="form-control" />
+                <div class="input-group">
+                    <input asp-for="Password" type="password" class="form-control" id="profilePassword" />
+                    <button class="btn btn-outline-secondary" type="button" id="toggleProfilePassword" tabindex="-1">
+                        <i class="bi bi-eye" id="profilePasswordIcon"></i>
+                    </button>
+                </div>
                 <span asp-validation-for="Password" class="text-danger"></span>
             </div>
         </div>
@@ -120,5 +125,28 @@
         </div>
     </div>
 </form>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        // Toggle password visibility for profile edit
+        document.getElementById('toggleProfilePassword').addEventListener('click', function () {
+            const passwordInput = document.getElementById('profilePassword');
+            const passwordIcon = document.getElementById('profilePasswordIcon');
+
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                passwordIcon.classList.remove('bi-eye');
+                passwordIcon.classList.add('bi-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                passwordIcon.classList.remove('bi-eye-slash');
+                passwordIcon.classList.add('bi-eye');
+            }
+        });
+    </script>
+}
 
                      

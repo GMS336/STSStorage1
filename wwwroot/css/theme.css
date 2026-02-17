@@ -155,7 +155,7 @@ body {
    LOGIN PAGE SPECIFIC
    ============================================ */
 .login-page {
-    background-color: var(--sky-blue);
+    background-color: transparent;
 }
 
 .login-container {

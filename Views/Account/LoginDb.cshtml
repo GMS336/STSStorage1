@@ -16,17 +16,6 @@
         <div class="row justify-content-center mt-5">
             <div class="col-md-6 col-lg-5">
 
-                <!-- Header Section -->
-                <div class="text-center mb-4">
-                    <img src="~/images/Magna Int logo.jpg" width="171" height="55" alt="Magna Logo" class="mb-3" />
-                    <div class="card">
-                        <div class="card-header bg-primary-custom text-white">
-                            <h5 class="mb-0">Storage and Inventory Control System</h5>
-                            <p class="mb-0 small">Troy Office and Laboratory</p>
-                        </div>
-                    </div>
-                </div>
-
                 <!-- Login Form -->
                 <div class="card login-container">
                     <div class="card-body">
@@ -50,10 +39,15 @@
                                 }
                             </div>
 
-                            <!-- Password Field -->
+                            <!-- Password Field with Toggle -->
                             <div class="mb-3">
                                 <label asp-for="Password" class="form-label">Password</label>
-                                <input asp-for="Password" type="password" class="form-control" name="Password" value="MyPassword" />
+                                <div class="input-group">
+                                    <input asp-for="Password" type="password" class="form-control" name="Password" value="MyPassword" id="loginPassword" />
+                                    <button class="btn btn-outline-secondary" type="button" id="toggleLoginPassword" tabindex="-1">
+                                        <i class="bi bi-eye" id="loginPasswordIcon"></i>
+                                    </button>
+                                </div>
                                 <span asp-validation-for="Password" class="text-danger"></span>
                                 @if (!string.IsNullOrEmpty(ViewBag.PasswordErrorMessage))
                                 {
@@ -108,4 +102,21 @@
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
     <script src="~/js/main.js"></script>
+    <script>
+        // Toggle password visibility for login
+        document.getElementById('toggleLoginPassword').addEventListener('click', function () {
+            const passwordInput = document.getElementById('loginPassword');
+            const passwordIcon = document.getElementById('loginPasswordIcon');
+
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                passwordIcon.classList.remove('bi-eye');
+                passwordIcon.classList.add('bi-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                passwordIcon.classList.remove('bi-eye-slash');
+                passwordIcon.classList.add('bi-eye');
+            }
+        });
+    </script>
 }
