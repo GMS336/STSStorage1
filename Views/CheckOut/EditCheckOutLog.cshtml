@@ -1,0 +1,135 @@
+﻿@model STSStorage1.Models.InvCheckOutModel
+
+@{
+    int inventoryRecid = ViewBag.InventoryRecid ?? 0;
+    int checkOutRecid = ViewBag.CheckOutRecid ?? 0;
+}
+
+<div class="modal-header">
+    <h5 class="modal-title">Edit CheckOut Log Entry</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+</div>
+
+<form asp-action="EditCheckOutLog" asp-controller="CheckOut" method="post" class="needs-validation" novalidate>
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="CheckOutRecid" />
+    <input type="hidden" asp-for="InventoryRecid" />
+
+    <div class="modal-body">
+        <div class="row">
+            <!-- Left Column -->
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label asp-for="CheckOutRecid" class="form-label">CheckOut Record ID</label>
+                    <input asp-for="CheckOutRecid" class="form-control" readonly />
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="RequestDate" class="form-label">Request Date</label>
+                    <input asp-for="RequestDate" type="date" class="form-control" />
+                    <span asp-validation-for="RequestDate" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="RequestorIDNum" class="form-label">Requestor ID</label>
+                    <input asp-for="RequestorIDNum" type="number" class="form-control" />
+                    <span asp-validation-for="RequestorIDNum" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="RequestFormType" class="form-label">Request Form Type</label>
+                    <input asp-for="RequestFormType" class="form-control" readonly />
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="DateIn" class="form-label">Date In</label>
+                    <input asp-for="DateIn" type="date" class="form-control" />
+                    <span asp-validation-for="DateIn" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="QtyIn" class="form-label">Quantity In</label>
+                    <input asp-for="QtyIn" type="number" class="form-control" />
+                    <span asp-validation-for="QtyIn" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="DateOut" class="form-label">Date Out</label>
+                    <input asp-for="DateOut" type="date" class="form-control" />
+                    <span asp-validation-for="DateOut" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="QtyOut" class="form-label">Quantity Out</label>
+                    <input asp-for="QtyOut" type="number" class="form-control" />
+                    <span asp-validation-for="QtyOut" class="text-danger"></span>
+                </div>
+            </div>
+
+            <!-- Right Column -->
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label asp-for="LocationHistory" class="form-label">Location History</label>
+                    <input asp-for="LocationHistory" class="form-control" />
+                    <span asp-validation-for="LocationHistory" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="ShelfName" class="form-label">Shelf Name</label>
+                    <input asp-for="ShelfName" class="form-control" />
+                    <span asp-validation-for="ShelfName" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="BinNum" class="form-label">Bin Number</label>
+                    <input asp-for="BinNum" type="number" class="form-control" />
+                    <span asp-validation-for="BinNum" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="WONum" class="form-label">Work Order Number</label>
+                    <input asp-for="WONum" class="form-control" />
+                    <span asp-validation-for="WONum" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="ItemStatus" class="form-label">Item Status</label>
+                    <input asp-for="ItemStatus" class="form-control" />
+                    <span asp-validation-for="ItemStatus" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="OilCheck" class="form-label">Oil Drained?</label>
+                    <select asp-for="OilCheck" class="form-select">
+                        <option value="">No</option>
+                        <option value="Yes">Yes</option>
+                    </select>
+                    <span asp-validation-for="OilCheck" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="CommentsStored" class="form-label">Comments - Stored</label>
+                    <textarea asp-for="CommentsStored" class="form-control" rows="3"></textarea>
+                    <span asp-validation-for="CommentsStored" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="CommentRetrieval" class="form-label">Comments - Retrieval</label>
+                    <textarea asp-for="CommentRetrieval" class="form-control" rows="3"></textarea>
+                    <span asp-validation-for="CommentRetrieval" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="submit" class="btn btn-primary">Save Changes</button>
+    </div>
+</form>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

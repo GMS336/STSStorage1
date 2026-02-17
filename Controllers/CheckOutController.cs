@@ -148,7 +148,7 @@ namespace STSStorage1.Controllers
             return View();
         }
 
-        // GET: CheckOut/EditCheckOutItem
+        // GET: CheckOut/EditCheckOutItem (OLD - keeping for now in case referenced elsewhere)
         public async Task<IActionResult> EditCheckOutItem(int inventoryRecid, int checkOutRecid)
         {
             // Placeholder for edit checkout item
@@ -156,6 +156,112 @@ namespace STSStorage1.Controllers
             ViewBag.InventoryRecid = inventoryRecid;
             ViewBag.CheckOutRecid = checkOutRecid;
             return View();
+        }
+
+        // ===== NEW: Edit CheckOut Log Entry =====
+
+        // GET: CheckOut/EditCheckOutLog
+        /// <summary>
+        /// Displays the edit form for a specific checkout log entry in a modal
+        /// </summary>
+        public async Task<IActionResult> EditCheckOutLog(int inventoryRecid, int checkOutRecid)
+        {
+            if (checkOutRecid <= 0)
+            {
+                return BadRequest("Invalid CheckOut Record ID");
+            }
+
+            // Fetch the specific checkout record using existing SP
+            var checkOutRecidParam = new SqlParameter("@CheckOutRecid", checkOutRecid);
+            var inventoryRecidParam = new SqlParameter("@InventoryRecid", (object)DBNull.Value);
+
+            var item = await _context.InvCheckOut
+                .FromSqlRaw("EXEC spGETCheckOutItem @InventoryRecid, @CheckOutRecid",
+                    inventoryRecidParam, checkOutRecidParam)
+                .AsNoTracking()
+                .FirstOrDefaultAsync();
+
+            if (item == null)
+            {
+                return NotFound("CheckOut record not found");
+            }
+
+            ViewBag.InventoryRecid = inventoryRecid;
+            ViewBag.CheckOutRecid = checkOutRecid;
+
+            return PartialView("~/Views/CheckOut/EditCheckOutLog.cshtml", item);
+        }
+
+        // POST: CheckOut/EditCheckOutLog
+        /// <summary>
+        /// Processes the edit form submission for a checkout log entry
+        /// </summary>
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditCheckOutLog(InvCheckOutModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    // Calculate the new balance based on quantities
+                    int newBalance = (model.QtyIn ?? 0) - (model.QtyOut ?? 0);
+
+                    // Look up ItemStatusID from ItemStatus string if provided
+                    int? itemStatusId = null;
+                    if (!string.IsNullOrEmpty(model.ItemStatus))
+                    {
+                        var statusRecord = await _context.InvItemStatus
+                            .Where(s => s.ItemStatus == model.ItemStatus)
+                            .FirstOrDefaultAsync();
+                        itemStatusId = statusRecord?.ItemStatusID;
+                    }
+
+                    // Update the checkout record using existing SP with all parameters
+                    var parameters = new[]
+                    {
+                        new SqlParameter("@CheckOutRecid", model.CheckOutRecid),
+                        new SqlParameter("@InventoryRecid", model.InventoryRecid),
+                        new SqlParameter("@RequestorIDNum", model.RequestorIDNum ?? (object)DBNull.Value),
+                        new SqlParameter("@RequestDate", model.RequestDate ?? (object)DBNull.Value),
+                        new SqlParameter("@NeedDate", (object)DBNull.Value), // Not in model, will be added later
+                        new SqlParameter("@DateIn", model.DateIn ?? (object)DBNull.Value),
+                        new SqlParameter("@QtyIn", model.QtyIn ?? (object)DBNull.Value),
+                        new SqlParameter("@CommentsStored", model.CommentsStored ?? (object)DBNull.Value),
+                        new SqlParameter("@DateOut", model.DateOut ?? (object)DBNull.Value),
+                        new SqlParameter("@QtyOut", model.QtyOut ?? (object)DBNull.Value),
+                        new SqlParameter("@RequestFormType", model.RequestFormType ?? (object)DBNull.Value),
+                        new SqlParameter("@Balance", newBalance),
+                        new SqlParameter("@CommentRetrieval", model.CommentRetrieval ?? (object)DBNull.Value),
+                        new SqlParameter("@WONum", model.WONum ?? (object)DBNull.Value),
+                        new SqlParameter("@OilCheck", model.OilCheck ?? (object)DBNull.Value),
+                        new SqlParameter("@LocationHistory", model.LocationHistory ?? (object)DBNull.Value),
+                        new SqlParameter("@ItemStatusID", itemStatusId ?? (object)DBNull.Value),
+                        new SqlParameter("@LTSTorageNum", model.LTStorageNum ?? (object)DBNull.Value),
+                        new SqlParameter("@ShelfRecid", model.ShelfRecid ?? (object)DBNull.Value),
+                        new SqlParameter("@BinNum", model.BinNum ?? (object)DBNull.Value)
+                    };
+
+                    await _context.Database.ExecuteSqlRawAsync(
+                        @"EXEC spUPDATECheckOutItem 
+                            @CheckOutRecid, @InventoryRecid, @RequestorIDNum, @RequestDate, @NeedDate,
+                            @DateIn, @QtyIn, @CommentsStored, @DateOut, @QtyOut, @RequestFormType,
+                            @Balance, @CommentRetrieval, @WONum, @OilCheck, @LocationHistory,
+                            @ItemStatusID, @LTSTorageNum, @ShelfRecid, @BinNum",
+                        parameters);
+
+                    TempData["SuccessMessage"] = "CheckOut record updated successfully!";
+                    return RedirectToAction("CheckoutLog", new { inventoryRecid = model.InventoryRecid });
+                }
+                catch (Exception ex)
+                {
+                    ModelState.AddModelError("", $"Error updating record: {ex.Message}");
+                }
+            }
+
+            ViewBag.InventoryRecid = model.InventoryRecid;
+            ViewBag.CheckOutRecid = model.CheckOutRecid;
+            return PartialView("~/Views/CheckOut/EditCheckOutLog.cshtml", model);
         }
     }
 }
