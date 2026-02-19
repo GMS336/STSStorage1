@@ -158,7 +158,7 @@ namespace STSStorage1.Controllers
             return View();
         }
 
- //________________________________________________________________________________
+        //________________________________________________________________________________
         // ===== NEW: Edit CheckOut Log Entry =====
 
         // GET: CheckOut/EditCheckOutLog
@@ -198,8 +198,6 @@ namespace STSStorage1.Controllers
                 ViewBag.CheckOutRecid = checkOutRecid;
 
                 return PartialView("~/Views/CheckOut/EditCheckOutLog.cshtml", item);
-
-
             }
             catch (Exception ex)
             {
@@ -288,16 +286,32 @@ namespace STSStorage1.Controllers
         /// </summary>
         private async Task LoadShelfDropdownData()
         {
-            // Get all shelves for the dropdown
-            var shelves = await _context.InventoryShelf
-                .OrderBy(s => s.ShelfName)
-                .Select(s => new
+            try
+            {
+                // Get all shelves for the dropdown
+                var shelves = await _context.InventoryShelf
+                    .OrderBy(s => s.ShelfName)
+                    .Select(s => new
+                    {
+                        ShelfRecid = s.ShelfRecid,
+                        ShelfName = s.ShelfName
+                    })
+                    .ToListAsync();
+
+                // Debug output
+                Console.WriteLine($"Loaded {shelves.Count} shelves");
+                foreach (var shelf in shelves)
                 {
-                    ShelfRecid = s.ShelfRecid,
-                    ShelfName = s.ShelfName
-                })
-                .ToListAsync();
-            ViewBag.Shelves = shelves;
+                    Console.WriteLine($"  ShelfRecid: {shelf.ShelfRecid}, ShelfName: {shelf.ShelfName}");
+                }
+
+                ViewBag.Shelves = shelves;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error loading shelves: {ex.Message}");
+                ViewBag.Shelves = new List<dynamic>();
+            }
         }
     }
 }

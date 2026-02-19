@@ -2,12 +2,20 @@
 
 @{
     int checkOutRecid = ViewBag.CheckOutRecid ?? 0;
+    var shelves = ViewBag.Shelves as List<dynamic>;
+    var shelfCount = shelves != null ? System.Linq.Enumerable.Count(shelves.Cast<dynamic>()) : 0;
 }
 
 <div class="modal-header">
     <h5 class="modal-title">Edit CheckOut Item Detail - Record #@checkOutRecid</h5>
     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 </div>
+
+<!-- DEBUG INFO - Remove this after testing -->
+<div class="alert alert-info">
+    <strong>DEBUG:</strong> ViewBag.Shelves is @(shelves == null ? "NULL" : "NOT NULL") - Contains @shelfCount shelves
+</div>
+
 
 <form asp-action="EditCheckOutLog" asp-controller="CheckOut" method="post" id="editCheckOutForm">
     @Html.AntiForgeryToken()
@@ -116,10 +124,26 @@
                             <div class="card-body">
                                 <div class="mb-2">
                                     <label class="form-label fw-bold">Storage Shelf Number:</label>
-                                    <select asp-for="ShelfRecid" class="form-select" id="ShelfRecid">
+                                    !-- DEBUG: Show what we're working with -->
+                                    <div class="small text-muted mb-1">
+                                        Current: ShelfRecid=@Model.ShelfRecid, ShelfName=@Model.ShelfName
+                                    </div>
+
+                                    <select name="ShelfRecid" class="form-select" id="ShelfRecid">
                                         <option value="@Model.ShelfRecid" selected>@Model.ShelfName</option>
                                         <option value="" class="text-danger">--Select Shelf--</option>
-                                        @* Populate from ViewBag.Shelves in controller *@
+                                        @if (shelves != null)
+                                        {
+                                            @foreach (var shelf in shelves)
+                                            {
+                                                var shelfObj = (dynamic)shelf;
+                                                <option value="@shelfObj.ShelfRecid">@shelfObj.ShelfName</option>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <option value="" class="text-danger">ERROR: No shelves loaded</option>
+                                        }
                                     </select>
                                 </div>
                                 <div>
