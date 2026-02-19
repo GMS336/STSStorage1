@@ -196,7 +196,6 @@ namespace STSStorage1.Controllers
                     return Content("<div class='alert alert-danger'>CheckOut record not found</div>", "text/html");
                 }
 
-                // Look up ItemStatusID from ItemStatus string
                 // Look up ItemStatusID from ItemStatus string (with whitespace handling)
                 int? itemStatusId = null;
 
@@ -216,7 +215,6 @@ namespace STSStorage1.Controllers
                         itemStatusId = statusRecord.ItemStatusID;
                     }
                 }
-
 
                 // Map InvCheckOutModel to InvCheckOutEditModel
                 var editModel = new InvCheckOutEditModel
@@ -241,6 +239,7 @@ namespace STSStorage1.Controllers
                     BinNum = item.BinNum,
                     LTStorageNum = item.LTStorageNum,
                     ItemStatus = item.ItemStatus,
+                    ItemStatusID = itemStatusId,  // THIS IS THE KEY LINE!
                     WONum = item.WONum,
                     OilCheck = item.OilCheck,
                     RunningBalance = item.RunningBalance,
@@ -250,11 +249,11 @@ namespace STSStorage1.Controllers
                 // Load dropdown options
                 await LoadCheckOutDropdownOptions(editModel);
 
-                Console.WriteLine($"EditModel created with {editModel.ShelfOptions?.Count() ?? 0} shelf options");
+                Console.WriteLine($"EditModel created - ItemStatusID: {editModel.ItemStatusID}");
 
                 ViewBag.CheckOutRecid = checkOutRecid;
 
-                return PartialView("~/Views/CheckOut/EditCheckOutLog.cshtml", editModel);
+                return PartialView("~/Views/CheckOut/EditCheckOutLog.cshtml", editModel);  // RETURN editModel NOT item!
             }
             catch (Exception ex)
             {
@@ -275,8 +274,8 @@ namespace STSStorage1.Controllers
                 // Use the Balance from the form if provided, otherwise calculate it
                 int newBalance = Balance ?? ((model.QtyIn ?? 0) - (model.QtyOut ?? 0));
 
-                // Look up ItemStatusID from ItemStatus string if not provided directly
-                int? itemStatusId = ItemStatusID ?? model.ItemStatusID;
+                // Use ItemStatusID from model or from form parameter
+                int? itemStatusId = model.ItemStatusID ?? ItemStatusID;
 
                 // Update the checkout record using existing SP with all parameters
                 var parameters = new[]
@@ -311,16 +310,17 @@ namespace STSStorage1.Controllers
                         @ItemStatusID, @LTSTorageNum, @ShelfRecid, @BinNum",
                     parameters);
 
-                TempData["SuccessMessage"] = "CheckOut record updated successfully!";
+                // Redirect back to CheckoutLog with no success message
                 return RedirectToAction("CheckoutLog", new { inventoryRecid = model.InventoryRecid });
             }
             catch (Exception ex)
             {
-                ModelState.AddModelError("", $"Error updating record: {ex.Message}");
+                Console.WriteLine($"Error in EditCheckOutLog POST: {ex.Message}");
 
-                // Reload dropdown options on error
+                // On error, reload the form with dropdown options
                 await LoadCheckOutDropdownOptions(model);
                 ViewBag.CheckOutRecid = model.CheckOutRecid;
+                ModelState.AddModelError("", $"Error updating record: {ex.Message}");
 
                 return PartialView("~/Views/CheckOut/EditCheckOutLog.cshtml", model);
             }

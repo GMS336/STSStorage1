@@ -9,34 +9,6 @@
     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 </div>
 
-
-<!-- DEBUG DISPLAY -->
-<div class="alert alert-warning m-3">
-    <strong>DEBUG ItemStatus:</strong><br />
-    Raw ItemStatus: '@Model.ItemStatus' (Length: @(Model.ItemStatus?.Length ?? 0))<br />
-    Trimmed: '@(Model.ItemStatus?.Trim())' (Length: @(Model.ItemStatus?.Trim().Length ?? 0))<br />
-    ItemStatusID: @(Model.ItemStatusID?.ToString() ?? "NULL")<br />
-    <hr />
-    <strong>Available options in dropdown:</strong><br />
-    @if (Model.ItemStatusOptions != null)
-    {
-        @foreach (var opt in Model.ItemStatusOptions)
-        {
-            var optTextTrimmed = opt.Text?.Trim() ?? "";
-            var modelTrimmed = Model.ItemStatus?.Trim() ?? "";
-            var match = optTextTrimmed.Equals(modelTrimmed, StringComparison.OrdinalIgnoreCase);
-
-            <div style="background: @(match ? "yellow" : "transparent")">
-                Value=@opt.Value,
-                Text='@opt.Text' (Len:@(opt.Text?.Length ?? 0)),
-                Trimmed='@optTextTrimmed' (Len:@optTextTrimmed.Length),
-                Selected=@opt.Selected,
-                <strong>MATCH=@match</strong>
-            </div>
-        }
-    }
-</div>
-
 <form asp-action="EditCheckOutLog" asp-controller="CheckOut" method="post" id="editCheckOutForm">
     @Html.AntiForgeryToken()
     <input type="hidden" asp-for="CheckOutRecid" />
