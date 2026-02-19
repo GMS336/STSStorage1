@@ -1,9 +1,7 @@
-﻿@model STSStorage1.Models.InvCheckOutModel
+﻿@model STSStorage1.Models.InvCheckOutEditModel
 
 @{
     int checkOutRecid = ViewBag.CheckOutRecid ?? 0;
-    var shelves = ViewBag.Shelves as List<dynamic>;
-    var shelfCount = shelves != null ? System.Linq.Enumerable.Count(shelves.Cast<dynamic>()) : 0;
 }
 
 <div class="modal-header">
@@ -11,11 +9,33 @@
     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 </div>
 
-<!-- DEBUG INFO - Remove this after testing -->
-<div class="alert alert-info">
-    <strong>DEBUG:</strong> ViewBag.Shelves is @(shelves == null ? "NULL" : "NOT NULL") - Contains @shelfCount shelves
-</div>
 
+<!-- DEBUG DISPLAY -->
+<div class="alert alert-warning m-3">
+    <strong>DEBUG ItemStatus:</strong><br />
+    Raw ItemStatus: '@Model.ItemStatus' (Length: @(Model.ItemStatus?.Length ?? 0))<br />
+    Trimmed: '@(Model.ItemStatus?.Trim())' (Length: @(Model.ItemStatus?.Trim().Length ?? 0))<br />
+    ItemStatusID: @(Model.ItemStatusID?.ToString() ?? "NULL")<br />
+    <hr />
+    <strong>Available options in dropdown:</strong><br />
+    @if (Model.ItemStatusOptions != null)
+    {
+        @foreach (var opt in Model.ItemStatusOptions)
+        {
+            var optTextTrimmed = opt.Text?.Trim() ?? "";
+            var modelTrimmed = Model.ItemStatus?.Trim() ?? "";
+            var match = optTextTrimmed.Equals(modelTrimmed, StringComparison.OrdinalIgnoreCase);
+
+            <div style="background: @(match ? "yellow" : "transparent")">
+                Value=@opt.Value,
+                Text='@opt.Text' (Len:@(opt.Text?.Length ?? 0)),
+                Trimmed='@optTextTrimmed' (Len:@optTextTrimmed.Length),
+                Selected=@opt.Selected,
+                <strong>MATCH=@match</strong>
+            </div>
+        }
+    }
+</div>
 
 <form asp-action="EditCheckOutLog" asp-controller="CheckOut" method="post" id="editCheckOutForm">
     @Html.AntiForgeryToken()
@@ -66,11 +86,10 @@
         <div class="row mb-3">
             <div class="col-md-8">
                 <label class="form-label fw-bold">Change Requestor Name:</label>
-                <select asp-for="RequestorIDNum" class="form-select" id="RequestorIDNum">
-                    <option value="@Model.RequestorIDNum">@Model.RequestorIDNum - @Model.RequestorName</option>
-                    <option value="" class="text-danger">--Select Requestor--</option>
-                    @* Populate from ViewBag.Requestors in controller *@
+                <select asp-for="RequestorIDNum" asp-items="Model.RequestorOptions" class="form-select">
+                    <option value="">--Select Requestor--</option>
                 </select>
+                <span asp-validation-for="RequestorIDNum" class="text-danger"></span>
             </div>
             <div class="col-md-4">
                 <label asp-for="RequestDate" class="form-label fw-bold">Request Date:</label>
@@ -124,35 +143,17 @@
                             <div class="card-body">
                                 <div class="mb-2">
                                     <label class="form-label fw-bold">Storage Shelf Number:</label>
-                                    !-- DEBUG: Show what we're working with -->
-                                    <div class="small text-muted mb-1">
-                                        Current: ShelfRecid=@Model.ShelfRecid, ShelfName=@Model.ShelfName
-                                    </div>
-
-                                    <select name="ShelfRecid" class="form-select" id="ShelfRecid">
-                                        <option value="@Model.ShelfRecid" selected>@Model.ShelfName</option>
-                                        <option value="" class="text-danger">--Select Shelf--</option>
-                                        @if (shelves != null)
-                                        {
-                                            @foreach (var shelf in shelves)
-                                            {
-                                                var shelfObj = (dynamic)shelf;
-                                                <option value="@shelfObj.ShelfRecid">@shelfObj.ShelfName</option>
-                                            }
-                                        }
-                                        else
-                                        {
-                                            <option value="" class="text-danger">ERROR: No shelves loaded</option>
-                                        }
+                                    <select asp-for="ShelfRecid" asp-items="Model.ShelfOptions" class="form-select">
+                                        <option value="">--Select Shelf--</option>
                                     </select>
+                                    <span asp-validation-for="ShelfRecid" class="text-danger"></span>
                                 </div>
                                 <div>
                                     <label asp-for="BinNum" class="form-label fw-bold">Storage Bin Number:</label>
-                                    <select asp-for="BinNum" class="form-select" id="BinNum">
-                                        <option value="@Model.BinNum" selected>@Model.BinNum</option>
-                                        <option value="0" class="text-danger">--Select a New Bin #--</option>
-                                        @* Populate from ViewBag.Bins in controller *@
+                                    <select asp-for="BinNum" asp-items="Model.BinOptions" class="form-select">
+                                        <option value="">--Select Bin--</option>
                                     </select>
+                                    <span asp-validation-for="BinNum" class="text-danger"></span>
                                 </div>
                             </div>
                         </div>
@@ -241,11 +242,10 @@
             </div>
             <div class="col-md-3">
                 <label class="form-label fw-bold">Item Status:</label>
-                <select name="ItemStatusID" class="form-select" id="ItemStatusID">
-                    <option value="">@Model.ItemStatus</option>
-                    <option value="" class="text-danger">--Select Status--</option>
-                    @* Populate from ViewBag.ItemStatuses in controller *@
+                <select asp-for="ItemStatusID" asp-items="Model.ItemStatusOptions" class="form-select">
+                    <option value="">--Select Status--</option>
                 </select>
+                <span asp-validation-for="ItemStatusID" class="text-danger"></span>
             </div>
             <div class="col-md-3">
                 <div class="card bg-warning bg-opacity-25">

@@ -1,8 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
+
 using STSStorage1.Data;
 using STSStorage1.Models;
+
 using System.Diagnostics;
 
 namespace STSStorage1.Controllers
@@ -174,11 +177,12 @@ namespace STSStorage1.Controllers
                     return BadRequest("Invalid CheckOut Record ID");
                 }
 
+                Console.WriteLine($"EditCheckOutLog GET: Loading data for CheckOutRecid={checkOutRecid}");
+
                 // Fetch the specific checkout record using existing SP
                 var checkOutRecidParam = new SqlParameter("@CheckOutRecid", checkOutRecid);
                 var inventoryRecidParam = new SqlParameter("@InventoryRecid", (object)DBNull.Value);
 
-                // First get the list, then get the first item (can't use FirstOrDefaultAsync directly with FromSqlRaw)
                 var items = await _context.InvCheckOut
                     .FromSqlRaw("EXEC spGETCheckOutItem @InventoryRecid, @CheckOutRecid",
                         inventoryRecidParam, checkOutRecidParam)
@@ -192,31 +196,79 @@ namespace STSStorage1.Controllers
                     return Content("<div class='alert alert-danger'>CheckOut record not found</div>", "text/html");
                 }
 
-                // Load ONLY Shelf dropdown data for now
-                await LoadShelfDropdownData();
+                // Look up ItemStatusID from ItemStatus string
+                // Look up ItemStatusID from ItemStatus string (with whitespace handling)
+                int? itemStatusId = null;
+
+                if (!string.IsNullOrEmpty(item.ItemStatus))
+                {
+                    // Load all statuses and do the comparison in memory (not in SQL)
+                    var allStatuses = await _context.InventoryItemStatus.ToListAsync();
+
+                    var trimmedStatus = item.ItemStatus.Trim();
+
+                    var statusRecord = allStatuses
+                        .FirstOrDefault(s => s.ItemStatus != null &&
+                                           s.ItemStatus.Trim().Equals(trimmedStatus, StringComparison.OrdinalIgnoreCase));
+
+                    if (statusRecord != null)
+                    {
+                        itemStatusId = statusRecord.ItemStatusID;
+                    }
+                }
+
+
+                // Map InvCheckOutModel to InvCheckOutEditModel
+                var editModel = new InvCheckOutEditModel
+                {
+                    CheckOutRecid = item.CheckOutRecid,
+                    InventoryRecid = item.InventoryRecid,
+                    RequestorIDNum = item.RequestorIDNum,
+                    RequestorName = item.RequestorName,
+                    FirstName = item.FirstName,
+                    LastName = item.LastName,
+                    RequestDate = item.RequestDate,
+                    RequestFormType = item.RequestFormType,
+                    DateIn = item.DateIn,
+                    QtyIn = item.QtyIn,
+                    CommentsStored = item.CommentsStored,
+                    DateOut = item.DateOut,
+                    QtyOut = item.QtyOut,
+                    CommentRetrieval = item.CommentRetrieval,
+                    LocationHistory = item.LocationHistory,
+                    ShelfRecid = item.ShelfRecid,
+                    ShelfName = item.ShelfName,
+                    BinNum = item.BinNum,
+                    LTStorageNum = item.LTStorageNum,
+                    ItemStatus = item.ItemStatus,
+                    WONum = item.WONum,
+                    OilCheck = item.OilCheck,
+                    RunningBalance = item.RunningBalance,
+                    Balance = item.RunningBalance
+                };
+
+                // Load dropdown options
+                await LoadCheckOutDropdownOptions(editModel);
+
+                Console.WriteLine($"EditModel created with {editModel.ShelfOptions?.Count() ?? 0} shelf options");
 
                 ViewBag.CheckOutRecid = checkOutRecid;
 
-                return PartialView("~/Views/CheckOut/EditCheckOutLog.cshtml", item);
+                return PartialView("~/Views/CheckOut/EditCheckOutLog.cshtml", editModel);
             }
             catch (Exception ex)
             {
-                // Log the error for debugging
                 Console.WriteLine($"Error in EditCheckOutLog: {ex.Message}");
                 Console.WriteLine($"Stack trace: {ex.StackTrace}");
 
-                // Return a simple error view for debugging
                 return Content($"<div class='alert alert-danger'>Error loading checkout record: {ex.Message}<br/><br/>{ex.InnerException?.Message}</div>", "text/html");
             }
         }
 
         // POST: CheckOut/EditCheckOutLog
-        /// <summary>
-        /// Processes the edit form submission for a checkout log entry
-        /// </summary>
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditCheckOutLog(InvCheckOutModel model, int? ItemStatusID, int? Balance, DateTime? NeedDate)
+        public async Task<IActionResult> EditCheckOutLog(InvCheckOutEditModel model, int? ItemStatusID, int? Balance, DateTime? NeedDate)
         {
             try
             {
@@ -224,14 +276,7 @@ namespace STSStorage1.Controllers
                 int newBalance = Balance ?? ((model.QtyIn ?? 0) - (model.QtyOut ?? 0));
 
                 // Look up ItemStatusID from ItemStatus string if not provided directly
-                int? itemStatusId = ItemStatusID;
-                if (itemStatusId == null && !string.IsNullOrEmpty(model.ItemStatus))
-                {
-                    var statusRecord = await _context.InventoryItemStatus
-                        .Where(s => s.ItemStatus == model.ItemStatus)
-                        .FirstOrDefaultAsync();
-                    itemStatusId = statusRecord?.ItemStatusID;
-                }
+                int? itemStatusId = ItemStatusID ?? model.ItemStatusID;
 
                 // Update the checkout record using existing SP with all parameters
                 var parameters = new[]
@@ -273,8 +318,8 @@ namespace STSStorage1.Controllers
             {
                 ModelState.AddModelError("", $"Error updating record: {ex.Message}");
 
-                // Reload shelf dropdown data on error
-                await LoadShelfDropdownData();
+                // Reload dropdown options on error
+                await LoadCheckOutDropdownOptions(model);
                 ViewBag.CheckOutRecid = model.CheckOutRecid;
 
                 return PartialView("~/Views/CheckOut/EditCheckOutLog.cshtml", model);
@@ -282,36 +327,141 @@ namespace STSStorage1.Controllers
         }
 
         /// <summary>
-        /// Loads ONLY Shelf dropdown data for the edit form
+        /// Loads dropdown options for the CheckOut Edit form (matching ShortTerm pattern)
         /// </summary>
-        private async Task LoadShelfDropdownData()
+        private async Task LoadCheckOutDropdownOptions(InvCheckOutEditModel model)
         {
             try
             {
-                // Get all shelves for the dropdown
+                Console.WriteLine("LoadCheckOutDropdownOptions: Starting...");
+
+                // Load Shelves
                 var shelves = await _context.InventoryShelf
                     .OrderBy(s => s.ShelfName)
-                    .Select(s => new
-                    {
-                        ShelfRecid = s.ShelfRecid,
-                        ShelfName = s.ShelfName
-                    })
                     .ToListAsync();
 
-                // Debug output
-                Console.WriteLine($"Loaded {shelves.Count} shelves");
-                foreach (var shelf in shelves)
+                model.ShelfOptions = new SelectList(
+                    shelves,
+                    "ShelfRecid",       // Value field
+                    "ShelfName",        // Display field
+                    model.ShelfRecid    // Selected value
+                );
+
+                Console.WriteLine($"Loaded {shelves.Count} shelves into SelectList");
+
+                // Load Requestors (Users) - Format: "ID - FirstName LastName"
+                var requestors = await _context.InventoryUsers
+                    .OrderBy(u => u.LastName)
+                    .ThenBy(u => u.FirstName)
+                    .ToListAsync();
+
+                var requestorList = requestors.Select(r => new
                 {
-                    Console.WriteLine($"  ShelfRecid: {shelf.ShelfRecid}, ShelfName: {shelf.ShelfName}");
+                    MyID = r.MyID,
+                    FullName = r.MyID + " - " + r.FirstName + " " + r.LastName
+                }).ToList();
+
+                model.RequestorOptions = new SelectList(
+                    requestorList,
+                    "MyID",                 // Value field
+                    "FullName",             // Display field
+                    model.RequestorIDNum    // Selected value
+                );
+
+                Console.WriteLine($"Loaded {requestorList.Count} requestors into SelectList");
+
+                // Load Item Statuses
+                var itemStatuses = await _context.InventoryItemStatus
+                    .OrderBy(s => s.ItemStatus)
+                    .ToListAsync();
+
+                model.ItemStatusOptions = new SelectList(
+                    itemStatuses,
+                    "ItemStatusID",         // Value field
+                    "ItemStatus",           // Display field
+                    model.ItemStatusID      // Selected value
+                );
+
+                Console.WriteLine($"Loaded {itemStatuses.Count} item statuses into SelectList");
+
+                // Load Bin Numbers from stored procedure
+                var binNumbers = new List<BinNumberOption>();
+                int lastBinUsed = 0;
+
+                using (var command = _context.Database.GetDbConnection().CreateCommand())
+                {
+                    command.CommandText = "spADDNewBinNumber";
+                    command.CommandType = System.Data.CommandType.StoredProcedure;
+
+                    await _context.Database.OpenConnectionAsync();
+
+                    using (var reader = await command.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            var binNum = reader.IsDBNull(reader.GetOrdinal("BinNum"))
+                                ? 0
+                                : reader.GetInt32(reader.GetOrdinal("BinNum"));
+
+                            var lastBin = reader.IsDBNull(reader.GetOrdinal("LastBinUsed"))
+                                ? 0
+                                : reader.GetInt32(reader.GetOrdinal("LastBinUsed"));
+
+                            if (binNum > 0)
+                            {
+                                binNumbers.Add(new BinNumberOption { BinNum = binNum });
+                            }
+
+                            if (lastBin > lastBinUsed)
+                            {
+                                lastBinUsed = lastBin;
+                            }
+                        }
+                    }
                 }
 
-                ViewBag.Shelves = shelves;
+                // Add the "New" bin option at the top
+                var newBinNum = lastBinUsed + 1;
+                var binOptionsWithNew = new List<BinNumberOption>
+                {
+                    new BinNumberOption { BinNum = newBinNum, DisplayText = $"{newBinNum} (New)" }
+                };
+                binOptionsWithNew.AddRange(binNumbers.Select(b => new BinNumberOption
+                {
+                    BinNum = b.BinNum,
+                    DisplayText = b.BinNum.ToString()
+                }));
+
+                model.BinOptions = new SelectList(
+                    binOptionsWithNew,
+                    "BinNum",           // Value field
+                    "DisplayText",      // Display field
+                    model.BinNum        // Selected value
+                );
+
+                Console.WriteLine($"Loaded {binOptionsWithNew.Count} bin numbers into SelectList (New bin: {newBinNum})");
+
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error loading shelves: {ex.Message}");
-                ViewBag.Shelves = new List<dynamic>();
+                Console.WriteLine($"LoadCheckOutDropdownOptions ERROR: {ex.Message}");
+                Console.WriteLine($"Stack trace: {ex.StackTrace}");
             }
+            finally
+            {
+                // Ensure connection is closed
+                if (_context.Database.GetDbConnection().State == System.Data.ConnectionState.Open)
+                {
+                    await _context.Database.CloseConnectionAsync();
+                }
+            }
+        }
+
+        // Helper class for bin number options
+        private class BinNumberOption
+        {
+            public int BinNum { get; set; }
+            public string DisplayText { get; set; } = string.Empty;
         }
     }
 }
