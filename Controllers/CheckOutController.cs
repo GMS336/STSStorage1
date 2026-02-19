@@ -158,6 +158,7 @@ namespace STSStorage1.Controllers
             return View();
         }
 
+ //________________________________________________________________________________
         // ===== NEW: Edit CheckOut Log Entry =====
 
         // GET: CheckOut/EditCheckOutLog
@@ -191,12 +192,14 @@ namespace STSStorage1.Controllers
                     return Content("<div class='alert alert-danger'>CheckOut record not found</div>", "text/html");
                 }
 
-                // Load dropdown data for the form
-                await LoadDropdownData();
+                // Load ONLY Shelf dropdown data for now
+                await LoadShelfDropdownData();
 
                 ViewBag.CheckOutRecid = checkOutRecid;
 
                 return PartialView("~/Views/CheckOut/EditCheckOutLog.cshtml", item);
+
+
             }
             catch (Exception ex)
             {
@@ -217,138 +220,84 @@ namespace STSStorage1.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> EditCheckOutLog(InvCheckOutModel model, int? ItemStatusID, int? Balance, DateTime? NeedDate)
         {
-            if (ModelState.IsValid)
+            try
             {
-                try
+                // Use the Balance from the form if provided, otherwise calculate it
+                int newBalance = Balance ?? ((model.QtyIn ?? 0) - (model.QtyOut ?? 0));
+
+                // Look up ItemStatusID from ItemStatus string if not provided directly
+                int? itemStatusId = ItemStatusID;
+                if (itemStatusId == null && !string.IsNullOrEmpty(model.ItemStatus))
                 {
-                    // Use the Balance from the form if provided, otherwise calculate it
-                    int newBalance = Balance ?? ((model.QtyIn ?? 0) - (model.QtyOut ?? 0));
-
-                    // Look up ItemStatusID from ItemStatus string if not provided directly
-                    int? itemStatusId = ItemStatusID;
-                    if (itemStatusId == null && !string.IsNullOrEmpty(model.ItemStatus))
-                    {
-                        var statusRecord = await _context.InventoryItemStatus
-                            .Where(s => s.ItemStatus == model.ItemStatus)
-                            .FirstOrDefaultAsync();
-                        itemStatusId = statusRecord?.ItemStatusID;
-                    }
-
-                    // Update the checkout record using existing SP with all parameters
-                    var parameters = new[]
-                    {
-                        new SqlParameter("@CheckOutRecid", model.CheckOutRecid),
-                        new SqlParameter("@InventoryRecid", model.InventoryRecid),
-                        new SqlParameter("@RequestorIDNum", model.RequestorIDNum ?? (object)DBNull.Value),
-                        new SqlParameter("@RequestDate", model.RequestDate ?? (object)DBNull.Value),
-                        new SqlParameter("@NeedDate", NeedDate ?? (object)DBNull.Value),
-                        new SqlParameter("@DateIn", model.DateIn ?? (object)DBNull.Value),
-                        new SqlParameter("@QtyIn", model.QtyIn ?? (object)DBNull.Value),
-                        new SqlParameter("@CommentsStored", model.CommentsStored ?? (object)DBNull.Value),
-                        new SqlParameter("@DateOut", model.DateOut ?? (object)DBNull.Value),
-                        new SqlParameter("@QtyOut", model.QtyOut ?? (object)DBNull.Value),
-                        new SqlParameter("@RequestFormType", model.RequestFormType ?? (object)DBNull.Value),
-                        new SqlParameter("@Balance", newBalance),
-                        new SqlParameter("@CommentRetrieval", model.CommentRetrieval ?? (object)DBNull.Value),
-                        new SqlParameter("@WONum", model.WONum ?? (object)DBNull.Value),
-                        new SqlParameter("@OilCheck", model.OilCheck ?? (object)DBNull.Value),
-                        new SqlParameter("@LocationHistory", model.LocationHistory ?? (object)DBNull.Value),
-                        new SqlParameter("@ItemStatusID", itemStatusId ?? (object)DBNull.Value),
-                        new SqlParameter("@LTSTorageNum", model.LTStorageNum ?? (object)DBNull.Value),
-                        new SqlParameter("@ShelfRecid", model.ShelfRecid ?? (object)DBNull.Value),
-                        new SqlParameter("@BinNum", model.BinNum ?? (object)DBNull.Value)
-                    };
-
-                    await _context.Database.ExecuteSqlRawAsync(
-                        @"EXEC spUPDATECheckOutItem 
-                            @CheckOutRecid, @InventoryRecid, @RequestorIDNum, @RequestDate, @NeedDate,
-                            @DateIn, @QtyIn, @CommentsStored, @DateOut, @QtyOut, @RequestFormType,
-                            @Balance, @CommentRetrieval, @WONum, @OilCheck, @LocationHistory,
-                            @ItemStatusID, @LTSTorageNum, @ShelfRecid, @BinNum",
-                        parameters);
-
-                    TempData["SuccessMessage"] = "CheckOut record updated successfully!";
-                    return RedirectToAction("CheckoutLog", new { inventoryRecid = model.InventoryRecid });
+                    var statusRecord = await _context.InventoryItemStatus
+                        .Where(s => s.ItemStatus == model.ItemStatus)
+                        .FirstOrDefaultAsync();
+                    itemStatusId = statusRecord?.ItemStatusID;
                 }
-                catch (Exception ex)
+
+                // Update the checkout record using existing SP with all parameters
+                var parameters = new[]
                 {
-                    ModelState.AddModelError("", $"Error updating record: {ex.Message}");
-                }
+                    new SqlParameter("@CheckOutRecid", model.CheckOutRecid),
+                    new SqlParameter("@InventoryRecid", model.InventoryRecid),
+                    new SqlParameter("@RequestorIDNum", model.RequestorIDNum ?? (object)DBNull.Value),
+                    new SqlParameter("@RequestDate", model.RequestDate ?? (object)DBNull.Value),
+                    new SqlParameter("@NeedDate", NeedDate ?? (object)DBNull.Value),
+                    new SqlParameter("@DateIn", model.DateIn ?? (object)DBNull.Value),
+                    new SqlParameter("@QtyIn", model.QtyIn ?? (object)DBNull.Value),
+                    new SqlParameter("@CommentsStored", model.CommentsStored ?? (object)DBNull.Value),
+                    new SqlParameter("@DateOut", model.DateOut ?? (object)DBNull.Value),
+                    new SqlParameter("@QtyOut", model.QtyOut ?? (object)DBNull.Value),
+                    new SqlParameter("@RequestFormType", model.RequestFormType ?? (object)DBNull.Value),
+                    new SqlParameter("@Balance", newBalance),
+                    new SqlParameter("@CommentRetrieval", model.CommentRetrieval ?? (object)DBNull.Value),
+                    new SqlParameter("@WONum", model.WONum ?? (object)DBNull.Value),
+                    new SqlParameter("@OilCheck", model.OilCheck ?? (object)DBNull.Value),
+                    new SqlParameter("@LocationHistory", model.LocationHistory ?? (object)DBNull.Value),
+                    new SqlParameter("@ItemStatusID", itemStatusId ?? (object)DBNull.Value),
+                    new SqlParameter("@LTSTorageNum", model.LTStorageNum ?? (object)DBNull.Value),
+                    new SqlParameter("@ShelfRecid", model.ShelfRecid ?? (object)DBNull.Value),
+                    new SqlParameter("@BinNum", model.BinNum ?? (object)DBNull.Value)
+                };
+
+                await _context.Database.ExecuteSqlRawAsync(
+                    @"EXEC spUPDATECheckOutItem 
+                        @CheckOutRecid, @InventoryRecid, @RequestorIDNum, @RequestDate, @NeedDate,
+                        @DateIn, @QtyIn, @CommentsStored, @DateOut, @QtyOut, @RequestFormType,
+                        @Balance, @CommentRetrieval, @WONum, @OilCheck, @LocationHistory,
+                        @ItemStatusID, @LTSTorageNum, @ShelfRecid, @BinNum",
+                    parameters);
+
+                TempData["SuccessMessage"] = "CheckOut record updated successfully!";
+                return RedirectToAction("CheckoutLog", new { inventoryRecid = model.InventoryRecid });
             }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", $"Error updating record: {ex.Message}");
 
-            // If we got this far, something failed, reload dropdown data and redisplay form
-            await LoadDropdownData();
-            ViewBag.CheckOutRecid = model.CheckOutRecid;
-            return PartialView("~/Views/CheckOut/EditCheckOutLog.cshtml", model);
+                // Reload shelf dropdown data on error
+                await LoadShelfDropdownData();
+                ViewBag.CheckOutRecid = model.CheckOutRecid;
+
+                return PartialView("~/Views/CheckOut/EditCheckOutLog.cshtml", model);
+            }
         }
 
         /// <summary>
-        /// Loads dropdown data for the edit form (Requestors, Shelves, ItemStatuses, Bins)
+        /// Loads ONLY Shelf dropdown data for the edit form
         /// </summary>
-        private async Task LoadDropdownData()
+        private async Task LoadShelfDropdownData()
         {
-            // Get all requestors (users) for the dropdown
-            var requestors = await _context.InventoryUsers
-                .OrderBy(u => u.LastName)
-                .ThenBy(u => u.FirstName)
-                .Select(u => new
-                {
-                    u.MyID,
-                    FullName = u.MyID + " - " + u.FirstName + " " + u.LastName
-                })
-                .ToListAsync();
-            ViewBag.Requestors = requestors;
-
             // Get all shelves for the dropdown
             var shelves = await _context.InventoryShelf
                 .OrderBy(s => s.ShelfName)
                 .Select(s => new
                 {
-                    s.ShelfRecid,
-                    s.ShelfName
+                    ShelfRecid = s.ShelfRecid,
+                    ShelfName = s.ShelfName
                 })
                 .ToListAsync();
             ViewBag.Shelves = shelves;
-
-            // Get all item statuses for the dropdown
-            var itemStatuses = await _context.InventoryItemStatus
-                .OrderBy(s => s.ItemStatus)
-                .Select(s => new
-                {
-                    s.ItemStatusID,
-                    s.ItemStatus
-                })
-                .ToListAsync();
-            ViewBag.ItemStatuses = itemStatuses;
-
-            // Get bin numbers using stored procedure
-            try
-            {
-                var binNumbers = await _context.Database
-                    .SqlQueryRaw<BinNumberResult>("EXEC spADDNewBinNumber")
-                    .ToListAsync();
-
-                var lastBinUsed = binNumbers.FirstOrDefault()?.LastBinUsed ?? 0;
-                var newBinNum = lastBinUsed + 1;
-
-                ViewBag.NewBinNum = newBinNum;
-                ViewBag.AllBinNumbers = binNumbers.Select(b => b.BinNum).ToList();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error loading bin numbers: {ex.Message}");
-                ViewBag.NewBinNum = 1;
-                ViewBag.AllBinNumbers = new List<int>();
-            }
-        }
-
-        /// <summary>
-        /// Helper class for bin number stored procedure result
-        /// </summary>
-        private class BinNumberResult
-        {
-            public int BinNum { get; set; }
-            public int LastBinUsed { get; set; }
         }
     }
 }
