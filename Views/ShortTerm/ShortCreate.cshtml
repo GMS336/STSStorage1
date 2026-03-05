@@ -1,45 +1,314 @@
-﻿@model STSStorage1.Models.InvCustomerModel
+﻿@model STSStorage1.Models.InvShortTermCreateModel
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "ShortCreate";
 }
 
-<!-- Add New Customer Modal-->
-<div class="modal-header" style="background-color:cornflowerblue">
-    <h5 class="modal-title" id="exampleModalLabel">Add New Customer</h5>
-    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-        <span aria-hidden="true">&times;</span>
-    </button>
+<div class="container my-3 main-content shortterm" id="createItemForm">
+    <div class="text-center page-header">New Item - Storage Request Form</div>
+
+    <div class="bg-info bg-opacity-25 border rounded shadow-sm p-4 mx-auto" style="background-color:lightblue;">
+
+        <div class="card mb-3">
+            <div class="card-header card-header-accent">
+                <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center">
+                    <div class="d-flex gap-2 align-items-center">
+                        <button type="submit" class="btn btn-light btn-sm" form="createItemForm" title="Create">
+                            Create item
+                        </button>
+                    </div>
+
+                    <div class="header-right text-sm-end text-white mt-3 mt-sm-0">
+                        <button type="button"
+                                class="btn btn-light btn-sm btn-gap no-print"
+                                onclick="window.print()"
+                                title="Print Form">
+                            Print New Item
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <form id="createItemForm" asp-action="ShortCreate" method="post">
+                @Html.AntiForgeryToken()
+
+                <input type="hidden" name="returnPage" value="@ViewBag.ReturnPage" />
+                <input type="hidden" name="returnPageSize" value="@ViewBag.ReturnPageSize" />
+                <input type="hidden" name="returnSortOrder" value="@ViewBag.ReturnSortOrder" />
+                <input type="hidden" name="returnSortDir" value="@ViewBag.ReturnSortDir" />
+
+                <div class="card-body">
+
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                    <div class="alert alert-info mb-3">
+                        Fill in as much information as possible. Fields marked required must be completed.
+                    </div>
+
+                    <!-- Storage Location -->
+                    <div class="row g-3 mb-3">
+                        <div class="col-12 col-lg-4">
+                            <label class="form-label fw-bold">Storage Location <span class="text-danger">*</span></label>
+
+                            <div class="form-check">
+                                <input class="form-check-input"
+                                       type="radio"
+                                       asp-for="StorageLocation"
+                                       value="ShortTerm"
+                                       id="StorageLocation_ShortTerm"
+                                       checked="@(Model.StorageLocation == "ShortTerm")" />
+                                <label class="form-check-label" for="StorageLocation_ShortTerm">
+                                    Short Term (180 Day Limit)
+                                </label>
+                            </div>
+
+                            <div class="form-check">
+                                <input class="form-check-input"
+                                       type="radio"
+                                       asp-for="StorageLocation"
+                                       value="LongTerm"
+                                       id="StorageLocation_LongTerm"
+                                       checked="@(Model.StorageLocation == "LongTerm")" />
+                                <label class="form-check-label" for="StorageLocation_LongTerm">
+                                    Long Term
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-lg-4">
+                            <label asp-for="TargetDuration" class="form-label fw-bold">Short Term Target Duration (Days)</label>
+                            <input asp-for="TargetDuration" class="form-control" />
+                            <span asp-validation-for="TargetDuration" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-12 col-lg-4">
+                            <label asp-for="LongTermReason" class="form-label fw-bold">Long Term Reason</label>
+                            <textarea asp-for="LongTermReason" class="form-control" rows="2"></textarea>
+                            <span asp-validation-for="LongTermReason" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <!-- Requestor / Owner / Date -->
+                    <div class="row g-3 mb-3">
+                        <div class="col-12 col-lg-4">
+                            <label class="form-label fw-bold">Requested By (read-only)</label>
+                            <div class="form-control bg-light">
+                                @ViewBag.CurrentUserId - @ViewBag.CurrentUserFullName
+                            </div>
+                            <input type="hidden" asp-for="RequestorIDNum" value="@ViewBag.CurrentUserId" />
+                        </div>
+
+                        <div class="col-12 col-lg-4">
+                            <label asp-for="OwnerIDNum" class="form-label fw-bold">Owner / Responsible <span class="text-danger">*</span></label>
+                            <select asp-for="OwnerIDNum" class="form-select" asp-items="(IEnumerable<SelectListItem>)ViewBag.Owners">
+                                <option value="">-- Select Owner --</option>
+                            </select>
+                            <span asp-validation-for="OwnerIDNum" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-12 col-lg-4">
+                            <label asp-for="RequestDate" class="form-label fw-bold">Request Date <span class="text-danger">*</span></label>
+                            <input asp-for="RequestDate" class="form-control" />
+                            <span asp-validation-for="RequestDate" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <hr />
+
+                    <!-- Core item fields -->
+                    <div class="row g-3 mb-3">
+                        <div class="col-12 col-lg-6">
+                            <label asp-for="PartNumber" class="form-label fw-bold">Part Number <span class="text-danger">*</span></label>
+                            <input asp-for="PartNumber" class="form-control" />
+                            <span asp-validation-for="PartNumber" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-12 col-lg-6">
+                            <label asp-for="SerialNumber" class="form-label fw-bold">Serial Number <span class="text-danger">*</span></label>
+                            <input asp-for="SerialNumber" class="form-control" />
+                            <span asp-validation-for="SerialNumber" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-12 col-lg-8">
+                            <label asp-for="PartDescription" class="form-label fw-bold">Part Description <span class="text-danger">*</span></label>
+                            <input asp-for="PartDescription" class="form-control" />
+                            <span asp-validation-for="PartDescription" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-12 col-lg-4">
+                            <label asp-for="UUTNumber" class="form-label fw-bold">UUT Number</label>
+                            <input asp-for="UUTNumber" class="form-control" />
+                            <span asp-validation-for="UUTNumber" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-12 col-lg-8">
+                            <label asp-for="Model_Variant" class="form-label fw-bold">Model / Variant <span class="text-danger">*</span></label>
+                            <input asp-for="Model_Variant" class="form-control" />
+                            <span asp-validation-for="Model_Variant" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-12 col-lg-4">
+                            <label asp-for="QtyIn" class="form-label fw-bold">Qty In <span class="text-danger">*</span></label>
+                            <input asp-for="QtyIn" class="form-control" />
+                            <span asp-validation-for="QtyIn" class="text-danger"></span>
+                            <input type="hidden" asp-for="QtyOut" />
+                        </div>
+
+                        <div class="col-12 col-lg-6">
+                            <label asp-for="RevLevel" class="form-label fw-bold">Revision Level</label>
+                            <input asp-for="RevLevel" class="form-control" />
+                            <span asp-validation-for="RevLevel" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-12 col-lg-6">
+                            <label asp-for="CommentsStored" class="form-label fw-bold">Comment In</label>
+                            <textarea asp-for="CommentsStored" class="form-control" rows="2"></textarea>
+                            <span asp-validation-for="CommentsStored" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <!-- Dropdowns -->
+                    <div class="row g-3 mb-3">
+                        <div class="col-12 col-lg-6">
+                            <label asp-for="CustomerRecID" class="form-label fw-bold">Customer</label>
+                            <select asp-for="CustomerRecID" class="form-select" asp-items="(IEnumerable<SelectListItem>)ViewBag.Customers">
+                                <option value="">-- Select Customer --</option>
+                            </select>
+                            <span asp-validation-for="CustomerRecID" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-12 col-lg-6">
+                            <label asp-for="WONum" class="form-label fw-bold">Work Orders</label>
+                            <input asp-for="WONum" class="form-control" />
+                            <span asp-validation-for="WONum" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-12 col-lg-6">
+                            <label asp-for="ProgramName" class="form-label fw-bold">Program Name <span class="text-danger">*</span></label>
+                            <input asp-for="ProgramName" class="form-control" />
+                            <span asp-validation-for="ProgramName" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-12 col-lg-6">
+                            <label asp-for="ItemStatusID" class="form-label fw-bold">Item Status</label>
+                            <select asp-for="ItemStatusID" class="form-select" asp-items="(IEnumerable<SelectListItem>)ViewBag.ItemStatuses">
+                                <option value="">-- Select Status --</option>
+                            </select>
+                            <span asp-validation-for="ItemStatusID" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-12 col-lg-6">
+                            <label asp-for="UM" class="form-label fw-bold">Unit of Measure</label>
+                            <input asp-for="UM" class="form-control" />
+                            <span asp-validation-for="UM" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-12 col-lg-6">
+                            <label asp-for="ProgramPhaseID" class="form-label fw-bold">Project Phase</label>
+                            <select asp-for="ProgramPhaseID" class="form-select" asp-items="(IEnumerable<SelectListItem>)ViewBag.ProgramPhases">
+                                <option value="">-- Select Phase --</option>
+                            </select>
+                            <span asp-validation-for="ProgramPhaseID" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-12 col-lg-6">
+                            <label asp-for="ClassificationID" class="form-label fw-bold">Classification / Usage <span class="text-danger">*</span></label>
+                            <select asp-for="ClassificationID" class="form-select" asp-items="(IEnumerable<SelectListItem>)ViewBag.Classifications">
+                                <option value="">-- Select Classification --</option>
+                            </select>
+                            <span asp-validation-for="ClassificationID" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-12 col-lg-6">
+                            <label asp-for="PickUpLocation" class="form-label fw-bold">Pick Up Location <span class="text-danger">*</span></label>
+                            <input asp-for="PickUpLocation" class="form-control" />
+                            <span asp-validation-for="PickUpLocation" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <!-- Location -->
+                    <div class="row g-3 mb-3">
+                        <div class="col-12 col-lg-4">
+                            <label asp-for="ShelfRecid" class="form-label fw-bold">Shelf</label>
+                            <select asp-for="ShelfRecid" class="form-select" asp-items="(IEnumerable<SelectListItem>)ViewBag.Shelves">
+                                <option value="">-- Select Shelf --</option>
+                            </select>
+                            <span asp-validation-for="ShelfRecid" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-12 col-lg-4">
+                            <label asp-for="BinNum" class="form-label fw-bold">Bin #</label>
+                            <input asp-for="BinNum" class="form-control" />
+                            <span asp-validation-for="BinNum" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-12 col-lg-4">
+                            <label asp-for="LocationHistory" class="form-label fw-bold">Location History</label>
+                            <input asp-for="LocationHistory" class="form-control" />
+                            <span asp-validation-for="LocationHistory" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <!-- General comments + OilCheck -->
+                    <div class="row g-3 mb-3">
+                        <div class="col-12 col-lg-8">
+                            <label asp-for="GeneralComment" class="form-label fw-bold">General Comments</label>
+                            <textarea asp-for="GeneralComment" class="form-control" rows="3"></textarea>
+                            <span asp-validation-for="GeneralComment" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-12 col-lg-4">
+                            <label class="form-label fw-bold">Has Oil been Drained from Unit? <span class="text-danger">*</span></label>
+
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" asp-for="OilCheck" value="Yes" id="OilCheck_Yes" />
+                                <label class="form-check-label" for="OilCheck_Yes">Yes</label>
+                            </div>
+
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" asp-for="OilCheck" value="No" id="OilCheck_No" />
+                                <label class="form-check-label" for="OilCheck_No">No</label>
+                            </div>
+
+                            <span asp-validation-for="OilCheck" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <!-- Hidden defaults -->
+                    <input type="hidden" asp-for="LogStatus" />
+                    <input type="hidden" asp-for="RequestFormType" />
+
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
-<div class="modal-body">
-    <form asp-action="Create">
+
+@section Scripts {
+    <script>
+        function myprint() {
+        // simple, reliable print call — page CSS ensures only the form prints
+        window.print();
+        }
         
-        <div class="form-horizontal" id="CreateForm">
-            @Html.AntiForgeryToken()
+        // Optional UX: disable/enable LongTermReason based on StorageLocation
+        function toggleLongTermReason() {
+            const longTerm = document.getElementById("StorageLocation_LongTerm");
+            const reason = document.getElementById("LongTermReason");
+            if (!reason || !longTerm) return;
 
-            <div class="form-group">
-                <label asp-for="CustomerName" class="control-label"></label>
-                <input asp-for="CustomerName" class="form-control w-100" style="font-size:12px;" />
-                <span asp-validation-for="CustomerName" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="CustomerCode" class="control-label"></label>
-                <input asp-for="CustomerCode" class="form-control w-25" style="font-size:12px;" />
-                <span asp-validation-for="CustomerCode" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="CustomerLocation" class="control-label"></label>
-                <input asp-for="CustomerLocation" class="form-control w-50" style="font-size:12px;" />
-                <span asp-validation-for="CustomerLocation" class="text-danger"></span>
-            </div>
-        </div>
-        <div class="modal-footer">
-            <input type="submit" value="Create" class="btn btn-primary" />
-        </div>
-    </form>
-</div>
+            reason.disabled = !longTerm.checked;
+            if (!longTerm.checked) {
+                // don't force-clear; server clears optionally
+                // reason.value = "";
+            }
+        }
 
-<div>
-    <a asp-action="CustIndex" data-bs-dismiss="modal">Back to List</a>
-</div>
+        document.addEventListener("DOMContentLoaded", function () {
+            toggleLongTermReason();
+            const radios = document.querySelectorAll('input[name="StorageLocation"]');
+            radios.forEach(r => r.addEventListener("change", toggleLongTermReason));
+        });
+    </script>
+}
 

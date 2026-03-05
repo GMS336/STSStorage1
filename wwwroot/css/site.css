@@ -473,7 +473,7 @@ body {
     vertical-align: middle;
 }
 
-/* Print: shortterm page single-page, include colors/backgrounds */
+
 /* Print: shortterm page single-page, include colors/backgrounds */
 @media print {
     /* hide everything by default */
@@ -482,7 +482,7 @@ body {
     }
 
     /* show only the edit form and its children */
-    #editItemForm, #editItemForm * {
+    #editItemForm, #editItemForm *, #createItemForm, #createItemForm * {
         visibility: visible !important;
     }
 
@@ -504,7 +504,7 @@ body {
         /* Prevent breaking the form across pages */
         break-inside: avoid;
         page-break-inside: avoid;
-        zoom: 1.00; /* tweak between 1.0 and ~0.80 as needed */
+        zoom: 0.75; /* tweak between 1.0 and ~0.80 as needed */
     }
 
         /* Compact spacing for form controls inside the printed form */

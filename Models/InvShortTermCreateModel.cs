@@ -1,0 +1,113 @@
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace STSStorage1.Models
+{
+    public class InvShortTermCreateModel
+    {
+        // ====== InventoryMaster fields (spCreateNewItem params) ======
+
+        [Required]
+        [Display(Name = "Part Number")]
+        public string? PartNumber { get; set; }
+
+        [Required]
+        [Display(Name = "Part Description")]
+        public string? PartDescription { get; set; }
+
+        [Required]
+        [Display(Name = "Model / Variant")]
+        public string? Model_Variant { get; set; }
+
+        [Display(Name = "Revision Level")]
+        public string? RevLevel { get; set; }
+
+        [Required]
+        [Display(Name = "Owner / Responsible")]
+        public int? OwnerIDNum { get; set; }
+
+        [Required]
+        [Display(Name = "Program Name")]
+        public string? ProgramName { get; set; }
+
+        [Display(Name = "Customer")]
+        public int? CustomerRecID { get; set; }
+
+        [Display(Name = "Unit of Measure")]
+        public string? UM { get; set; } = "Each";
+
+        [Display(Name = "Target Duration (Days)")]
+        public int? TargetDuration { get; set; } = 180;
+
+        [Required]
+        [Display(Name = "Classification / Usage")]
+        public int? ClassificationID { get; set; }
+
+        [Required]
+        [Display(Name = "Serial Number")]
+        public string? SerialNumber { get; set; }
+
+        [Display(Name = "UUT Number")]
+        public string? UUTNumber { get; set; }
+
+        [Display(Name = "General Comments")]
+        public string? GeneralComment { get; set; }
+
+        [Display(Name = "Project Phase")]
+        public int? ProgramPhaseID { get; set; }
+
+        [Required]
+        [Display(Name = "Storage Location")]
+        public string? StorageLocation { get; set; } = "ShortTerm"; // "ShortTerm" or "LongTerm"
+
+        [Display(Name = "Long Term Reason")]
+        public string? LongTermReason { get; set; }
+
+        [Display(Name = "Log Status")]
+        public string? LogStatus { get; set; } = "New";
+
+        // ====== InventoryCheckOut fields (spADDNewItem params) ======
+
+        [Display(Name = "Bin #")]
+        public string? BinNum { get; set; }
+
+        [Display(Name = "Shelf")]
+        public int? ShelfRecid { get; set; }
+
+        [Required]
+        [Display(Name = "Request Date")]
+        [DataType(DataType.Date)]
+        public DateTime? RequestDate { get; set; } = DateTime.Today;
+
+        [Required]
+        [Display(Name = "Qty In")]
+        public int? QtyIn { get; set; }
+
+        [Display(Name = "Qty Out")]
+        public int? QtyOut { get; set; } = 0;
+
+        [Display(Name = "Location History")]
+        public string? LocationHistory { get; set; }
+
+        [Display(Name = "Comment In")]
+        public string? CommentsStored { get; set; }
+
+        // RequestorIDNum is set server-side from Session["MyID"] and not editable
+        public int? RequestorIDNum { get; set; }
+
+        [Display(Name = "Work Orders")]
+        public string? WONum { get; set; }
+
+        [Display(Name = "Request Form Type")]
+        public string? RequestFormType { get; set; } = "Return";
+
+        [Display(Name = "Item Status")]
+        public int? ItemStatusID { get; set; }
+
+        [Required]
+        [Display(Name = "Pick Up Location")]
+        public string? PickUpLocation { get; set; }
+
+        [Display(Name = "Oil Drained?")]
+        public string? OilCheck { get; set; } = "Yes"; // "Yes" or "No"
+    }
+}
