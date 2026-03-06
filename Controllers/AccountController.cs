@@ -104,7 +104,7 @@ namespace STSStorage1.Controllers
             HttpContext.Session.SetString("LoginTime", newLoginTime.ToString("o"));
 
             // Calculate new expiry time (1 minute from now)
-            var sessionTimeout = TimeSpan.FromMinutes(1);
+            var sessionTimeout = TimeSpan.FromMinutes(10);
             var newExpiry = newLoginTime.Add(sessionTimeout);
 
             return Json(new

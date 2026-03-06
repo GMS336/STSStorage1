@@ -5,7 +5,7 @@
 }
 
 <div class="container my-3 main-content shortterm" id="createItemForm">
-    <div class="text-center page-header">New Item - Storage Request Form</div>
+    <div class="text-center page-header">New Material - Storage Request Form</div>
 
     <div class="bg-info bg-opacity-25 border rounded shadow-sm p-4 mx-auto" style="background-color:lightblue;">
 
@@ -13,7 +13,7 @@
             <div class="card-header card-header-accent">
                 <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center">
                     <div class="d-flex gap-2 align-items-center">
-                        <button type="submit" class="btn btn-light btn-sm" form="createItemForm" title="Create">
+                        <button type="submit" class="btn btn-light btn-sm" title="Create" form="shortCreateForm">
                             Create item
                         </button>
                     </div>
@@ -29,9 +29,10 @@
                 </div>
             </div>
 
-            <form id="createItemForm" asp-action="ShortCreate" method="post">
+<!-- This begins the body of the card area: -->
+            <form id="shortCreateForm" asp-action="ShortCreate" method="post">
                 @Html.AntiForgeryToken()
-
+                @* Hidden fields to preserve return parameters on POST *@
                 <input type="hidden" name="returnPage" value="@ViewBag.ReturnPage" />
                 <input type="hidden" name="returnPageSize" value="@ViewBag.ReturnPageSize" />
                 <input type="hidden" name="returnSortOrder" value="@ViewBag.ReturnSortOrder" />
@@ -223,29 +224,6 @@
                             <label asp-for="PickUpLocation" class="form-label fw-bold">Pick Up Location <span class="text-danger">*</span></label>
                             <input asp-for="PickUpLocation" class="form-control" />
                             <span asp-validation-for="PickUpLocation" class="text-danger"></span>
-                        </div>
-                    </div>
-
-                    <!-- Location -->
-                    <div class="row g-3 mb-3">
-                        <div class="col-12 col-lg-4">
-                            <label asp-for="ShelfRecid" class="form-label fw-bold">Shelf</label>
-                            <select asp-for="ShelfRecid" class="form-select" asp-items="(IEnumerable<SelectListItem>)ViewBag.Shelves">
-                                <option value="">-- Select Shelf --</option>
-                            </select>
-                            <span asp-validation-for="ShelfRecid" class="text-danger"></span>
-                        </div>
-
-                        <div class="col-12 col-lg-4">
-                            <label asp-for="BinNum" class="form-label fw-bold">Bin #</label>
-                            <input asp-for="BinNum" class="form-control" />
-                            <span asp-validation-for="BinNum" class="text-danger"></span>
-                        </div>
-
-                        <div class="col-12 col-lg-4">
-                            <label asp-for="LocationHistory" class="form-label fw-bold">Location History</label>
-                            <input asp-for="LocationHistory" class="form-control" />
-                            <span asp-validation-for="LocationHistory" class="text-danger"></span>
                         </div>
                     </div>
 

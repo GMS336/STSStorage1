@@ -482,7 +482,8 @@ body {
     }
 
     /* show only the edit form and its children */
-    #editItemForm, #editItemForm *, #createItemForm, #createItemForm * {
+    #editItemForm, #editItemForm *, 
+    #createItemForm, #createItemForm * {
         visibility: visible !important;
     }
 
