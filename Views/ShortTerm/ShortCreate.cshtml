@@ -7,12 +7,25 @@
 <div class="container my-3 main-content shortterm" id="createItemForm">
     <div class="text-center page-header">New Material - Storage Request Form</div>
 
-    <div class="bg-info bg-opacity-25 border rounded shadow-sm p-4 mx-auto" style="background-color:lightblue;">
+    <div class="bg-info bg-opacity-25 border rounded shadow-sm p-3 mx-auto"
+         style="background-color:lightblue; max-width: 1200px;">
 
-        <div class="card mb-3">
+        <div class="card mb-2">
             <div class="card-header card-header-accent">
                 <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center">
                     <div class="d-flex gap-2 align-items-center">
+                        <!-- Back to List (match ShortEdit) -->
+                        <a asp-controller="ShortTerm"
+                           asp-action="ShortIndex"
+                           asp-route-page="@ViewBag.ReturnPage"
+                           asp-route-pageSize="@ViewBag.ReturnPageSize"
+                           asp-route-sortOrder="@ViewBag.ReturnSortOrder"
+                           asp-route-sortDir="@ViewBag.ReturnSortDir"
+                           class="btn btn-secondary btn-sm"
+                           title="Back to List">
+                            ← Back to List
+                        </a>
+
                         <button type="submit" class="btn btn-light btn-sm" title="Create" form="shortCreateForm">
                             Create item
                         </button>
@@ -21,7 +34,7 @@
                     <div class="header-right text-sm-end text-white mt-3 mt-sm-0">
                         <button type="button"
                                 class="btn btn-light btn-sm btn-gap no-print"
-                                onclick="window.print()"
+                                onclick="myprint()"
                                 title="Print Form">
                             Print New Item
                         </button>
@@ -29,232 +42,295 @@
                 </div>
             </div>
 
-<!-- This begins the body of the card area: -->
+            <!-- This begins the body of the card area: -->
             <form id="shortCreateForm" asp-action="ShortCreate" method="post">
                 @Html.AntiForgeryToken()
+
                 @* Hidden fields to preserve return parameters on POST *@
                 <input type="hidden" name="returnPage" value="@ViewBag.ReturnPage" />
                 <input type="hidden" name="returnPageSize" value="@ViewBag.ReturnPageSize" />
                 <input type="hidden" name="returnSortOrder" value="@ViewBag.ReturnSortOrder" />
                 <input type="hidden" name="returnSortDir" value="@ViewBag.ReturnSortDir" />
 
-                <div class="card-body">
+                <div class="card-body py-2">
 
-                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-2"></div>
 
-                    <div class="alert alert-info mb-3">
+                    @* Optional helper text (kept, but made smaller/less tall) *@
+                    <div class="alert alert-info py-1 mb-2 small">
                         Fill in as much information as possible. Fields marked required must be completed.
                     </div>
 
-                    <!-- Storage Location -->
-                    <div class="row g-3 mb-3">
-                        <div class="col-12 col-lg-4">
-                            <label class="form-label fw-bold">Storage Location <span class="text-danger">*</span></label>
+                    @* Two-column layout like ShortEdit:
+                       LEFT = "info" column (replacing record/location/time column)
+                       RIGHT = the rest of the fields *@
+                    <div class="row g-2">
 
-                            <div class="form-check">
-                                <input class="form-check-input"
-                                       type="radio"
-                                       asp-for="StorageLocation"
-                                       value="ShortTerm"
-                                       id="StorageLocation_ShortTerm"
-                                       checked="@(Model.StorageLocation == "ShortTerm")" />
-                                <label class="form-check-label" for="StorageLocation_ShortTerm">
-                                    Short Term (180 Day Limit)
-                                </label>
+                        <!-- LEFT COLUMN (StorageLocation / Target / LongTermReason / Requested By / Request Date) -->
+                        <div class="col-12 col-lg-4">
+                            <div class="border rounded bg-white bg-opacity-50 p-2 shadow-sm h-100">
+
+                                <!-- Storage Location -->
+                                <div class="mb-2">
+                                    <label class="form-label fw-bold mb-1">
+                                        Select Storage Location <span class="text-danger">*</span>
+                                    </label>
+
+                                    <div class="form-check">
+                                        <input class="form-check-input"
+                                               type="radio"
+                                               asp-for="StorageLocation"
+                                               value="ShortTerm"
+                                               id="StorageLocation_ShortTerm"
+                                               checked="@(Model.StorageLocation == "ShortTerm")" />
+                                        <label class="form-check-label" for="StorageLocation_ShortTerm">
+                                            Short Term (180 Day Limit)
+                                        </label>
+                                    </div>
+
+                                    <div class="form-check">
+                                        <input class="form-check-input"
+                                               type="radio"
+                                               asp-for="StorageLocation"
+                                               value="LongTerm"
+                                               id="StorageLocation_LongTerm"
+                                               checked="@(Model.StorageLocation == "LongTerm")" />
+                                        <label class="form-check-label" for="StorageLocation_LongTerm">
+                                            Long Term
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <!-- Short Term Target Duration -->
+                                <div class="mb-2">
+                                    <label asp-for="TargetDuration" class="form-label fw-bold mb-1">
+                                        Short Term Target (Days)
+                                    </label>
+                                    <input asp-for="TargetDuration" class="form-control form-control-sm" />
+                                    <span asp-validation-for="TargetDuration" class="text-danger"></span>
+                                </div>
+
+                                <!-- Long Term Reason -->
+                                <div class="mb-2">
+                                    <label asp-for="LongTermReason" class="form-label fw-bold mb-1">
+                                        Long Term Reason
+                                    </label>
+                                    <textarea asp-for="LongTermReason" class="form-control form-control-sm" rows="2"></textarea>
+                                    <span asp-validation-for="LongTermReason" class="text-danger"></span>
+                                </div>
+
+                                <hr class="my-2 border border-dark" />
+
+                                <!-- Requested By -->
+                                <div class="mb-2">
+                                    <label class="form-label fw-bold mb-1">Requested By (read-only)</label>
+                                    <div class="form-control form-control-sm bg-light">
+                                        @ViewBag.CurrentUserId - @ViewBag.CurrentUserFullName
+                                    </div>
+                                    <input type="hidden" asp-for="RequestorIDNum" value="@ViewBag.CurrentUserId" />
+                                </div>
+
+                                <!-- Request Date -->
+                                <div class="mb-2">
+                                    <label asp-for="RequestDate" class="form-label fw-bold mb-1">
+                                        Request Date <span class="text-danger">*</span>
+                                    </label>
+                                    <input asp-for="RequestDate" class="form-control form-control-sm" />
+                                    <span asp-validation-for="RequestDate" class="text-danger"></span>
+                                </div>
+
+                                <hr class="my-2 border border-dark" />
+
+                                <div class="mb-2">
+                                    <label asp-for="PickUpLocation" class="form-label fw-bold mb-1">
+                                        Pick Up Location <span class="text-danger">*</span>
+                                    </label>
+                                    <input asp-for="PickUpLocation" class="form-control form-control-sm" />
+                                    <span asp-validation-for="PickUpLocation" class="text-danger"></span>
+                                </div>
+
+
+                                <div class="col-12">
+                                    <label asp-for="CommentsStored" class="form-label fw-bold mb-1">
+                                        Comment In
+                                        <span class="fw-normal text-danger">(details about going into storage)</span>
+                                    </label>
+                                    <textarea asp-for="CommentsStored" class="form-control form-control-sm" rows="2"></textarea>
+                                    <span asp-validation-for="CommentsStored" class="text-danger"></span>
+                                </div>
+
                             </div>
-
-                            <div class="form-check">
-                                <input class="form-check-input"
-                                       type="radio"
-                                       asp-for="StorageLocation"
-                                       value="LongTerm"
-                                       id="StorageLocation_LongTerm"
-                                       checked="@(Model.StorageLocation == "LongTerm")" />
-                                <label class="form-check-label" for="StorageLocation_LongTerm">
-                                    Long Term
-                                </label>
-                            </div>
                         </div>
 
-                        <div class="col-12 col-lg-4">
-                            <label asp-for="TargetDuration" class="form-label fw-bold">Short Term Target Duration (Days)</label>
-                            <input asp-for="TargetDuration" class="form-control" />
-                            <span asp-validation-for="TargetDuration" class="text-danger"></span>
-                        </div>
-
-                        <div class="col-12 col-lg-4">
-                            <label asp-for="LongTermReason" class="form-label fw-bold">Long Term Reason</label>
-                            <textarea asp-for="LongTermReason" class="form-control" rows="2"></textarea>
-                            <span asp-validation-for="LongTermReason" class="text-danger"></span>
-                        </div>
-                    </div>
-
-                    <!-- Requestor / Owner / Date -->
-                    <div class="row g-3 mb-3">
-                        <div class="col-12 col-lg-4">
-                            <label class="form-label fw-bold">Requested By (read-only)</label>
-                            <div class="form-control bg-light">
-                                @ViewBag.CurrentUserId - @ViewBag.CurrentUserFullName
-                            </div>
-                            <input type="hidden" asp-for="RequestorIDNum" value="@ViewBag.CurrentUserId" />
-                        </div>
-
-                        <div class="col-12 col-lg-4">
-                            <label asp-for="OwnerIDNum" class="form-label fw-bold">Owner / Responsible <span class="text-danger">*</span></label>
-                            <select asp-for="OwnerIDNum" class="form-select" asp-items="(IEnumerable<SelectListItem>)ViewBag.Owners">
-                                <option value="">-- Select Owner --</option>
-                            </select>
-                            <span asp-validation-for="OwnerIDNum" class="text-danger"></span>
-                        </div>
-
-                        <div class="col-12 col-lg-4">
-                            <label asp-for="RequestDate" class="form-label fw-bold">Request Date <span class="text-danger">*</span></label>
-                            <input asp-for="RequestDate" class="form-control" />
-                            <span asp-validation-for="RequestDate" class="text-danger"></span>
-                        </div>
-                    </div>
-
-                    <hr />
-
-                    <!-- Core item fields -->
-                    <div class="row g-3 mb-3">
-                        <div class="col-12 col-lg-6">
-                            <label asp-for="PartNumber" class="form-label fw-bold">Part Number <span class="text-danger">*</span></label>
-                            <input asp-for="PartNumber" class="form-control" />
-                            <span asp-validation-for="PartNumber" class="text-danger"></span>
-                        </div>
-
-                        <div class="col-12 col-lg-6">
-                            <label asp-for="SerialNumber" class="form-label fw-bold">Serial Number <span class="text-danger">*</span></label>
-                            <input asp-for="SerialNumber" class="form-control" />
-                            <span asp-validation-for="SerialNumber" class="text-danger"></span>
-                        </div>
-
+                        <!-- RIGHT COLUMN (match ShortEdit fields as much as possible) -->
                         <div class="col-12 col-lg-8">
-                            <label asp-for="PartDescription" class="form-label fw-bold">Part Description <span class="text-danger">*</span></label>
-                            <input asp-for="PartDescription" class="form-control" />
-                            <span asp-validation-for="PartDescription" class="text-danger"></span>
-                        </div>
+                            <div class="border rounded bg-white bg-opacity-50 p-2 shadow-sm">
 
-                        <div class="col-12 col-lg-4">
-                            <label asp-for="UUTNumber" class="form-label fw-bold">UUT Number</label>
-                            <input asp-for="UUTNumber" class="form-control" />
-                            <span asp-validation-for="UUTNumber" class="text-danger"></span>
-                        </div>
+                                <div class="fw-bold mb-1">Item Details</div>
 
-                        <div class="col-12 col-lg-8">
-                            <label asp-for="Model_Variant" class="form-label fw-bold">Model / Variant <span class="text-danger">*</span></label>
-                            <input asp-for="Model_Variant" class="form-control" />
-                            <span asp-validation-for="Model_Variant" class="text-danger"></span>
-                        </div>
+                                <div class="row g-2">
 
-                        <div class="col-12 col-lg-4">
-                            <label asp-for="QtyIn" class="form-label fw-bold">Qty In <span class="text-danger">*</span></label>
-                            <input asp-for="QtyIn" class="form-control" />
-                            <span asp-validation-for="QtyIn" class="text-danger"></span>
-                            <input type="hidden" asp-for="QtyOut" />
-                        </div>
+                                    <div class="col-12 col-md-6">
+                                        <label asp-for="PartNumber" class="form-label fw-bold mb-1">
+                                            Part Number <span class="text-danger">*</span>
+                                        </label>
+                                        <input asp-for="PartNumber" class="form-control form-control-sm" />
+                                        <span asp-validation-for="PartNumber" class="text-danger"></span>
+                                    </div>
 
-                        <div class="col-12 col-lg-6">
-                            <label asp-for="RevLevel" class="form-label fw-bold">Revision Level</label>
-                            <input asp-for="RevLevel" class="form-control" />
-                            <span asp-validation-for="RevLevel" class="text-danger"></span>
-                        </div>
+                                    <div class="col-12 col-md-6">
+                                        <label asp-for="SerialNumber" class="form-label fw-bold mb-1">
+                                            Serial Number <span class="text-danger">*</span>
+                                        </label>
+                                        <input asp-for="SerialNumber" class="form-control form-control-sm" />
+                                        <span asp-validation-for="SerialNumber" class="text-danger"></span>
+                                    </div>
 
-                        <div class="col-12 col-lg-6">
-                            <label asp-for="CommentsStored" class="form-label fw-bold">Comment In</label>
-                            <textarea asp-for="CommentsStored" class="form-control" rows="2"></textarea>
-                            <span asp-validation-for="CommentsStored" class="text-danger"></span>
-                        </div>
-                    </div>
+                                    <div class="col-12">
+                                        <label asp-for="PartDescription" class="form-label fw-bold mb-1">
+                                            Part Description <span class="text-danger">*</span>
+                                        </label>
+                                        <input asp-for="PartDescription" class="form-control form-control-sm" />
+                                        <span asp-validation-for="PartDescription" class="text-danger"></span>
+                                    </div>
 
-                    <!-- Dropdowns -->
-                    <div class="row g-3 mb-3">
-                        <div class="col-12 col-lg-6">
-                            <label asp-for="CustomerRecID" class="form-label fw-bold">Customer</label>
-                            <select asp-for="CustomerRecID" class="form-select" asp-items="(IEnumerable<SelectListItem>)ViewBag.Customers">
-                                <option value="">-- Select Customer --</option>
-                            </select>
-                            <span asp-validation-for="CustomerRecID" class="text-danger"></span>
-                        </div>
+                                    <div class="col-12 col-md-8">
+                                        <label asp-for="Model_Variant" class="form-label fw-bold mb-1">
+                                            Model / Variant <span class="text-danger">*</span>
+                                        </label>
+                                        <input asp-for="Model_Variant" class="form-control form-control-sm" />
+                                        <span asp-validation-for="Model_Variant" class="text-danger"></span>
+                                    </div>
 
-                        <div class="col-12 col-lg-6">
-                            <label asp-for="WONum" class="form-label fw-bold">Work Orders</label>
-                            <input asp-for="WONum" class="form-control" />
-                            <span asp-validation-for="WONum" class="text-danger"></span>
-                        </div>
+                                    <div class="col-12 col-md-4">
+                                        <label asp-for="RevLevel" class="form-label fw-bold mb-1">Revision Level</label>
+                                        <input asp-for="RevLevel" class="form-control form-control-sm" />
+                                        <span asp-validation-for="RevLevel" class="text-danger"></span>
+                                    </div>
 
-                        <div class="col-12 col-lg-6">
-                            <label asp-for="ProgramName" class="form-label fw-bold">Program Name <span class="text-danger">*</span></label>
-                            <input asp-for="ProgramName" class="form-control" />
-                            <span asp-validation-for="ProgramName" class="text-danger"></span>
-                        </div>
+                                    <div class="col-12 col-md-4">
+                                        <label asp-for="QtyIn" class="form-label fw-bold mb-1">
+                                            Qty In <span class="text-danger">*</span>
+                                        </label>
+                                        <input asp-for="QtyIn" class="form-control form-control-sm" />
+                                        <span asp-validation-for="QtyIn" class="text-danger"></span>
+                                        <input type="hidden" asp-for="QtyOut" />
+                                    </div>
 
-                        <div class="col-12 col-lg-6">
-                            <label asp-for="ItemStatusID" class="form-label fw-bold">Item Status</label>
-                            <select asp-for="ItemStatusID" class="form-select" asp-items="(IEnumerable<SelectListItem>)ViewBag.ItemStatuses">
-                                <option value="">-- Select Status --</option>
-                            </select>
-                            <span asp-validation-for="ItemStatusID" class="text-danger"></span>
-                        </div>
+                                    <div class="col-12 col-md-4">
+                                        <label asp-for="UM" class="form-label fw-bold mb-1">Unit of Measure</label>
+                                        <input asp-for="UM" class="form-control form-control-sm" />
+                                        <span asp-validation-for="UM" class="text-danger"></span>
+                                    </div>
 
-                        <div class="col-12 col-lg-6">
-                            <label asp-for="UM" class="form-label fw-bold">Unit of Measure</label>
-                            <input asp-for="UM" class="form-control" />
-                            <span asp-validation-for="UM" class="text-danger"></span>
-                        </div>
+                                    <div class="col-12 col-md-4">
+                                        <label asp-for="UUTNumber" class="form-label fw-bold mb-1">UUT Number</label>
+                                        <input asp-for="UUTNumber" class="form-control form-control-sm" />
+                                        <span asp-validation-for="UUTNumber" class="text-danger"></span>
+                                    </div>
 
-                        <div class="col-12 col-lg-6">
-                            <label asp-for="ProgramPhaseID" class="form-label fw-bold">Project Phase</label>
-                            <select asp-for="ProgramPhaseID" class="form-select" asp-items="(IEnumerable<SelectListItem>)ViewBag.ProgramPhases">
-                                <option value="">-- Select Phase --</option>
-                            </select>
-                            <span asp-validation-for="ProgramPhaseID" class="text-danger"></span>
-                        </div>
+                                    <div class="col-12 col-md-6">
+                                        <label asp-for="ProgramName" class="form-label fw-bold mb-1">
+                                            Program Name <span class="text-danger">*</span>
+                                        </label>
+                                        <input asp-for="ProgramName" class="form-control form-control-sm" />
+                                        <span asp-validation-for="ProgramName" class="text-danger"></span>
+                                    </div>
 
-                        <div class="col-12 col-lg-6">
-                            <label asp-for="ClassificationID" class="form-label fw-bold">Classification / Usage <span class="text-danger">*</span></label>
-                            <select asp-for="ClassificationID" class="form-select" asp-items="(IEnumerable<SelectListItem>)ViewBag.Classifications">
-                                <option value="">-- Select Classification --</option>
-                            </select>
-                            <span asp-validation-for="ClassificationID" class="text-danger"></span>
-                        </div>
+                                    <div class="col-12 col-md-6">
+                                        <label asp-for="WONum" class="form-label fw-bold mb-1">Work Orders</label>
+                                        <input asp-for="WONum" class="form-control form-control-sm" />
+                                        <span asp-validation-for="WONum" class="text-danger"></span>
+                                    </div>
 
-                        <div class="col-12 col-lg-6">
-                            <label asp-for="PickUpLocation" class="form-label fw-bold">Pick Up Location <span class="text-danger">*</span></label>
-                            <input asp-for="PickUpLocation" class="form-control" />
-                            <span asp-validation-for="PickUpLocation" class="text-danger"></span>
-                        </div>
-                    </div>
+                                    <div class="col-12 col-md-6">
+                                        <label asp-for="CustomerRecID" class="form-label fw-bold mb-1">Customer</label>
+                                        <select asp-for="CustomerRecID"
+                                                class="form-select form-select-sm"
+                                                asp-items="(IEnumerable<SelectListItem>)ViewBag.Customers">
+                                            <option value="">-- Select Customer --</option>
+                                        </select>
+                                        <span asp-validation-for="CustomerRecID" class="text-danger"></span>
+                                    </div>
 
-                    <!-- General comments + OilCheck -->
-                    <div class="row g-3 mb-3">
-                        <div class="col-12 col-lg-8">
-                            <label asp-for="GeneralComment" class="form-label fw-bold">General Comments</label>
-                            <textarea asp-for="GeneralComment" class="form-control" rows="3"></textarea>
-                            <span asp-validation-for="GeneralComment" class="text-danger"></span>
-                        </div>
+                                    <div class="col-12 col-md-6">
+                                        <label asp-for="OwnerIDNum" class="form-label fw-bold mb-1">
+                                            Owner / Responsible <span class="text-danger">*</span>
+                                        </label>
+                                        <select asp-for="OwnerIDNum"
+                                                class="form-select form-select-sm"
+                                                asp-items="(IEnumerable<SelectListItem>)ViewBag.Owners">
+                                            <option value="">-- Select Owner --</option>
+                                        </select>
+                                        <span asp-validation-for="OwnerIDNum" class="text-danger"></span>
+                                    </div>
 
-                        <div class="col-12 col-lg-4">
-                            <label class="form-label fw-bold">Has Oil been Drained from Unit? <span class="text-danger">*</span></label>
+                                    <div class="col-12 col-md-6">
+                                        <label asp-for="ClassificationID" class="form-label fw-bold mb-1">
+                                            Classification / Usage <span class="text-danger">*</span>
+                                        </label>
+                                        <select asp-for="ClassificationID"
+                                                class="form-select form-select-sm"
+                                                asp-items="(IEnumerable<SelectListItem>)ViewBag.Classifications">
+                                            <option value="">-- Select Classification --</option>
+                                        </select>
+                                        <span asp-validation-for="ClassificationID" class="text-danger"></span>
+                                    </div>
 
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" asp-for="OilCheck" value="Yes" id="OilCheck_Yes" />
-                                <label class="form-check-label" for="OilCheck_Yes">Yes</label>
+                                    <div class="col-12 col-md-6">
+                                        <label asp-for="ProgramPhaseID" class="form-label fw-bold mb-1">Project Phase</label>
+                                        <select asp-for="ProgramPhaseID"
+                                                class="form-select form-select-sm"
+                                                asp-items="(IEnumerable<SelectListItem>)ViewBag.ProgramPhases">
+                                            <option value="">-- Select Phase --</option>
+                                        </select>
+                                        <span asp-validation-for="ProgramPhaseID" class="text-danger"></span>
+                                    </div>
+
+                                    <div class="col-12 col-md-6">
+                                        <label asp-for="ItemStatusID" class="form-label fw-bold mb-1">Item Status</label>
+                                        <select asp-for="ItemStatusID"
+                                                class="form-select form-select-sm"
+                                                asp-items="(IEnumerable<SelectListItem>)ViewBag.ItemStatuses">
+                                            <option value="">-- Select Status --</option>
+                                        </select>
+                                        <span asp-validation-for="ItemStatusID" class="text-danger"></span>
+                                    </div>
+
+                                    <div class="col-12 col-md-4">
+                                        <label class="form-label fw-bold mb-1">
+                                            Has Oil been Drained? <span class="text-danger">*</span>
+                                        </label>
+
+                                        <div class="d-flex gap-3">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" asp-for="OilCheck" value="Yes" id="OilCheck_Yes" />
+                                                <label class="form-check-label" for="OilCheck_Yes">Yes</label>
+                                            </div>
+
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" asp-for="OilCheck" value="No" id="OilCheck_No" />
+                                                <label class="form-check-label" for="OilCheck_No">No</label>
+                                            </div>
+                                        </div>
+                                        <span asp-validation-for="OilCheck" class="text-danger"></span>
+                                    </div>
+
+                                    <div class="col-12 col-md-12">
+                                        <label asp-for="GeneralComment" class="form-label fw-bold mb-1">General Comments 
+                                                <span class="fw-normal text-danger">(about the item)</span></label>
+                                        <textarea asp-for="GeneralComment" class="form-control form-control-sm" rows="2"></textarea>
+                                        <span asp-validation-for="GeneralComment" class="text-danger"></span>
+                                    </div>
+                                   
+                                </div>
+
+                                <!-- Hidden defaults -->
+                                <input type="hidden" asp-for="LogStatus" />
+                                <input type="hidden" asp-for="RequestFormType" />
                             </div>
-
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" asp-for="OilCheck" value="No" id="OilCheck_No" />
-                                <label class="form-check-label" for="OilCheck_No">No</label>
-                            </div>
-
-                            <span asp-validation-for="OilCheck" class="text-danger"></span>
                         </div>
                     </div>
-
-                    <!-- Hidden defaults -->
-                    <input type="hidden" asp-for="LogStatus" />
-                    <input type="hidden" asp-for="RequestFormType" />
 
                 </div>
             </form>
@@ -265,10 +341,10 @@
 @section Scripts {
     <script>
         function myprint() {
-        // simple, reliable print call — page CSS ensures only the form prints
-        window.print();
+            // simple, reliable print call — page CSS ensures only the form prints
+            window.print();
         }
-        
+
         // Optional UX: disable/enable LongTermReason based on StorageLocation
         function toggleLongTermReason() {
             const longTerm = document.getElementById("StorageLocation_LongTerm");
@@ -276,10 +352,6 @@
             if (!reason || !longTerm) return;
 
             reason.disabled = !longTerm.checked;
-            if (!longTerm.checked) {
-                // don't force-clear; server clears optionally
-                // reason.value = "";
-            }
         }
 
         document.addEventListener("DOMContentLoaded", function () {
@@ -289,4 +361,3 @@
         });
     </script>
 }
-

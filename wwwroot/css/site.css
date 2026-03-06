@@ -481,14 +481,22 @@ body {
         visibility: hidden !important;
     }
 
-    /* show only the edit form and its children */
-    #editItemForm, #editItemForm *, 
+    /* show only the edit/create form and its children */
+    #editItemForm, #editItemForm *,
     #createItemForm, #createItemForm * {
         visibility: visible !important;
     }
 
+    /* Force white page background so body yellow never shows through */
+    html, body {
+        background: #ffffff !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
     /* place the form at the top-left of the printed page */
-    #editItemForm {
+    #editItemForm,
+    #createItemForm {
         position: absolute;
         left: 0;
         top: 0;
@@ -496,7 +504,7 @@ body {
         margin: 0;
         padding: 6mm; /* small inner padding on printed page */
         box-shadow: none !important; /* remove shadows that may print oddly */
-        background: white;
+        background: white !important;
         -webkit-print-color-adjust: exact; /* request printing of colors in WebKit */
         print-color-adjust: exact; /* standard property for printing colors */
         /* Reduce font-size/line-height to help fit to one page (tweak as needed) */
@@ -513,20 +521,28 @@ body {
         #editItemForm .card-body,
         #editItemForm .card-header,
         #editItemForm .row,
-        #editItemForm .col-*-* {
+        #editItemForm .col-*-*,
+        #createItemForm .card,
+        #createItemForm .card-body,
+        #createItemForm .card-header,
+        #createItemForm .row,
+        #createItemForm .col-*-* {
             margin: 0;
             padding: 0.15rem !important;
         }
 
         /* Make headings slightly smaller */
-        #editItemForm .page-header {
+        #editItemForm .page-header,
+        #createItemForm .page-header {
             font-size: 1.1rem;
             margin-bottom: .25rem;
         }
 
         /* Reduce inputs, selects and textareas visuals */
         #editItemForm .form-control,
-        #editItemForm .form-control-plaintext {
+        #editItemForm .form-control-plaintext,
+        #createItemForm .form-control,
+        #createItemForm .form-control-plaintext {
             font-size: 12px;
             padding: .15rem .35rem;
         }
