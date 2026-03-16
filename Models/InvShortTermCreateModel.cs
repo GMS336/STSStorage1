@@ -1,11 +1,12 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
+using Microsoft.AspNetCore.Mvc.Rendering;
+
 namespace STSStorage1.Models
 {
     public class InvShortTermCreateModel
     {
-        // ====== InventoryMaster fields (spCreateNewItem params) ======
-
+        // ====== InventoryMaster fields (spADDNewItem params) ======
         [Required]
         [Display(Name = "Part Number")]
         public string? PartNumber { get; set; }
@@ -57,7 +58,7 @@ namespace STSStorage1.Models
 
         [Required]
         [Display(Name = "Storage Location")]
-        public string? StorageLocation { get; set; } = "ShortTerm"; // "ShortTerm" or "LongTerm"
+        public string? StorageLocation { get; set; } = "ShortTerm";
 
         [Display(Name = "Long Term Reason")]
         public string? LongTermReason { get; set; }
@@ -66,13 +67,6 @@ namespace STSStorage1.Models
         public string? LogStatus { get; set; } = "New";
 
         // ====== InventoryCheckOut fields (spADDNewItem params) ======
-
-        [Display(Name = "Bin #")]
-        public string? BinNum { get; set; }
-
-        [Display(Name = "Shelf")]
-        public int? ShelfRecid { get; set; }
-
         [Required]
         [Display(Name = "Request Date")]
         [DataType(DataType.Date)]
@@ -85,13 +79,9 @@ namespace STSStorage1.Models
         [Display(Name = "Qty Out")]
         public int? QtyOut { get; set; } = 0;
 
-        [Display(Name = "Location History")]
-        public string? LocationHistory { get; set; }
-
         [Display(Name = "Comment In")]
         public string? CommentsStored { get; set; }
 
-        // RequestorIDNum is set server-side from Session["MyID"] and not editable
         public int? RequestorIDNum { get; set; }
 
         [Display(Name = "Work Orders")]
@@ -108,6 +98,15 @@ namespace STSStorage1.Models
         public string? PickUpLocation { get; set; }
 
         [Display(Name = "Oil Drained?")]
-        public string? OilCheck { get; set; } = "Yes"; // "Yes" or "No"
+        public string? OilCheck { get; set; } = "Yes";
+
+        // ============================
+        // Dropdown options (Create)
+        // ============================
+        public SelectList? ClassificationOptions { get; set; }
+        public SelectList? CustomerOptions { get; set; }
+        public SelectList? PhaseOptions { get; set; }
+        public SelectList? OwnerOptions { get; set; }
+        public SelectList? ItemStatusOptions { get; set; }
     }
 }

@@ -77,6 +77,7 @@ namespace STSStorage1.Controllers
             HttpContext.Session.SetInt32("MyID", user.MyID);
             HttpContext.Session.SetString("UserName", username);
             HttpContext.Session.SetString("FullName", user.FirstName + " " + user.LastName);
+            HttpContext.Session.SetString("PhoneNum", user.PhoneNum ?? string.Empty);   // <-- ADDED THIS
             HttpContext.Session.SetString("LoginTime", DateTime.UtcNow.ToString("o"));
 
             // Set temp data for login view only

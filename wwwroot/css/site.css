@@ -547,6 +547,26 @@ body {
             padding: .15rem .35rem;
         }
 }
+/* Generic: any Index/List page that has a table + paging controls */
+.index-scroll {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    max-height: calc(100vh - 180px); /* adjust if needed for your header */
+    overflow-y: auto;
+    overflow-x: auto; /* recommend auto for wide tables */
+    padding-bottom: 8px; /* breathing room so paging bar isn't flush */
+}
+
+/* Keep paging bar readable (shared by all index pages) */
+.paging-bar {
+    margin-top: 8px;
+    padding: 6px 8px;
+    background: #ffffff;
+    border: 1px solid #dee2e6;
+    border-radius: .25rem;
+}
+
 /* End of namespaced shortterm styles */
 
 

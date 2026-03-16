@@ -31,6 +31,7 @@ namespace STSStorage1.Controllers
             var userName = HttpContext.Session.GetString("UserName");
             var fullName = HttpContext.Session.GetString("FullName");
             var roleName = HttpContext.Session.GetString("RoleName");
+            var phoneNum = HttpContext.Session.GetString("PhoneNum");
 
             // Debug logging
             System.Diagnostics.Debug.WriteLine($"BaseController.OnActionExecuting - Action: {actionName}, AllowAnonymous: {allowAnonymous}, UserName: {userName}");
@@ -45,11 +46,12 @@ namespace STSStorage1.Controllers
                     DateTime.TryParse(loginTimeStr, null, System.Globalization.DateTimeStyles.RoundtripKind, out var loginTime))
                 {
                     // User is logged in, show timer
-                    var sessionTimeout = TimeSpan.FromMinutes(1);
+                    var sessionTimeout = TimeSpan.FromMinutes(10);
                     var sessionExpiry = loginTime.Add(sessionTimeout);
                     ViewBag.SessionExpiry = sessionExpiry.ToUniversalTime().ToString("o");
                     ViewBag.FullName = fullName;
                     ViewBag.RoleName = roleName;
+                    ViewBag.PhoneNum = phoneNum;
                     ViewBag.MyID = HttpContext.Session.GetInt32("MyID");
                     ViewBag.LogInName = userName; // Set to username when logged in
                 }
@@ -59,6 +61,7 @@ namespace STSStorage1.Controllers
                     ViewBag.SessionExpiry = null;
                     ViewBag.FullName = null;
                     ViewBag.RoleName = null;
+                    ViewBag.PhoneNum = null;
                     ViewBag.MyID = null;
                     ViewBag.LogInName = "Log In!"; // Set to "Log In!" when not logged in
                 }
@@ -70,11 +73,12 @@ namespace STSStorage1.Controllers
             if (isLoggedIn && !string.IsNullOrEmpty(loginTimeStr) &&
                 DateTime.TryParse(loginTimeStr, null, System.Globalization.DateTimeStyles.RoundtripKind, out var authLoginTime))
             {
-                var sessionTimeout = TimeSpan.FromMinutes(1);
+                var sessionTimeout = TimeSpan.FromMinutes(10);
                 var sessionExpiry = authLoginTime.Add(sessionTimeout);
                 ViewBag.SessionExpiry = sessionExpiry.ToUniversalTime().ToString("o");
                 ViewBag.FullName = fullName;
                 ViewBag.RoleName = roleName;
+                ViewBag.PhoneNum = phoneNum;
                 ViewBag.MyID = HttpContext.Session.GetInt32("MyID");
                 ViewBag.LogInName = userName; // Set to username when logged in
             }
@@ -83,6 +87,7 @@ namespace STSStorage1.Controllers
                 ViewBag.SessionExpiry = null;
                 ViewBag.FullName = null;
                 ViewBag.RoleName = null;
+                ViewBag.PhoneNum = null;
                 ViewBag.MyID = null;
                 ViewBag.LogInName = "Log In!"; // Set to "Log In!" when not logged in
             }

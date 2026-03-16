@@ -7,11 +7,13 @@
     int pageSize = ViewBag.PageSize ?? 10;
     // sort state exposed by controller (defaults)
     string sortOrder = ViewBag.SortOrder ?? "InventoryRecid";
-    string sortDir = ViewBag.SortDir ?? "asc";
+    string sortDir = ViewBag.SortDir ?? "desc";
 
     // helper to compute next direction for a column (toggle only for ProgramName for now)
     Func<string, string> nextDirFor = col => (sortOrder == col && sortDir == "asc") ? "desc" : "asc";
 }
+<!-- OPTION A: one scroll container for table + paging controls -->
+<div class="index-scroll">
 
 <table style="width:100%">
     <tr>
@@ -217,3 +219,4 @@
         </form>
     </div>
 }
+</div>

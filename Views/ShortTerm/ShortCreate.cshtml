@@ -128,6 +128,9 @@
                                         @ViewBag.CurrentUserId - @ViewBag.CurrentUserFullName
                                     </div>
                                     <input type="hidden" asp-for="RequestorIDNum" value="@ViewBag.CurrentUserId" />
+                                    <span class="form-label fw-light">
+                                       Requestor Phone #: @ViewBag.PhoneNum
+                                    </span>
                                 </div>
 
                                 <!-- Request Date -->
@@ -247,7 +250,7 @@
                                         <label asp-for="CustomerRecID" class="form-label fw-bold mb-1">Customer</label>
                                         <select asp-for="CustomerRecID"
                                                 class="form-select form-select-sm"
-                                                asp-items="(IEnumerable<SelectListItem>)ViewBag.Customers">
+                                                asp-items="Model.CustomerOptions">
                                             <option value="">-- Select Customer --</option>
                                         </select>
                                         <span asp-validation-for="CustomerRecID" class="text-danger"></span>
@@ -259,7 +262,7 @@
                                         </label>
                                         <select asp-for="OwnerIDNum"
                                                 class="form-select form-select-sm"
-                                                asp-items="(IEnumerable<SelectListItem>)ViewBag.Owners">
+                                                asp-items="Model.OwnerOptions">
                                             <option value="">-- Select Owner --</option>
                                         </select>
                                         <span asp-validation-for="OwnerIDNum" class="text-danger"></span>
@@ -271,7 +274,7 @@
                                         </label>
                                         <select asp-for="ClassificationID"
                                                 class="form-select form-select-sm"
-                                                asp-items="(IEnumerable<SelectListItem>)ViewBag.Classifications">
+                                                asp-items="Model.ClassificationOptions">
                                             <option value="">-- Select Classification --</option>
                                         </select>
                                         <span asp-validation-for="ClassificationID" class="text-danger"></span>
@@ -281,7 +284,7 @@
                                         <label asp-for="ProgramPhaseID" class="form-label fw-bold mb-1">Project Phase</label>
                                         <select asp-for="ProgramPhaseID"
                                                 class="form-select form-select-sm"
-                                                asp-items="(IEnumerable<SelectListItem>)ViewBag.ProgramPhases">
+                                                asp-items="Model.PhaseOptions">
                                             <option value="">-- Select Phase --</option>
                                         </select>
                                         <span asp-validation-for="ProgramPhaseID" class="text-danger"></span>
@@ -291,7 +294,7 @@
                                         <label asp-for="ItemStatusID" class="form-label fw-bold mb-1">Item Status</label>
                                         <select asp-for="ItemStatusID"
                                                 class="form-select form-select-sm"
-                                                asp-items="(IEnumerable<SelectListItem>)ViewBag.ItemStatuses">
+                                                asp-items="Model.ItemStatusOptions">
                                             <option value="">-- Select Status --</option>
                                         </select>
                                         <span asp-validation-for="ItemStatusID" class="text-danger"></span>

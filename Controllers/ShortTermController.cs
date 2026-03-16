@@ -21,13 +21,15 @@ namespace STSStorage1.Controllers
         }
         //______________________________________________________________________________________________________________   
 
-        // GET: InvShortTerm Index
+        // ============================
+        // GET: ShortTerm/ShortIndex
+        // ============================
         // Accept sortOrder and sortDir (asc/desc). Pass both to the stored procedure.
         public async Task<IActionResult> ShortIndex(string sortOrder = "InventoryRecid", string sortDir = "asc", int page = 1, int pageSize = 10)
         {
             // Normalize incoming values
             sortOrder = string.IsNullOrWhiteSpace(sortOrder) ? "InventoryRecid" : sortOrder;
-            sortDir = (sortDir ?? "asc").ToLower() == "desc" ? "desc" : "asc";
+            sortDir = (sortDir ?? "desc").ToLower() == "desc" ? "desc" : "asc";
 
             // Increase the command timeout to 10 seconds
             _context.Database.SetCommandTimeout(10);
@@ -71,16 +73,16 @@ namespace STSStorage1.Controllers
 
             return View("~/Views/ShortTerm/ShortIndex.cshtml", pagedList);
         }
-//_________________________________________________________________________________________________
+        //_________________________________________________________________________________________________
 
         // ============================
         // GET: ShortTerm/ShortCreate
         // ============================
         public async Task<IActionResult> ShortCreate(
-            int? returnPage = null,
-            int? returnPageSize = null,
-            string? returnSortOrder = null,
-            string? returnSortDir = null)
+    int? returnPage = null,
+    int? returnPageSize = null,
+    string? returnSortOrder = null,
+    string? returnSortDir = null)
         {
             var myId = HttpContext.Session.GetInt32("MyID");
             if (!myId.HasValue || myId.Value == 0)
@@ -88,19 +90,14 @@ namespace STSStorage1.Controllers
                 return RedirectToAction("LoginDb", "Account", new { timeout = true });
             }
 
-            // Store return parameters in ViewBag for the view (same pattern as ShortEdit)
             ViewBag.ReturnPage = returnPage ?? 1;
             ViewBag.ReturnPageSize = returnPageSize ?? 10;
             ViewBag.ReturnSortOrder = returnSortOrder ?? "InventoryRecid";
             ViewBag.ReturnSortDir = returnSortDir ?? "asc";
 
-            // Requestor display info (read-only)
             ViewBag.CurrentUserId = myId.Value;
             ViewBag.CurrentUserFullName = HttpContext.Session.GetString("FullName") ?? "";
 
-            await PopulateShortCreateDropdowns(selectedOwnerId: myId.Value);
-
-            // Default model values (classic ASP defaults)
             var model = new InvShortTermCreateModel
             {
                 RequestorIDNum = myId.Value,
@@ -114,6 +111,8 @@ namespace STSStorage1.Controllers
                 RequestFormType = "Return",
                 OilCheck = "Yes"
             };
+
+            await LoadCreateDropdownOptions(model);
 
             return View("~/Views/ShortTerm/ShortCreate.cshtml", model);
         }
@@ -136,14 +135,45 @@ namespace STSStorage1.Controllers
                 return RedirectToAction("LoginDb", "Account", new { timeout = true });
             }
 
-            // Force requestor from session (NOT editable)
+            // Preserve return parameters (same pattern as Edit)
+            ViewBag.ReturnPage = returnPage ?? 1;
+            ViewBag.ReturnPageSize = returnPageSize ?? 10;
+            ViewBag.ReturnSortOrder = returnSortOrder ?? "InventoryRecid";
+            ViewBag.ReturnSortDir = returnSortDir ?? "asc";
+
+            // Requestor display info
+            ViewBag.CurrentUserId = myId.Value;
+            ViewBag.CurrentUserFullName = HttpContext.Session.GetString("FullName") ?? "";
+
+            // Basic sanity checks (parallel to Edit's "missing identifier" check)
+            if (model == null)
+            {
+                ModelState.AddModelError(string.Empty, "Missing form data.");
+                model = new InvShortTermCreateModel
+                {
+                    RequestorIDNum = myId.Value,
+                    OwnerIDNum = myId.Value
+                };
+                await LoadCreateDropdownOptions(model);
+                return View("~/Views/ShortTerm/ShortCreate.cshtml", model);
+            }
+
+            // Force server-controlled fields (NOT editable)
             model.RequestorIDNum = myId.Value;
 
-            // Enforce basic location rules
+            // Ensure defaults (avoid null issues if hidden fields omitted)
+            model.QtyOut ??= 0;
+            model.LogStatus ??= "New";
+            model.RequestFormType ??= "Return";
+            model.UM ??= "Each";
+            model.RequestDate ??= DateTime.Today;
+            model.OilCheck ??= "Yes";
+            model.StorageLocation ??= "ShortTerm";
+
+            // Enforce location rule (same as your prior Create)
             if (string.Equals(model.StorageLocation, "ShortTerm", StringComparison.OrdinalIgnoreCase))
             {
                 model.TargetDuration ??= 180;
-                // optional: clear long term reason when short term
                 model.LongTermReason = null;
             }
             else if (string.Equals(model.StorageLocation, "LongTerm", StringComparison.OrdinalIgnoreCase))
@@ -156,191 +186,153 @@ namespace STSStorage1.Controllers
             }
             else
             {
-                ModelState.AddModelError(nameof(model.StorageLocation), "Storage Location must be ShortTerm or LongTerm.");
+                ModelState.AddModelError(nameof(model.StorageLocation),
+                    "Storage Location must be ShortTerm or LongTerm.");
             }
 
             if (!ModelState.IsValid)
             {
-                // Preserve return parameters
-                ViewBag.ReturnPage = returnPage ?? 1;
-                ViewBag.ReturnPageSize = returnPageSize ?? 10;
-                ViewBag.ReturnSortOrder = returnSortOrder ?? "InventoryRecid";
-                ViewBag.ReturnSortDir = returnSortDir ?? "asc";
-
-                // Requestor display info
-                ViewBag.CurrentUserId = myId.Value;
-                ViewBag.CurrentUserFullName = HttpContext.Session.GetString("FullName") ?? "";
-
-                await PopulateShortCreateDropdowns(selectedOwnerId: model.OwnerIDNum);
-
+                // Reload dropdowns (same pattern as Edit)
+                await LoadCreateDropdownOptions(model);
                 return View("~/Views/ShortTerm/ShortCreate.cshtml", model);
             }
 
-            // Call spADDNewItem (existing in DB)
-            // Note: use ExecuteSqlRawAsync because this SP performs inserts and returns no projection.
-            var sql = @"
-EXEC dbo.spADDNewItem
-    @PartNumber,
-    @PartDescription,
-    @Model_Variant,
-    @RevLevel,
-    @OwnerIDNum,
-    @ProgramName,
-    @CustomerRecID,
-    @UM,
-    @TargetDuration,
-    @ClassificationID,
-    @SerialNumber,
-    @UUTNumber,
-    @GeneralComment,
-    @ProgramPhaseID,
-    @StorageLocation,
-    @LongTermReason,
-    @LogStatus,
-    @BinNum,
-    @ShelfRecid,
-    @RequestDate,
-    @QtyIn,
-    @QtyOut,
-    @locationHistory,
-    @CommentsStored,
-    @RequestorIDNum,
-    @WONum,
-    @RequestFormType,
-    @ItemStatusID,
-    @PickUpLocation,
-    @OilCheck";
-
-            var parameters = new[]
+            try
             {
-                new SqlParameter("@PartNumber", (object?)model.PartNumber ?? DBNull.Value),
-                new SqlParameter("@PartDescription", (object?)model.PartDescription ?? DBNull.Value),
-                new SqlParameter("@Model_Variant", (object?)model.Model_Variant ?? DBNull.Value),
-                new SqlParameter("@RevLevel", (object?)model.RevLevel ?? DBNull.Value),
-                new SqlParameter("@OwnerIDNum", (object?)model.OwnerIDNum ?? DBNull.Value),
-                new SqlParameter("@ProgramName", (object?)model.ProgramName ?? DBNull.Value),
-                new SqlParameter("@CustomerRecID", (object?)model.CustomerRecID ?? DBNull.Value),
-                new SqlParameter("@UM", (object?)model.UM ?? DBNull.Value),
-                new SqlParameter("@TargetDuration", (object?)model.TargetDuration ?? DBNull.Value),
-                new SqlParameter("@ClassificationID", (object?)model.ClassificationID ?? DBNull.Value),
-                new SqlParameter("@SerialNumber", (object?)model.SerialNumber ?? DBNull.Value),
-                new SqlParameter("@UUTNumber", (object?)model.UUTNumber ?? DBNull.Value),
-                new SqlParameter("@GeneralComment", (object?)model.GeneralComment ?? DBNull.Value),
-                new SqlParameter("@ProgramPhaseID", (object?)model.ProgramPhaseID ?? DBNull.Value),
-                new SqlParameter("@StorageLocation", (object?)model.StorageLocation ?? DBNull.Value),
-                new SqlParameter("@LongTermReason", (object?)model.LongTermReason ?? DBNull.Value),
-                new SqlParameter("@LogStatus", (object?)model.LogStatus ?? DBNull.Value),
+                // Use named args to match stored procedure robustly (like Edit uses named args)
+                await _context.Database.ExecuteSqlInterpolatedAsync(
+                    $@"EXEC dbo.spADDNewItem
+                @PartNumber = {model.PartNumber},
+                @PartDescription = {model.PartDescription},
+                @Model_Variant = {model.Model_Variant},
+                @RevLevel = {model.RevLevel},
+                @OwnerIDNum = {model.OwnerIDNum},
+                @ProgramName = {model.ProgramName},
+                @CustomerRecID = {model.CustomerRecID},
+                @UM = {model.UM},
+                @TargetDuration = {model.TargetDuration},
+                @ClassificationID = {model.ClassificationID},
+                @SerialNumber = {model.SerialNumber},
+                @UUTNumber = {model.UUTNumber},
+                @GeneralComment = {model.GeneralComment},
+                @ProgramPhaseID = {model.ProgramPhaseID},
+                @StorageLocation = {model.StorageLocation},
+                @LongTermReason = {model.LongTermReason},
+                @LogStatus = {model.LogStatus},
+                @RequestDate = {model.RequestDate},
+                @QtyIn = {model.QtyIn},
+                @QtyOut = {model.QtyOut},
+                @CommentsStored = {model.CommentsStored},
+                @RequestorIDNum = {model.RequestorIDNum},
+                @WONum = {model.WONum},
+                @RequestFormType = {model.RequestFormType},
+                @ItemStatusID = {model.ItemStatusID},
+                @PickUpLocation = {model.PickUpLocation},
+                @OilCheck = {model.OilCheck}"
+                );
 
-                new SqlParameter("@BinNum", (object?)model.BinNum ?? DBNull.Value),
-                new SqlParameter("@ShelfRecid", (object?)model.ShelfRecid ?? DBNull.Value),
-                new SqlParameter("@RequestDate", (object?)model.RequestDate ?? DBNull.Value),
-                new SqlParameter("@QtyIn", (object?)model.QtyIn ?? DBNull.Value),
-                new SqlParameter("@QtyOut", (object?)model.QtyOut ?? DBNull.Value),
+                // Optional: show a message on index if you want
+                // TempData["Success"] = "Item created";
 
-                // Note: SP param is @locationHistory in your script; SQL Server is usually case-insensitive,
-                // but we keep the same casing here.
-                new SqlParameter("@locationHistory", (object?)model.LocationHistory ?? DBNull.Value),
-
-                new SqlParameter("@CommentsStored", (object?)model.CommentsStored ?? DBNull.Value),
-                new SqlParameter("@RequestorIDNum", (object?)model.RequestorIDNum ?? DBNull.Value),
-                new SqlParameter("@WONum", (object?)model.WONum ?? DBNull.Value),
-                new SqlParameter("@RequestFormType", (object?)model.RequestFormType ?? DBNull.Value),
-                new SqlParameter("@ItemStatusID", (object?)model.ItemStatusID ?? DBNull.Value),
-                new SqlParameter("@PickUpLocation", (object?)model.PickUpLocation ?? DBNull.Value),
-                new SqlParameter("@OilCheck", (object?)model.OilCheck ?? DBNull.Value),
-            };
-
-            await _context.Database.ExecuteSqlRawAsync(sql, parameters);
-
-            // Back to list (preserve paging/sort if caller used them)
-            return RedirectToAction("ShortIndex", new
+                return RedirectToAction("ShortIndex", new
+                {
+                    page = returnPage ?? 1,
+                    pageSize = returnPageSize ?? 10,
+                    sortOrder = returnSortOrder ?? "InventoryRecid",
+                    sortDir = returnSortDir ?? "asc"
+                });
+            }
+            catch (DbUpdateException)
             {
-                page = returnPage ?? 1,
-                pageSize = returnPageSize ?? 10,
-                sortOrder = returnSortOrder ?? "InventoryRecid",
-                sortDir = returnSortDir ?? "asc"
-            });
+                ModelState.AddModelError(string.Empty, "Unable to save changes to the database.");
+                await LoadCreateDropdownOptions(model);
+                return View("~/Views/ShortTerm/ShortCreate.cshtml", model);
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError(string.Empty, $"An unexpected error occurred. {ex.Message}");
+                await LoadCreateDropdownOptions(model);
+                return View("~/Views/ShortTerm/ShortCreate.cshtml", model);
+            }
         }
 
-        // Helper: dropdown lists for ShortCreate (from existing EF tables)
-        private async Task PopulateShortCreateDropdowns(int? selectedOwnerId)
+        // Helper method to load all dropdown options for CREATE (model-based like Edit)
+        private async Task LoadCreateDropdownOptions(InvShortTermCreateModel model)
         {
-            // Owners (Users)
-            ViewBag.Owners = await _context.InventoryUsers
-                .OrderBy(u => u.LastName)
-                .ThenBy(u => u.FirstName)
-                .Select(u => new SelectListItem
-                {
-                    Value = u.MyID.ToString(),
-                    Text = (u.LastName + ", " + u.FirstName).Trim()
-                })
+            // Classifications
+            var classifications = await _context.InventoryClassification
+                .OrderBy(c => c.Classification)
                 .ToListAsync();
+
+            model.ClassificationOptions = new SelectList(
+                classifications,
+                "ClassificationID",
+                "Classification",
+                model.ClassificationID
+            );
 
             // Customers
-            ViewBag.Customers = await _context.InventoryCustomer
+            var customers = await _context.InventoryCustomer
                 .OrderBy(c => c.CustomerName)
-                .Select(c => new SelectListItem
-                {
-                    Value = c.CustomerRecID.ToString(),
-                    Text = c.CustomerName
-                })
                 .ToListAsync();
 
-            // Classifications
-            ViewBag.Classifications = await _context.InventoryClassification
-                .OrderBy(c => c.Classification)
-                .Select(c => new SelectListItem
-                {
-                    Value = c.ClassificationID.ToString(),
-                    Text = c.Classification
-                })
-                .ToListAsync();
+            model.CustomerOptions = new SelectList(
+                customers,
+                "CustomerRecID",
+                "CustomerName",
+                model.CustomerRecID
+            );
 
             // Program Phases
-            ViewBag.ProgramPhases = await _context.InventoryProjectPhase
+            var phases = await _context.InventoryProjectPhase
                 .OrderBy(p => p.PhaseName)
-                .Select(p => new SelectListItem
-                {
-                    Value = p.ProgramPhaseID.ToString(),
-                    Text = p.PhaseName
-                })
                 .ToListAsync();
+
+            model.PhaseOptions = new SelectList(
+                phases,
+                "ProgramPhaseID",
+                "PhaseName",
+                model.ProgramPhaseID
+            );
+
+            // Owners (Users)
+            var owners = await _context.InventoryUsers
+                .OrderBy(u => u.LastName)
+                .ThenBy(u => u.FirstName)
+                .ToListAsync();
+
+            var ownerList = owners.Select(o => new
+            {
+                MyID = o.MyID,
+                FullName = $"{o.LastName}, {o.FirstName}".Trim()
+            }).ToList();
+
+            model.OwnerOptions = new SelectList(
+                ownerList,
+                "MyID",
+                "FullName",
+                model.OwnerIDNum
+            );
 
             // Item Status
-            ViewBag.ItemStatuses = await _context.InventoryItemStatus
+            var statuses = await _context.InventoryItemStatus
                 .OrderBy(s => s.ItemStatus)
-                .Select(s => new SelectListItem
-                {
-                    Value = s.ItemStatusID.ToString(),
-                    Text = s.ItemStatus
-                })
                 .ToListAsync();
 
-            // Shelves (optional)
-            ViewBag.Shelves = await _context.InventoryShelf
-                .OrderBy(s => s.ShelfName)
-                .Select(s => new SelectListItem
-                {
-                    Value = s.ShelfRecid.ToString(),
-                    Text = s.ShelfName
-                })
-                .ToListAsync();
+            model.ItemStatusOptions = new SelectList(
+                statuses,
+                "ItemStatusID",
+                "ItemStatus",
+                model.ItemStatusID
+            );
         }
-
-
-
-
-
-
-
-
-
 
 
 
         // __________________________________________________________________
-
-        // GET: invShortTerm/Edit/5
+        // ============================
+        // GET: ShortTerm/ShortEdit/5
+        // ============================
         public async Task<IActionResult> ShortEdit(
             int id,
             int? returnPage = null,
@@ -373,7 +365,9 @@ EXEC dbo.spADDNewItem
             return View(model);
         }
 
-        // POST: ShortTerm/Edit/5
+        // ============================
+        // POST: ShortTerm/ShortEdit
+        // ============================
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ShortEdit(
@@ -511,6 +505,7 @@ EXEC dbo.spADDNewItem
             }
         }
 
+        // __________________________________________________________________
         // Helper method to load all dropdown options
         private async Task LoadDropdownOptions(InvShortTermEditModel model)
         {
