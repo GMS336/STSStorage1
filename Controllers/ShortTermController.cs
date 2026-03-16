@@ -25,7 +25,7 @@ namespace STSStorage1.Controllers
         // GET: ShortTerm/ShortIndex
         // ============================
         // Accept sortOrder and sortDir (asc/desc). Pass both to the stored procedure.
-        public async Task<IActionResult> ShortIndex(string sortOrder = "InventoryRecid", string sortDir = "asc", int page = 1, int pageSize = 10)
+        public async Task<IActionResult> ShortIndex(string sortOrder = "InventoryRecid", string sortDir = "desc", int page = 1, int pageSize = 10)
         {
             // Normalize incoming values
             sortOrder = string.IsNullOrWhiteSpace(sortOrder) ? "InventoryRecid" : sortOrder;
