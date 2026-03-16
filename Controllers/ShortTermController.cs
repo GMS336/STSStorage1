@@ -93,7 +93,7 @@ namespace STSStorage1.Controllers
             ViewBag.ReturnPage = returnPage ?? 1;
             ViewBag.ReturnPageSize = returnPageSize ?? 10;
             ViewBag.ReturnSortOrder = returnSortOrder ?? "InventoryRecid";
-            ViewBag.ReturnSortDir = returnSortDir ?? "asc";
+            ViewBag.ReturnSortDir = returnSortDir ?? "desc";
 
             ViewBag.CurrentUserId = myId.Value;
             ViewBag.CurrentUserFullName = HttpContext.Session.GetString("FullName") ?? "";
@@ -139,7 +139,7 @@ namespace STSStorage1.Controllers
             ViewBag.ReturnPage = returnPage ?? 1;
             ViewBag.ReturnPageSize = returnPageSize ?? 10;
             ViewBag.ReturnSortOrder = returnSortOrder ?? "InventoryRecid";
-            ViewBag.ReturnSortDir = returnSortDir ?? "asc";
+            ViewBag.ReturnSortDir = returnSortDir ?? "desc";
 
             // Requestor display info
             ViewBag.CurrentUserId = myId.Value;
@@ -239,7 +239,7 @@ namespace STSStorage1.Controllers
                     page = returnPage ?? 1,
                     pageSize = returnPageSize ?? 10,
                     sortOrder = returnSortOrder ?? "InventoryRecid",
-                    sortDir = returnSortDir ?? "asc"
+                    sortDir = returnSortDir ?? "desc"
                 });
             }
             catch (DbUpdateException)
@@ -361,7 +361,7 @@ namespace STSStorage1.Controllers
             ViewBag.ReturnPage = returnPage ?? 1;
             ViewBag.ReturnPageSize = returnPageSize ?? 10;
             ViewBag.ReturnSortOrder = returnSortOrder ?? "InventoryRecid";
-            ViewBag.ReturnSortDir = returnSortDir ?? "asc";
+            ViewBag.ReturnSortDir = returnSortDir ?? "desc";
             return View(model);
         }
 
