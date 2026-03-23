@@ -334,34 +334,37 @@ namespace STSStorage1.Controllers
         // GET: ShortTerm/ShortEdit/5
         // ============================
         public async Task<IActionResult> ShortEdit(
-            int id,
-            int? returnPage = null,
-            int? returnPageSize = null,
-            string? returnSortOrder = null,
-            string? returnSortDir = null)
-          {
-            // This section gets the record from the stored procedure.
-            var param = new SqlParameter("@InventoryRecid", id);
+     int id,
+     int? returnPage = null,
+     int? returnPageSize = null,
+     string? returnSortOrder = null,
+     string? returnSortDir = null,
+     int? fromSearch = null)   // NEW
+        {
+            bool includeInactive = (fromSearch.HasValue && fromSearch.Value == 1);
+
+            var p1 = new SqlParameter("@InventoryRecid", id);
+            var p2 = new SqlParameter("@IncludeInactive", includeInactive);
 
             var rows = await _context.InvShortTermEdit
-                .FromSqlRaw("EXEC dbo.spGETShortTermById @InventoryRecid", param)
+                .FromSqlRaw("EXEC dbo.spGETShortTermById @InventoryRecid, @IncludeInactive", p1, p2)
                 .AsNoTracking()
                 .ToListAsync();
 
             var model = rows.FirstOrDefault();
             if (model == null) return NotFound();
-            // Load Classifications for the dropdown
 
             var classifications = await _context.InventoryClassification
                 .OrderBy(c => c.Classification)
                 .ToListAsync();
 
             await LoadDropdownOptions(model);
-            // Store return parameters in ViewBag for the view
+
             ViewBag.ReturnPage = returnPage ?? 1;
             ViewBag.ReturnPageSize = returnPageSize ?? 10;
             ViewBag.ReturnSortOrder = returnSortOrder ?? "InventoryRecid";
             ViewBag.ReturnSortDir = returnSortDir ?? "desc";
+
             return View(model);
         }
 

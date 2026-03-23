@@ -32,6 +32,9 @@ namespace STSStorage1.Data
         // CheckOut view uses InvCheckOutModel to retrieve checkout/checkin history from stored procedure
         public DbSet<InvCheckOutModel> InvCheckOut { get; set; } = default!;
 
+        // Search view uses InvSearchResultModel to retrieve the search criteria from a stored procedure
+        public DbSet<InvSearchResultModel> InvSearchResults { get; set; } = default!;
+        
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             // Keyless projection for stored-proc mapping (no underlying table/view)
@@ -46,6 +49,11 @@ namespace STSStorage1.Data
             modelBuilder.Entity<InvCheckOutModel>()
                         .HasNoKey()
                         .ToView(null);
+             
+            modelBuilder.Entity<InvSearchResultModel>()
+                .HasNoKey()
+                .ToView(null);
+
 
             base.OnModelCreating(modelBuilder);
         }

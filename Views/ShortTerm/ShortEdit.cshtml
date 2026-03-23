@@ -3,8 +3,14 @@
 @{
     ViewData["Title"] = "ShortEdit";
 }
-
-
+@if (Model.CheckoutRecid == null)
+{
+    <div class="alert alert-warning py-2">
+        <strong>No Logbook Records:</strong>
+        This part has no check-in/check-out (logbook) records yet.
+        You can create the first logbook entry below.
+    </div>
+}
 <div class="container my-3 main-content shortterm" id="editItemForm">
     <div class="text-center page-header">Edit Item Detail</div>
 

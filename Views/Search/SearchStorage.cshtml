@@ -1,0 +1,202 @@
+﻿@model STSStorage1.Models.SearchCriteriaModel
+
+@{
+    ViewData["Title"] = "SearchStorage";
+    bool noItemFound = (ViewBag.NoItemFound as bool?) ?? false;
+}
+
+<div class="container my-3 main-content shortterm" id="searchStorageForm">
+    <div class="text-center page-header">Search for Parts in Storage</div>
+
+    <div class="bg-info bg-opacity-25 border rounded shadow-sm p-3 mx-auto"
+         style="background-color:lightblue; max-width: 1200px;">
+
+        <div class="card mb-2">
+            <div class="card-header card-header-accent">
+                <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center">
+                    <div class="d-flex gap-2 align-items-center">
+                        <button type="submit" class="btn btn-light btn-sm" form="searchForm" title="Search">
+                            Search
+                        </button>
+
+                        <a asp-controller="Home" asp-action="STSHome" class="btn btn-secondary btn-sm" title="Back to Home">
+                            ← Back to Home
+                        </a>
+                    </div>
+
+                    <div class="header-right text-sm-end text-white mt-3 mt-sm-0">
+                        <button type="button"
+                                class="btn btn-light btn-sm btn-gap no-print"
+                                onclick="window.print()"
+                                title="Print Search Form">
+                            Print Search Form
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <form id="searchForm" asp-action="SearchStorage" method="post">
+                @Html.AntiForgeryToken()
+
+                <div class="card-body py-2">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-2"></div>
+
+                    @if (noItemFound)
+                    {
+                        <div class="alert alert-danger py-1 mb-2 small">
+                            Your Search Item did not find any matching records, please try another search criteria.
+                        </div>
+                    }
+
+                    <div class="alert alert-info py-1 mb-2 small">
+                        Enter at least one field to search. Results include both Short Term and Long Term items.
+                    </div>
+
+                    <div class="row g-2">
+                        <!-- LEFT COLUMN -->
+                        <div class="col-12 col-lg-4">
+                            <div class="border rounded bg-white bg-opacity-50 p-2 shadow-sm h-100">
+                                <div class="mb-2">
+                                    <label class="form-label fw-bold mb-1">Storage Facility</label>
+                                    <select asp-for="StorageLocation" class="form-select form-select-sm">
+                                        <option value="">--Any Location--</option>
+                                        <option value="ShortTerm">ShortTerm Storage</option>
+                                        <option value="LongTerm">LongTerm Storage</option>
+                                    </select>
+                                </div>
+
+                                <div class="mb-2">
+                                    <label asp-for="BeginDate" class="form-label fw-bold mb-1">Begin Date</label>
+                                    <input asp-for="BeginDate" type="date" class="form-control form-control-sm" />
+                                    <span asp-validation-for="BeginDate" class="text-danger"></span>
+                                </div>
+
+                                <div class="mb-2">
+                                    <label asp-for="EndDate" class="form-label fw-bold mb-1">End Date</label>
+                                    <input asp-for="EndDate" type="date" class="form-control form-control-sm" />
+                                    <span asp-validation-for="EndDate" class="text-danger"></span>
+                                </div>
+
+                                <hr class="my-2 border border-dark" />
+
+                                <div class="mb-2">
+                                    <label asp-for="InventoryRecid" class="form-label fw-bold mb-1">Record ID</label>
+                                    <input asp-for="InventoryRecid" class="form-control form-control-sm" />
+                                    <span asp-validation-for="InventoryRecid" class="text-danger"></span>
+                                </div>
+
+                                <div class="mb-2">
+                                    <label asp-for="OwnerIDNum" class="form-label fw-bold mb-1">Owner</label>
+                                    <select asp-for="OwnerIDNum" asp-items="Model.OwnerOptions" class="form-select form-select-sm">
+                                        <option value="">--Any Owner--</option>
+                                    </select>
+                                    <span asp-validation-for="OwnerIDNum" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- RIGHT COLUMN -->
+                        <div class="col-12 col-lg-8">
+                            <div class="border rounded bg-white bg-opacity-50 p-2 shadow-sm h-100">
+                                <div class="row g-2">
+                                    <div class="col-12 col-md-6">
+                                        <label asp-for="PartNumber" class="form-label fw-bold mb-1">Part Number</label>
+                                        <input asp-for="PartNumber" class="form-control form-control-sm" />
+                                        <span asp-validation-for="PartNumber" class="text-danger"></span>
+                                    </div>
+
+                                    <div class="col-12 col-md-6">
+                                        <label asp-for="PartDescription" class="form-label fw-bold mb-1">Part Description</label>
+                                        <input asp-for="PartDescription" class="form-control form-control-sm" />
+                                        <span asp-validation-for="PartDescription" class="text-danger"></span>
+                                    </div>
+
+                                    <div class="col-12 col-md-6">
+                                        <label asp-for="CustomerRecID" class="form-label fw-bold mb-1">Customer / OEM</label>
+                                        <select asp-for="CustomerRecID" asp-items="Model.CustomerOptions" class="form-select form-select-sm">
+                                            <option value="">--Any Customer--</option>
+                                        </select>
+                                        <span asp-validation-for="CustomerRecID" class="text-danger"></span>
+                                    </div>
+
+                                    <div class="col-12 col-md-6">
+                                        <label asp-for="ProgramName" class="form-label fw-bold mb-1">Program Name</label>
+                                        <input asp-for="ProgramName" class="form-control form-control-sm" />
+                                        <span asp-validation-for="ProgramName" class="text-danger"></span>
+                                    </div>
+
+                                    <div class="col-12 col-md-6">
+                                        <label asp-for="Model_Variant" class="form-label fw-bold mb-1">Model / Variant</label>
+                                        <input asp-for="Model_Variant" class="form-control form-control-sm" />
+                                        <span asp-validation-for="Model_Variant" class="text-danger"></span>
+                                    </div>
+
+                                    <div class="col-12 col-md-6">
+                                        <label asp-for="ProgramPhaseID" class="form-label fw-bold mb-1">Program Phase</label>
+                                        <select asp-for="ProgramPhaseID" asp-items="Model.PhaseOptions" class="form-select form-select-sm">
+                                            <option value="">--Any Phase--</option>
+                                        </select>
+                                        <span asp-validation-for="ProgramPhaseID" class="text-danger"></span>
+                                    </div>
+
+                                    <div class="col-12 col-md-6">
+                                        <label asp-for="ItemStatusID" class="form-label fw-bold mb-1">Current Status</label>
+                                        <select asp-for="ItemStatusID" asp-items="Model.ItemStatusOptions" class="form-select form-select-sm">
+                                            <option value="">--Any Status--</option>
+                                        </select>
+                                        <span asp-validation-for="ItemStatusID" class="text-danger"></span>
+                                    </div>
+
+                                    <div class="col-12 col-md-6">
+                                        <label asp-for="LTStorageNum" class="form-label fw-bold mb-1">Long Term Reference Locator</label>
+                                        <input asp-for="LTStorageNum" class="form-control form-control-sm" />
+                                        <span asp-validation-for="LTStorageNum" class="text-danger"></span>
+                                    </div>
+
+                                    <div class="col-12 col-md-6">
+                                        <label asp-for="ShelfRecid" class="form-label fw-bold mb-1">Shelf</label>
+                                        <select asp-for="ShelfRecid" asp-items="Model.ShelfOptions" class="form-select form-select-sm">
+                                            <option value="">--Any Shelf--</option>
+                                        </select>
+                                        <span asp-validation-for="ShelfRecid" class="text-danger"></span>
+                                    </div>
+
+                                    <div class="col-12 col-md-6">
+                                        <label asp-for="BinNum" class="form-label fw-bold mb-1">Short Term Bin / Pallet Number</label>
+                                        <input asp-for="BinNum" class="form-control form-control-sm" />
+                                        <span asp-validation-for="BinNum" class="text-danger"></span>
+                                    </div>
+
+                                    <div class="col-12 col-md-6">
+                                        <label asp-for="UUTNumber" class="form-label fw-bold mb-1">UUT Number</label>
+                                        <input asp-for="UUTNumber" class="form-control form-control-sm" />
+                                        <span asp-validation-for="UUTNumber" class="text-danger"></span>
+                                    </div>
+
+                                    <div class="col-12 col-md-6">
+                                        <label asp-for="SerialNumber" class="form-label fw-bold mb-1">Serial Number</label>
+                                        <input asp-for="SerialNumber" class="form-control form-control-sm" />
+                                        <span asp-validation-for="SerialNumber" class="text-danger"></span>
+                                    </div>
+
+                                    <div class="col-12">
+                                        <label asp-for="GeneralComment" class="form-label fw-bold mb-1">General Comments</label>
+                                        <input asp-for="GeneralComment" class="form-control form-control-sm" />
+                                        <span asp-validation-for="GeneralComment" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-center mt-3">
+                        <button type="submit" class="btn btn-primary px-4">
+                            Search
+                        </button>
+                    </div>
+
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

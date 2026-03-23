@@ -1,0 +1,471 @@
+﻿@model PaginatedList<STSStorage1.Models.InvSearchResultModel>
+@using STSStorage1.Helpers
+@using STSStorage1.Models
+@using System.Collections.Generic
+
+@{
+    int currentPage = ViewBag.CurrentPage ?? 1;
+    int pageSize = ViewBag.PageSize ?? 10;
+
+    string sortOrder = ViewBag.SortOrder ?? "InventoryRecid";
+    string sortDir = ViewBag.SortDir ?? "desc";
+
+    var criteria = ViewBag.Criteria as SearchCriteriaModel ?? new SearchCriteriaModel();
+
+    Func<string, string> nextDirFor = col => (sortOrder == col && sortDir == "asc") ? "desc" : "asc";
+
+    // ===== NEW: ID -> Name lookups provided by controller =====
+    var ownerNames = ViewBag.LookupOwnerNames as IDictionary<int, string>;
+    var customerNames = ViewBag.LookupCustomerNames as IDictionary<int, string>;
+    var phaseNames = ViewBag.LookupPhaseNames as IDictionary<int, string>;
+    var statusNames = ViewBag.LookupStatusNames as IDictionary<int, string>;
+    var shelfNames = ViewBag.LookupShelfNames as IDictionary<int, string>;
+
+    string FormatIdWithName(string label, int? id, IDictionary<int, string>? lookup)
+    {
+        if (!id.HasValue || id.Value == 0) return "";
+        if (lookup != null && lookup.TryGetValue(id.Value, out var name) && !string.IsNullOrWhiteSpace(name))
+            return $"{label}: {id.Value} {name}";
+        return $"{label}ID: {id.Value}";
+    }
+
+    object rv(int? page = null, int? pageSizeOverride = null, string? sortOrderOverride = null, string? sortDirOverride = null)
+    {
+        return new
+        {
+            // ===== Preserve criteria =====
+            inventoryRecid = criteria.InventoryRecid,
+            storageLocation = criteria.StorageLocation,
+            ownerIDNum = criteria.OwnerIDNum,
+            partNumber = criteria.PartNumber,
+            partDescription = criteria.PartDescription,
+            customerRecID = criteria.CustomerRecID,
+            programName = criteria.ProgramName,
+            model_Variant = criteria.Model_Variant,
+            programPhaseID = criteria.ProgramPhaseID,
+            itemStatusID = criteria.ItemStatusID,
+            ltStorageNum = criteria.LTStorageNum,
+            binNum = criteria.BinNum,
+            shelfRecid = criteria.ShelfRecid,
+            serialNumber = criteria.SerialNumber,
+            uutNumber = criteria.UUTNumber,
+            beginDate = criteria.BeginDate,
+            endDate = criteria.EndDate,
+            generalComment = criteria.GeneralComment,
+
+            // ===== paging/sorting =====
+            sortOrder = sortOrderOverride ?? sortOrder,
+            sortDir = sortDirOverride ?? sortDir,
+            page = page ?? currentPage,
+            pageSize = pageSizeOverride ?? pageSize
+        };
+    }
+
+    bool Has(string? s) => !string.IsNullOrWhiteSpace(s);
+    bool HasInt(int? v) => v.HasValue && v.Value != 0;
+    bool HasDate(DateTime? d) => d.HasValue;
+
+    bool anyCriteria =
+        Has(criteria.StorageLocation) ||
+        HasInt(criteria.InventoryRecid) ||
+        HasInt(criteria.OwnerIDNum) ||
+        Has(criteria.PartNumber) ||
+        Has(criteria.PartDescription) ||
+        HasInt(criteria.CustomerRecID) ||
+        Has(criteria.ProgramName) ||
+        Has(criteria.Model_Variant) ||
+        HasInt(criteria.ProgramPhaseID) ||
+        HasInt(criteria.ItemStatusID) ||
+        Has(criteria.LTStorageNum) ||
+        HasInt(criteria.BinNum) ||
+        HasInt(criteria.ShelfRecid) ||
+        Has(criteria.SerialNumber) ||
+        Has(criteria.UUTNumber) ||
+        Has(criteria.GeneralComment) ||
+        HasDate(criteria.BeginDate) ||
+        HasDate(criteria.EndDate);
+}
+
+<!-- Match ShortIndex structure: index-scroll wraps table + paging -->
+<div class="index-scroll">
+
+    <table style="width:100%">
+        <tr>
+            <td colspan="3"><h2 style="text-align:center">Search Results</h2></td>
+        </tr>
+        <tr>
+            <td>
+                <button type="button" class="btn btn-light btn-sm no-print" onclick="window.print()" title="Print Search Results">
+                    Print
+                </button>
+                <a asp-controller="Search" asp-action="SearchStorage" class="btn btn-secondary btn-sm no-print" title="Search Again">
+                    Search Again
+                </a>
+            </td>
+            <td></td>
+            <td><h6 style="text-align:right">Total Items this search: @Model.TotalCount</h6></td>
+        </tr>
+
+        @* ======================================================
+           Criteria "cards" summary
+           ====================================================== *@
+        <tr>
+            <td colspan="3">
+                <div class="card mb-2">
+                    <div class="card-header py-1" style="background-color:#2b5a3f; color:#fff;">
+                        <strong>Search Criteria</strong>
+                    </div>
+                    <div class="card-body py-2">
+                        <div class="small text-muted mb-1">
+                            Page <strong>@currentPage</strong> of <strong>@Model.TotalPages</strong>,
+                            sorted by <strong>@sortOrder</strong> (<strong>@sortDir</strong>).
+                        </div>
+
+                        @if (!anyCriteria)
+                        {
+                            <div class="small text-muted">No criteria provided (showing all results).</div>
+                        }
+                        else
+                        {
+                            <div class="d-flex flex-wrap gap-2">
+                                @if (Has(criteria.StorageLocation))
+                                {
+                                    <span class="badge bg-secondary">Storage: @criteria.StorageLocation</span>
+                                }
+                                @* InventoryRecid is excluded per your request *@
+                                @if (HasInt(criteria.InventoryRecid))
+                                {
+                                    <span class="badge bg-secondary">RecID: @criteria.InventoryRecid</span>
+                                }
+
+                                @if (HasInt(criteria.OwnerIDNum))
+                                {
+                                    <span class="badge bg-secondary">
+                                        @FormatIdWithName("Owner", criteria.OwnerIDNum, ownerNames)
+                                    </span>
+                                }
+                                @if (Has(criteria.PartNumber))
+                                {
+                                    <span class="badge bg-secondary">Part#: @criteria.PartNumber</span>
+                                }
+                                @if (Has(criteria.PartDescription))
+                                {
+                                    <span class="badge bg-secondary">Desc: @criteria.PartDescription</span>
+                                }
+                                @if (HasInt(criteria.CustomerRecID))
+                                {
+                                    <span class="badge bg-secondary">
+                                        @FormatIdWithName("Customer", criteria.CustomerRecID, customerNames)
+                                    </span>
+                                }
+                                @if (Has(criteria.ProgramName))
+                                {
+                                    <span class="badge bg-secondary">Program: @criteria.ProgramName</span>
+                                }
+                                @if (Has(criteria.Model_Variant))
+                                {
+                                    <span class="badge bg-secondary">Model: @criteria.Model_Variant</span>
+                                }
+                                @if (HasInt(criteria.ProgramPhaseID))
+                                {
+                                    <span class="badge bg-secondary">
+                                        @FormatIdWithName("Phase", criteria.ProgramPhaseID, phaseNames)
+                                    </span>
+                                }
+                                @if (HasInt(criteria.ItemStatusID))
+                                {
+                                    <span class="badge bg-secondary">
+                                        @FormatIdWithName("Status", criteria.ItemStatusID, statusNames)
+                                    </span>
+                                }
+                                @if (Has(criteria.LTStorageNum))
+                                {
+                                    <span class="badge bg-secondary">LT Ref: @criteria.LTStorageNum</span>
+                                }
+                                @if (HasInt(criteria.ShelfRecid))
+                                {
+                                    <span class="badge bg-secondary">
+                                        @FormatIdWithName("Shelf", criteria.ShelfRecid, shelfNames)
+                                    </span>
+                                }
+                                @if (HasInt(criteria.BinNum))
+                                {
+                                    <span class="badge bg-secondary">Bin: @criteria.BinNum</span>
+                                }
+                                @if (Has(criteria.SerialNumber))
+                                {
+                                    <span class="badge bg-secondary">Serial: @criteria.SerialNumber</span>
+                                }
+                                @if (Has(criteria.UUTNumber))
+                                {
+                                    <span class="badge bg-secondary">UUT: @criteria.UUTNumber</span>
+                                }
+                                @if (Has(criteria.GeneralComment))
+                                {
+                                    <span class="badge bg-secondary">Comment: @criteria.GeneralComment</span>
+                                }
+                                @if (HasDate(criteria.BeginDate) || HasDate(criteria.EndDate))
+                                {
+                                    <span class="badge bg-secondary">
+                                        DateIn:
+                                        @(criteria.BeginDate?.ToString("yyyy-MM-dd") ?? "Any")
+                                        to
+                                        @(criteria.EndDate?.ToString("yyyy-MM-dd") ?? "Any")
+                                    </span>
+                                }
+                            </div>
+                        }
+                    </div>
+                </div>
+            </td>
+        </tr>
+
+        <tr>
+            <td colspan="3">
+                <table class="table table-striped table-bordered d-md-table standard-table" id="MainList">
+                    <thead>
+                        <tr>
+                            <th>@Html.DisplayNameFor(m => Model[0].InventoryRecid)</th>
+
+                            <th style="text-align:center">
+                                <a class="link-light" href="@Url.Action("SearchIndex", rv(page: 1, sortOrderOverride: "ProgramName", sortDirOverride: nextDirFor("ProgramName")))">
+                                    Program Name
+                                    @if (sortOrder == "ProgramName")
+                                    {
+                                        <text> @(sortDir == "asc" ? " ▲" : " ▼")</text>
+                                    }
+                                </a>
+                            </th>
+
+                            <th style="text-align:center">
+                                <a class="link-light" href="@Url.Action("SearchIndex", rv(page: 1, sortOrderOverride: "ShelfRecid", sortDirOverride: nextDirFor("ShelfRecid")))">
+                                    Shelf Name
+                                    @if (sortOrder == "ShelfRecid")
+                                    {
+                                        <text> @(sortDir == "asc" ? " ▲" : " ▼")</text>
+                                    }
+                                </a>
+                            </th>
+
+                            <th style="text-align:center">
+                                <a class="link-light" href="@Url.Action("SearchIndex", rv(page: 1, sortOrderOverride: "BinNum", sortDirOverride: nextDirFor("BinNum")))">
+                                    Bin Number
+                                    @if (sortOrder == "BinNum")
+                                    {
+                                        <text> @(sortDir == "asc" ? " ▲" : " ▼")</text>
+                                    }
+                                </a>
+                            </th>
+
+                            <th style="text-align:center">
+                                <a class="link-light" href="@Url.Action("SearchIndex", rv(page: 1, sortOrderOverride: "PartNumber", sortDirOverride: nextDirFor("PartNumber")))">
+                                    Part Number
+                                    @if (sortOrder == "PartNumber")
+                                    {
+                                        <text> @(sortDir == "asc" ? " ▲" : " ▼")</text>
+                                    }
+                                </a>
+                            </th>
+
+                            <th style="text-align:center">
+                                <a class="link-light" href="@Url.Action("SearchIndex", rv(page: 1, sortOrderOverride: "PartDescription", sortDirOverride: nextDirFor("PartDescription")))">
+                                    Part Description
+                                    @if (sortOrder == "PartDescription")
+                                    {
+                                        <text> @(sortDir == "asc" ? " ▲" : " ▼")</text>
+                                    }
+                                </a>
+                            </th>
+
+                            <th style="text-align:center">
+                                <a class="link-light" href="@Url.Action("SearchIndex", rv(page: 1, sortOrderOverride: "OwnerIDNum", sortDirOverride: nextDirFor("OwnerIDNum")))">
+                                    Owner
+                                    @if (sortOrder == "OwnerIDNum")
+                                    {
+                                        <text> @(sortDir == "asc" ? " ▲" : " ▼")</text>
+                                    }
+                                </a>
+                            </th>
+
+                            <th style="text-align:center">
+                                <a class="link-light" href="@Url.Action("SearchIndex", rv(page: 1, sortOrderOverride: "DateIn", sortDirOverride: nextDirFor("DateIn")))">
+                                    Date In
+                                    @if (sortOrder == "DateIn")
+                                    {
+                                        <text> @(sortDir == "asc" ? " ▲" : " ▼")</text>
+                                    }
+                                </a>
+                            </th>
+
+                            <th style="text-align:center">
+                                <a class="link-light" href="@Url.Action("SearchIndex", rv(page: 1, sortOrderOverride: "CurrDuration", sortDirOverride: nextDirFor("CurrDuration")))">
+                                    Time in Storage
+                                    @if (sortOrder == "CurrDuration")
+                                    {
+                                        <text> @(sortDir == "asc" ? " ▲" : " ▼")</text>
+                                    }
+                                </a>
+                            </th>
+
+                            <th style="text-align:center">
+                                <a class="link-light" href="@Url.Action("SearchIndex", rv(page: 1, sortOrderOverride: "Balance", sortDirOverride: nextDirFor("Balance")))">
+                                    Current Quantity
+                                    @if (sortOrder == "Balance")
+                                    {
+                                        <text> @(sortDir == "asc" ? " ▲" : " ▼")</text>
+                                    }
+                                </a>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>
+                                    <a asp-controller="ShortTerm"
+                                       asp-action="ShortEdit"
+                                       asp-route-id="@item.InventoryRecid"
+                                       asp-route-fromSearch="1"
+                                       asp-route-returnPage="@ViewBag.CurrentPage"
+                                       asp-route-returnPageSize="@ViewBag.PageSize"
+                                       asp-route-returnSortOrder="@ViewBag.SortOrder"
+                                       asp-route-returnSortDir="@ViewBag.SortDir"
+                                       class="btn btn-link p-0"
+                                       title="Edit record @item.InventoryRecid">
+                                        @item.InventoryRecid
+                                    </a>
+                                </td>
+
+                                <td>@item.ProgramName</td>
+                                <td>@item.ShelfName</td>
+                                <td>@item.BinNum</td>
+                                <td>@item.PartNumber</td>
+                                <td>@item.PartDescription</td>
+                                <td>@item.Owner</td>
+                                <td>@item.DateIn?.ToString("MM/dd/yyyy")</td>
+                                <td>@item.CurrDuration <small>- days</small></td>
+                                <td>@item.Balance</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </td>
+        </tr>
+    </table>
+
+    @* Paging bar *@
+    @if (Model.TotalPages > 1)
+    {
+        <div class="paging-bar">
+            <nav>
+                <ul class="pagination pagination-sm mb-0">
+                    <li class="page-item @(Model.HasPreviousPage ? "" : "disabled")">
+                        <a class="page-link"
+                           href="@Url.Action("SearchIndex", rv(page: 1))"
+                           title="First page">&laquo;</a>
+                    </li>
+                    <li class="page-item @(Model.HasPreviousPage ? "" : "disabled")">
+                        <a class="page-link"
+                           href="@Url.Action("SearchIndex", rv(page: currentPage - 1))"
+                           title="Previous page">&lt;</a>
+                    </li>
+                    <li class="page-item disabled">
+                        <span class="page-link px-1" style="min-width: 75px">Page @currentPage of @Model.TotalPages</span>
+                    </li>
+                    <li class="page-item @(Model.HasNextPage ? "" : "disabled")">
+                        <a class="page-link"
+                           href="@Url.Action("SearchIndex", rv(page: currentPage + 1))"
+                           title="Next page">&gt;</a>
+                    </li>
+                    <li class="page-item @(Model.HasNextPage ? "" : "disabled")">
+                        <a class="page-link"
+                           href="@Url.Action("SearchIndex", rv(page: Model.TotalPages))"
+                           title="Last page">&raquo;</a>
+                    </li>
+                </ul>
+            </nav>
+
+            <form method="get" asp-action="SearchIndex" class="d-inline-block" style="margin-bottom:0;">
+                <label for="pageJump" class="me-1">Jump to:</label>
+                <input type="number"
+                       id="pageJump"
+                       name="page"
+                       min="1"
+                       max="@Model.TotalPages"
+                       value="@currentPage"
+                       class="form-control form-control-sm d-inline-block"
+                       style="width:60px; display:inline-block;" />
+
+                <input type="hidden" name="pageSize" value="@pageSize" />
+                <input type="hidden" name="sortOrder" value="@sortOrder" />
+                <input type="hidden" name="sortDir" value="@sortDir" />
+
+                <input type="hidden" name="inventoryrecid" value="@criteria.InventoryRecid" />
+                <input type="hidden" name="storagelocation" value="@criteria.StorageLocation" />
+                <input type="hidden" name="owneridnum" value="@criteria.OwnerIDNum" />
+                <input type="hidden" name="partnumber" value="@criteria.PartNumber" />
+                <input type="hidden" name="partdescription" value="@criteria.PartDescription" />
+                <input type="hidden" name="customerrecid" value="@criteria.CustomerRecID" />
+                <input type="hidden" name="programname" value="@criteria.ProgramName" />
+                <input type="hidden" name="model_variant" value="@criteria.Model_Variant" />
+                <input type="hidden" name="programphaseid" value="@criteria.ProgramPhaseID" />
+                <input type="hidden" name="itemstatusid" value="@criteria.ItemStatusID" />
+                <input type="hidden" name="ltstoragenum" value="@criteria.LTStorageNum" />
+                <input type="hidden" name="binnum" value="@criteria.BinNum" />
+                <input type="hidden" name="shelfrecid" value="@criteria.ShelfRecid" />
+                <input type="hidden" name="serialnumber" value="@criteria.SerialNumber" />
+                <input type="hidden" name="uutnumber" value="@criteria.UUTNumber" />
+                <input type="hidden" name="begindate" value="@(criteria.BeginDate?.ToString("yyyy-MM-dd"))" />
+                <input type="hidden" name="enddate" value="@(criteria.EndDate?.ToString("yyyy-MM-dd"))" />
+                <input type="hidden" name="generalcomment" value="@criteria.GeneralComment" />
+
+                <button type="submit" class="btn btn-primary btn-sm ms-1 px-2">Go</button>
+            </form>
+
+            <form method="get" asp-action="SearchIndex" class="d-inline-block" style="margin-bottom:0;">
+                <label class="me-1" for="pageSizeSelect">Records per page:</label>
+                <select name="pageSize"
+                        id="pageSizeSelect"
+                        onchange="this.form.submit()"
+                        class="form-select form-select-sm d-inline-block"
+                        style="width:70px; display:inline-block;">
+                    @foreach (var size in new int[] { 5, 10, 20, 50, 100 })
+                    {
+                        if (size == pageSize)
+                        {
+                            <option value="@size" selected="selected">@size</option>
+                        }
+                        else
+                        {
+                            <option value="@size">@size</option>
+                        }
+                    }
+                </select>
+
+                <input type="hidden" name="page" value="@currentPage" />
+                <input type="hidden" name="sortOrder" value="@sortOrder" />
+                <input type="hidden" name="sortDir" value="@sortDir" />
+
+                <input type="hidden" name="inventoryRecid" value="@criteria.InventoryRecid" />
+                <input type="hidden" name="storageLocation" value="@criteria.StorageLocation" />
+                <input type="hidden" name="ownerIDNum" value="@criteria.OwnerIDNum" />
+                <input type="hidden" name="partNumber" value="@criteria.PartNumber" />
+                <input type="hidden" name="partDescription" value="@criteria.PartDescription" />
+                <input type="hidden" name="customerRecID" value="@criteria.CustomerRecID" />
+                <input type="hidden" name="programName" value="@criteria.ProgramName" />
+                <input type="hidden" name="model_Variant" value="@criteria.Model_Variant" />
+                <input type="hidden" name="programPhaseID" value="@criteria.ProgramPhaseID" />
+                <input type="hidden" name="itemStatusID" value="@criteria.ItemStatusID" />
+                <input type="hidden" name="ltStorageNum" value="@criteria.LTStorageNum" />
+                <input type="hidden" name="binNum" value="@criteria.BinNum" />
+                <input type="hidden" name="shelfRecid" value="@criteria.ShelfRecid" />
+                <input type="hidden" name="serialNumber" value="@criteria.SerialNumber" />
+                <input type="hidden" name="uutNumber" value="@criteria.UUTNumber" />
+                <input type="hidden" name="beginDate" value="@(criteria.BeginDate?.ToString("yyyy-MM-dd"))" />
+                <input type="hidden" name="endDate" value="@(criteria.EndDate?.ToString("yyyy-MM-dd"))" />
+                <input type="hidden" name="generalComment" value="@criteria.GeneralComment" />
+            </form>
+        </div>
+    }
+</div>
