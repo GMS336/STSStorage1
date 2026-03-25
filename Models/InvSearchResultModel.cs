@@ -59,6 +59,9 @@ namespace STSStorage1.Models
 
         public int? cntAll { get; set; }
 
+        [Display(Name = "Logbook")]
+        public int? LogbookCount { get; set; }
+
         [Display(Name = "Date In")]
         public DateTime? DateIn { get; set; }
 

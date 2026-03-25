@@ -126,6 +126,8 @@ namespace STSStorage1.Models
         [Display(Name = "Current Quantity")]
         public int? FinalQty { get; set; }
 
+        public int LogbookCount { get; set; }
+
         [Display(Name = "Date In")]
         public DateTime? DateIn { get; set; }
 

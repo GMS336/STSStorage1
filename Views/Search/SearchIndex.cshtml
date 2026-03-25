@@ -315,7 +315,8 @@
                                         <text> @(sortDir == "asc" ? " ▲" : " ▼")</text>
                                     }
                                 </a>
-                            </th>
+                            <th style="text-align:center">Logbook Cnt</th>
+
                         </tr>
                     </thead>
                     <tbody>
@@ -346,6 +347,7 @@
                                 <td>@item.DateIn?.ToString("MM/dd/yyyy")</td>
                                 <td>@item.CurrDuration <small>- days</small></td>
                                 <td>@item.Balance</td>
+                                <td>@item.LogbookCount</td>
                             </tr>
                         }
                     </tbody>
