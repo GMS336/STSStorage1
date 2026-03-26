@@ -79,10 +79,10 @@ namespace STSStorage1.Controllers
         // GET: ShortTerm/ShortCreate
         // ============================
         public async Task<IActionResult> ShortCreate(
-    int? returnPage = null,
-    int? returnPageSize = null,
-    string? returnSortOrder = null,
-    string? returnSortDir = null)
+            int? returnPage = null,
+            int? returnPageSize = null,
+            string? returnSortOrder = null,
+            string? returnSortDir = null)
         {
             var myId = HttpContext.Session.GetInt32("MyID");
             if (!myId.HasValue || myId.Value == 0)
@@ -256,7 +256,7 @@ namespace STSStorage1.Controllers
             }
         }
 
-        // Helper method to load all dropdown options for CREATE (model-based like Edit)
+        // Helper method to load all dropdown options for CREATE model.
         private async Task LoadCreateDropdownOptions(InvShortTermCreateModel model)
         {
             // Classifications
@@ -509,7 +509,7 @@ namespace STSStorage1.Controllers
         }
 
         // __________________________________________________________________
-        // Helper method to load all dropdown options
+        // Helper method to load all dropdown options For the Edit model
         private async Task LoadDropdownOptions(InvShortTermEditModel model)
         {
             // Load Classifications
