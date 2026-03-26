@@ -2,7 +2,11 @@
 
 @{
     ViewData["Title"] = "ShortEdit";
+
+    // CHANGED: detect if we came from Search
+    var fromSearch = ((int?)ViewBag.FromSearch ?? 0) == 1;
 }
+
 @if (Model.LogbookCount == 0)
 {
     <div class="alert alert-warning py-2">
@@ -22,18 +26,54 @@
             <div class="card-header card-header-accent">
                 <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center">
                     <div class="d-flex gap-2 align-items-center">
-                        
-                        <!-- Back to List button -->
-                        <a asp-controller="ShortTerm"
-                           asp-action="ShortIndex"
-                           asp-route-page="@ViewBag.ReturnPage"
-                           asp-route-pageSize="@ViewBag.ReturnPageSize"
-                           asp-route-sortOrder="@ViewBag.ReturnSortOrder"
-                           asp-route-sortDir="@ViewBag.ReturnSortDir"
-                           class="btn btn-secondary btn-sm"
-                           title="Back to List">
-                            ← Back to List
-                        </a>
+
+                        <!-- CHANGED: Back button is conditional -->
+                        @if (fromSearch)
+                        {
+                            <a asp-controller="Search"
+                               asp-action="SearchIndex"
+
+                               asp-route-inventoryRecid="@ViewBag.Search_inventoryRecid"
+                               asp-route-storageLocation="@ViewBag.Search_storageLocation"
+                               asp-route-ownerIDNum="@ViewBag.Search_ownerIDNum"
+                               asp-route-partNumber="@ViewBag.Search_partNumber"
+                               asp-route-partDescription="@ViewBag.Search_partDescription"
+                               asp-route-customerRecID="@ViewBag.Search_customerRecID"
+                               asp-route-programName="@ViewBag.Search_programName"
+                               asp-route-model_Variant="@ViewBag.Search_model_Variant"
+                               asp-route-programPhaseID="@ViewBag.Search_programPhaseID"
+                               asp-route-itemStatusID="@ViewBag.Search_itemStatusID"
+                               asp-route-ltStorageNum="@ViewBag.Search_ltStorageNum"
+                               asp-route-binNum="@ViewBag.Search_binNum"
+                               asp-route-shelfRecid="@ViewBag.Search_shelfRecid"
+                               asp-route-serialNumber="@ViewBag.Search_serialNumber"
+                               asp-route-uutNumber="@ViewBag.Search_uutNumber"
+                               asp-route-beginDate="@(ViewBag.Search_beginDate?.ToString("yyyy-MM-dd"))"
+                               asp-route-endDate="@(ViewBag.Search_endDate?.ToString("yyyy-MM-dd"))"
+                               asp-route-generalComment="@ViewBag.Search_generalComment"
+
+                               asp-route-page="@ViewBag.ReturnPage"
+                               asp-route-pageSize="@ViewBag.ReturnPageSize"
+                               asp-route-sortOrder="@ViewBag.ReturnSortOrder"
+                               asp-route-sortDir="@ViewBag.ReturnSortDir"
+                               class="btn btn-secondary btn-sm"
+                               title="Back to Search">
+                                ← Back to Search
+                            </a>
+                        }
+                        else
+                        {
+                            <a asp-controller="ShortTerm"
+                               asp-action="ShortIndex"
+                               asp-route-page="@ViewBag.ReturnPage"
+                               asp-route-pageSize="@ViewBag.ReturnPageSize"
+                               asp-route-sortOrder="@ViewBag.ReturnSortOrder"
+                               asp-route-sortDir="@ViewBag.ReturnSortDir"
+                               class="btn btn-secondary btn-sm"
+                               title="Back to List">
+                                ← Back to List
+                            </a>
+                        }
 
                         <!-- Update button (submits the inner form with id="shortEditForm") -->
                         <button type="submit" class="btn btn-light btn-sm" title="Update" form="shortEditForm">
@@ -70,7 +110,28 @@
                 <input type="hidden" name="returnPageSize" value="@ViewBag.ReturnPageSize" />
                 <input type="hidden" name="returnSortOrder" value="@ViewBag.ReturnSortOrder" />
                 <input type="hidden" name="returnSortDir" value="@ViewBag.ReturnSortDir" />
-                
+
+                @* CHANGED: round-trip Search criteria via hidden inputs so Back-to-Search works after POST *@
+                <input type="hidden" name="fromSearch" value="@ViewBag.FromSearch" />
+                <input type="hidden" name="inventoryRecid" value="@ViewBag.Search_inventoryRecid" />
+                <input type="hidden" name="storageLocation" value="@ViewBag.Search_storageLocation" />
+                <input type="hidden" name="ownerIDNum" value="@ViewBag.Search_ownerIDNum" />
+                <input type="hidden" name="partNumber" value="@ViewBag.Search_partNumber" />
+                <input type="hidden" name="partDescription" value="@ViewBag.Search_partDescription" />
+                <input type="hidden" name="customerRecID" value="@ViewBag.Search_customerRecID" />
+                <input type="hidden" name="programName" value="@ViewBag.Search_programName" />
+                <input type="hidden" name="model_Variant" value="@ViewBag.Search_model_Variant" />
+                <input type="hidden" name="programPhaseID" value="@ViewBag.Search_programPhaseID" />
+                <input type="hidden" name="itemStatusID" value="@ViewBag.Search_itemStatusID" />
+                <input type="hidden" name="ltStorageNum" value="@ViewBag.Search_ltStorageNum" />
+                <input type="hidden" name="binNum" value="@ViewBag.Search_binNum" />
+                <input type="hidden" name="shelfRecid" value="@ViewBag.Search_shelfRecid" />
+                <input type="hidden" name="serialNumber" value="@ViewBag.Search_serialNumber" />
+                <input type="hidden" name="uutNumber" value="@ViewBag.Search_uutNumber" />
+                <input type="hidden" name="beginDate" value="@(ViewBag.Search_beginDate?.ToString("yyyy-MM-dd"))" />
+                <input type="hidden" name="endDate" value="@(ViewBag.Search_endDate?.ToString("yyyy-MM-dd"))" />
+                <input type="hidden" name="generalComment" value="@ViewBag.Search_generalComment" />
+
                 @* Toast-style success message in top-right corner *@
                 @if (ViewBag.SuccessMessage != null)
                 {
@@ -302,5 +363,3 @@
             }
         });
 </script>
-
-

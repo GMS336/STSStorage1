@@ -324,10 +324,31 @@
                         {
                             <tr>
                                 <td>
+                                    @* CHANGED: pass ALL search criteria into ShortEdit so Back-to-Search can restore it *@
                                     <a asp-controller="ShortTerm"
                                        asp-action="ShortEdit"
                                        asp-route-id="@item.InventoryRecid"
                                        asp-route-fromSearch="1"
+
+                                       asp-route-inventoryRecid="@criteria.InventoryRecid"
+                                       asp-route-storageLocation="@criteria.StorageLocation"
+                                       asp-route-ownerIDNum="@criteria.OwnerIDNum"
+                                       asp-route-partNumber="@criteria.PartNumber"
+                                       asp-route-partDescription="@criteria.PartDescription"
+                                       asp-route-customerRecID="@criteria.CustomerRecID"
+                                       asp-route-programName="@criteria.ProgramName"
+                                       asp-route-model_Variant="@criteria.Model_Variant"
+                                       asp-route-programPhaseID="@criteria.ProgramPhaseID"
+                                       asp-route-itemStatusID="@criteria.ItemStatusID"
+                                       asp-route-ltStorageNum="@criteria.LTStorageNum"
+                                       asp-route-binNum="@criteria.BinNum"
+                                       asp-route-shelfRecid="@criteria.ShelfRecid"
+                                       asp-route-serialNumber="@criteria.SerialNumber"
+                                       asp-route-uutNumber="@criteria.UUTNumber"
+                                       asp-route-beginDate="@(criteria.BeginDate?.ToString("yyyy-MM-dd"))"
+                                       asp-route-endDate="@(criteria.EndDate?.ToString("yyyy-MM-dd"))"
+                                       asp-route-generalComment="@criteria.GeneralComment"
+
                                        asp-route-returnPage="@ViewBag.CurrentPage"
                                        asp-route-returnPageSize="@ViewBag.PageSize"
                                        asp-route-returnSortOrder="@ViewBag.SortOrder"
@@ -461,7 +482,7 @@
                 <input type="hidden" name="itemStatusID" value="@criteria.ItemStatusID" />
                 <input type="hidden" name="ltStorageNum" value="@criteria.LTStorageNum" />
                 <input type="hidden" name="binNum" value="@criteria.BinNum" />
-                <input type="hidden" name="shelfRecid" value="@criteria.ShelfRecid" />
+                <input type="hidden" name="shelfrecid" value="@criteria.ShelfRecid" />
                 <input type="hidden" name="serialNumber" value="@criteria.SerialNumber" />
                 <input type="hidden" name="uutNumber" value="@criteria.UUTNumber" />
                 <input type="hidden" name="beginDate" value="@(criteria.BeginDate?.ToString("yyyy-MM-dd"))" />
