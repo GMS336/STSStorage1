@@ -32,7 +32,6 @@
                         {
                             <a asp-controller="Search"
                                asp-action="SearchIndex"
-
                                asp-route-inventoryRecid="@ViewBag.Search_inventoryRecid"
                                asp-route-storageLocation="@ViewBag.Search_storageLocation"
                                asp-route-ownerIDNum="@ViewBag.Search_ownerIDNum"
@@ -51,7 +50,6 @@
                                asp-route-beginDate="@(ViewBag.Search_beginDate?.ToString("yyyy-MM-dd"))"
                                asp-route-endDate="@(ViewBag.Search_endDate?.ToString("yyyy-MM-dd"))"
                                asp-route-generalComment="@ViewBag.Search_generalComment"
-
                                asp-route-page="@ViewBag.ReturnPage"
                                asp-route-pageSize="@ViewBag.ReturnPageSize"
                                asp-route-sortOrder="@ViewBag.ReturnSortOrder"
@@ -92,17 +90,44 @@
                         </button>
 
                         <!-- View Logbook button (navigates to logbook for this InventoryRecid) -->
-                        <a href="@Url.Action("CheckoutLog", "CheckOut", new { inventoryRecid = Model.InventoryRecid })"
+                        <!-- >>> CHANGE START: pass Search + return context into CheckoutLog -->
+                        <a asp-controller="CheckOut"
+                           asp-action="CheckoutLog"
+                           asp-route-inventoryRecid="@Model.InventoryRecid"
+                           asp-route-returnPage="@ViewBag.ReturnPage"
+                           asp-route-returnPageSize="@ViewBag.ReturnPageSize"
+                           asp-route-returnSortOrder="@ViewBag.ReturnSortOrder"
+                           asp-route-returnSortDir="@ViewBag.ReturnSortDir"
+                           asp-route-fromSearch="@ViewBag.FromSearch"
+                           asp-route-inventoryRecidSearch="@ViewBag.Search_inventoryRecid"
+                           asp-route-storageLocation="@ViewBag.Search_storageLocation"
+                           asp-route-ownerIDNum="@ViewBag.Search_ownerIDNum"
+                           asp-route-partNumber="@ViewBag.Search_partNumber"
+                           asp-route-partDescription="@ViewBag.Search_partDescription"
+                           asp-route-customerRecID="@ViewBag.Search_customerRecID"
+                           asp-route-programName="@ViewBag.Search_programName"
+                           asp-route-model_Variant="@ViewBag.Search_model_Variant"
+                           asp-route-programPhaseID="@ViewBag.Search_programPhaseID"
+                           asp-route-itemStatusID="@ViewBag.Search_itemStatusID"
+                           asp-route-ltStorageNum="@ViewBag.Search_ltStorageNum"
+                           asp-route-binNum="@ViewBag.Search_binNum"
+                           asp-route-shelfRecid="@ViewBag.Search_shelfRecid"
+                           asp-route-serialNumber="@ViewBag.Search_serialNumber"
+                           asp-route-uutNumber="@ViewBag.Search_uutNumber"
+                           asp-route-beginDate="@(ViewBag.Search_beginDate?.ToString("yyyy-MM-dd"))"
+                           asp-route-endDate="@(ViewBag.Search_endDate?.ToString("yyyy-MM-dd"))"
+                           asp-route-generalComment="@ViewBag.Search_generalComment"
                            class="btn btn-light btn-sm btn-gap"
                            title="View Logbook">
                             View Logbook
                         </a>
+                        <!-- <<< CHANGE END -->
 
                     </div>
                 </div>
             </div>
 
-<!-- This begins the body of the card area: -->
+            <!-- This begins the body of the card area: -->
             <form id="shortEditForm" asp-action="ShortEdit">
                 @Html.AntiForgeryToken()
                 @* Hidden fields to preserve return parameters on POST *@
@@ -135,116 +160,119 @@
                 @* Toast-style success message in top-right corner *@
                 @if (ViewBag.SuccessMessage != null)
                 {
-                <span class="badge bg-success text-white px-3 py-2 animate-fade" id="successBadge">
-                    ✓ @ViewBag.SuccessMessage
-                    <button type="button" class="btn-close btn-close-white btn-close-sm"
-                            onclick="document.getElementById('successBadge').remove();"
-                            aria-label="Close"
-                            style="font-size: 0.7rem;"></button>
-                </span>
+                    <span class="badge bg-success text-white px-3 py-2 animate-fade" id="successBadge">
+                        ✓ @ViewBag.SuccessMessage
+                        <button type="button" class="btn-close btn-close-white btn-close-sm"
+                                onclick="document.getElementById('successBadge').remove();"
+                                aria-label="Close"
+                                style="font-size: 0.7rem;"></button>
+                    </span>
                 }
                 <div class="card-body">
-                <div class="row gy-3">
-                    <!-- Left column: Record / Locators (readonly information) -->
+                    <div class="row gy-3">
+                        <!-- Left column: Record / Locators (readonly information) -->
                         @* Hidden input so InventoryRecid is posted *@
                         <input type="hidden" asp-for="InventoryRecid" />
-                    <div class="col-lg-4">
-                        <div class="mb-3">
-                            <div class="record-badge" style="font-size:24px; font-weight:bold;">
-                                Record Number:
-                                <span class="inventory-id-btn">@Model.InventoryRecid</span>
+                        <div class="col-lg-4">
+                            <div class="mb-3">
+                                <div class="record-badge" style="font-size:24px; font-weight:bold;">
+                                    Record Number:
+                                    <span class="inventory-id-btn">@Model.InventoryRecid</span>
+                                </div>
                             </div>
-                        </div>
 
-                        <div class="d-flex align-items-center">
-                            <label asp-for="StorageLocation" class="form-label field-label-bold mb-0 me-2"></label>
-                            <span class="form-control stp-lightyellow mb-0 d-inline-block" style="width:20ch;">@Model.StorageLocation</span>
-                            <input type="hidden" asp-for="StorageLocation" />
-                        </div>
-                        
-                        <div><hr /></div>
+                            <div class="d-flex align-items-center">
+                                <label asp-for="StorageLocation" class="form-label field-label-bold mb-0 me-2"></label>
+                                <span class="form-control stp-lightyellow mb-0 d-inline-block" style="width:20ch;">@Model.StorageLocation</span>
+                                <input type="hidden" asp-for="StorageLocation" />
+                            </div>
 
-                        <div class="mb-3">
-                            <label class="form-label field-label-bold">Short Term Storage Location:</label>
-                            <div>
-                                <span style="padding:12px;">Bin Number: </span>
-                                <span class="form-control stp-lightyellow">@Model.BinNum</span>
-                                <input type="hidden" asp-for="BinNum" />
-                            </div>
-                            <div>
-                                <span style="padding:12px;">Shelf Name: </span>
-                                <span class="form-control stp-lightyellow">@Model.ShelfName</span>
-                                <input type="hidden" asp-for="ShelfName" />
-                            </div>
-                        </div>
-                        <div><hr /></div>
+                            <div><hr /></div>
 
-                        <div class="mb-3">
-                            <label class="form-label field-label-bold">Long Term Storage Location:</label>
-                            <div>
-                                <span class="form-control stp-lightyellow">@Model.LTStorageNum</span>
-                                <input type="hidden" asp-for="LTStorageNum" />
+                            <div class="mb-3">
+                                <label class="form-label field-label-bold">Short Term Storage Location:</label>
+                                <div>
+                                    <span style="padding:12px;">Bin Number: </span>
+                                    <span class="form-control stp-lightyellow">@Model.BinNum</span>
+                                    <input type="hidden" asp-for="BinNum" />
+                                </div>
+                                <div>
+                                    <span style="padding:12px;">Shelf Name: </span>
+                                    <span class="form-control stp-lightyellow">@Model.ShelfName</span>
+                                    <input type="hidden" asp-for="ShelfName" />
+                                </div>
                             </div>
-                            <div>
-                                <span style="padding:12px;">Long Term Reason:</span>
-                                <span><textarea class="form-control stp-lightyellow" rows="2" readonly
-                                    aria-readonly="true">@Model.LongTermReason</textarea></span>
+                            <div><hr /></div>
+
+                            <div class="mb-3">
+                                <label class="form-label field-label-bold">Long Term Storage Location:</label>
+                                <div>
+                                    <span class="form-control stp-lightyellow">@Model.LTStorageNum</span>
+                                    <input type="hidden" asp-for="LTStorageNum" />
+                                </div>
+                                <div>
+                                    <span style="padding:12px;">Long Term Reason:</span>
+                                    <span>
+                                        <textarea class="form-control stp-lightyellow" rows="2" readonly
+                                                  aria-readonly="true">@Model.LongTermReason</textarea>
+                                    </span>
                                     <input type="hidden" asp-for="LongTermReason" />
+                                </div>
                             </div>
-                        </div>
 
-                        <div><hr /></div>
+                            <div><hr /></div>
 
-                        <div class="mb-3">
-                            <label class="form-label field-label-bold">Time in Storage:</label>
-                            <!-- Content row -->
-                            <div class="row gx-2 gy-1 mt-1">
-                                <div class="form-group col-sm-6">
-                                    <label asp-for="CurrDuration" class="form-label field-label"></label>
-                                    <span class="form-control stp-lightyellow readonly-display mb-0"
-                                            role="textbox"
-                                            aria-readonly="true"
-                                            tabindex="0"
-                                            title="@Model.CurrDuration">
-                                        @Model.CurrDuration
-                                    </span>
+                            <div class="mb-3">
+                                <label class="form-label field-label-bold">Time in Storage:</label>
+                                <!-- Content row -->
+                                <div class="row gx-2 gy-1 mt-1">
+                                    <div class="form-group col-sm-6">
+                                        <label asp-for="CurrDuration" class="form-label field-label"></label>
+                                        <span class="form-control stp-lightyellow readonly-display mb-0"
+                                              role="textbox"
+                                              aria-readonly="true"
+                                              tabindex="0"
+                                              title="@Model.CurrDuration">
+                                            @Model.CurrDuration
+                                        </span>
                                         <input type="hidden" asp-for="CurrDuration" />
-                                </div>
-                                <div class="form-group col-sm-6">
-                                    <label asp-for="TargetDuration" class="form-label field-label"></label>
-                                    <input asp-for="TargetDuration" class="form-control" />
-                                    <span asp-validation-for="TargetDuration" class="text-danger"></span>
+                                    </div>
+                                    <div class="form-group col-sm-6">
+                                        <label asp-for="TargetDuration" class="form-label field-label"></label>
+                                        <input asp-for="TargetDuration" class="form-control" />
+                                        <span asp-validation-for="TargetDuration" class="text-danger"></span>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <div><hr /></div>
-                        <div class="mb-3">
-                            <label class="form-label field-label-bold">Quantities Currently in Stock:</label>
-                            <!-- Content row -->
-                            <div class="row gx-2 gy-1 mt-1">
-                                <div class="form-group col-sm-6">
-                                    <label asp-for="FinalQty" class="form-label field-label"></label>
-                                    <span class="form-control stp-lightyellow readonly-display mb-0"
-                                            role="textbox"
-                                            aria-readonly="true"
-                                            tabindex="0"
-                                            title="@Model.FinalQty">@Model.FinalQty
-                                    </span>
+                            <div><hr /></div>
+                            <div class="mb-3">
+                                <label class="form-label field-label-bold">Quantities Currently in Stock:</label>
+                                <!-- Content row -->
+                                <div class="row gx-2 gy-1 mt-1">
+                                    <div class="form-group col-sm-6">
+                                        <label asp-for="FinalQty" class="form-label field-label"></label>
+                                        <span class="form-control stp-lightyellow readonly-display mb-0"
+                                              role="textbox"
+                                              aria-readonly="true"
+                                              tabindex="0"
+                                              title="@Model.FinalQty">
+                                            @Model.FinalQty
+                                        </span>
                                         <input type="hidden" asp-for="FinalQty" />
-                                </div>
+                                    </div>
                                     <div class="form-group col-sm-6">
                                         <label asp-for="UM" class="form-label field-label"></label>
                                         <input asp-for="UM" class="form-control" />
                                         <span asp-validation-for="UM" class="text-danger"></span>
                                     </div>
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- Right column: main form (only editable fields inside the FORM) -->
-                    <div class="col-lg-8">
-                        <!-- The actual form is here — it does NOT duplicate the outer visual classes -->
-                        <!-- the form originally started here but mooved for entire body.-->
+                        <!-- Right column: main form (only editable fields inside the FORM) -->
+                        <div class="col-lg-8">
+                            <!-- The actual form is here — it does NOT duplicate the outer visual classes -->
+                            <!-- the form originally started here but mooved for entire body.-->
 
                             <div class="row g-3">
                                 <div class="form-group col-md-8">
@@ -305,13 +333,13 @@
                                     </select>
                                     <span asp-validation-for="CustomerRecID" class="text-danger"></span>
                                 </div>
-                                
+
                                 <div class="form-group col-md-6">
                                     <label asp-for="ProgramName" class="form-label field-label-bold"></label>
                                     <input asp-for="ProgramName" class="form-control" />
                                     <span asp-validation-for="ProgramName" class="text-danger"></span>
                                 </div>
-                                
+
                                 <div class="form-group col-md-6">
                                     <label asp-for="FirstDateIn" class="form-label field-label-bold"></label>
                                     <input asp-for="FirstDateIn" type="date" class="form-control" />
@@ -334,9 +362,9 @@
 
                             </div>
 
-                    </div> <!-- end right column -->
-                </div> <!-- end inner row -->
-            </div> <!-- card-body -->
+                        </div> <!-- end right column -->
+                    </div> <!-- end inner row -->
+                </div> <!-- card-body -->
             </form>
             <div class="card-footer text-muted d-flex justify-content-between">
                 <div class="small">Last modified: 2026-01-05</div>

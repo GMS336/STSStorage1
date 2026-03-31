@@ -17,6 +17,34 @@
     <input type="hidden" id="QtyInOld" value="@(Model.QtyIn ?? 0)" />
     <input type="hidden" id="QtyOutOld" value="@(Model.QtyOut ?? 0)" />
 
+    @* >>> CHANGE START: preserve return/search context through modal POST *@
+    <input type="hidden" name="returnPage" value="@ViewBag.ReturnPage" />
+    <input type="hidden" name="returnPageSize" value="@ViewBag.ReturnPageSize" />
+    <input type="hidden" name="returnSortOrder" value="@ViewBag.ReturnSortOrder" />
+    <input type="hidden" name="returnSortDir" value="@ViewBag.ReturnSortDir" />
+
+    <input type="hidden" name="fromSearch" value="@ViewBag.FromSearch" />
+
+    <input type="hidden" name="inventoryRecidSearch" value="@ViewBag.Search_inventoryRecid" />
+    <input type="hidden" name="storageLocation" value="@ViewBag.Search_storageLocation" />
+    <input type="hidden" name="ownerIDNum" value="@ViewBag.Search_ownerIDNum" />
+    <input type="hidden" name="partNumber" value="@ViewBag.Search_partNumber" />
+    <input type="hidden" name="partDescription" value="@ViewBag.Search_partDescription" />
+    <input type="hidden" name="customerRecID" value="@ViewBag.Search_customerRecID" />
+    <input type="hidden" name="programName" value="@ViewBag.Search_programName" />
+    <input type="hidden" name="model_Variant" value="@ViewBag.Search_model_Variant" />
+    <input type="hidden" name="programPhaseID" value="@ViewBag.Search_programPhaseID" />
+    <input type="hidden" name="itemStatusID" value="@ViewBag.Search_itemStatusID" />
+    <input type="hidden" name="ltStorageNum" value="@ViewBag.Search_ltStorageNum" />
+    <input type="hidden" name="binNum" value="@ViewBag.Search_binNum" />
+    <input type="hidden" name="shelfRecid" value="@ViewBag.Search_shelfRecid" />
+    <input type="hidden" name="serialNumber" value="@ViewBag.Search_serialNumber" />
+    <input type="hidden" name="uutNumber" value="@ViewBag.Search_uutNumber" />
+    <input type="hidden" name="beginDate" value="@(ViewBag.Search_beginDate?.ToString("yyyy-MM-dd"))" />
+    <input type="hidden" name="endDate" value="@(ViewBag.Search_endDate?.ToString("yyyy-MM-dd"))" />
+    <input type="hidden" name="generalComment" value="@ViewBag.Search_generalComment" />
+    @* <<< CHANGE END *@
+
     <div class="modal-body">
         @if (ViewData.ModelState.ErrorCount > 0)
         {
