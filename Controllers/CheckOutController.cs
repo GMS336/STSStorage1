@@ -19,85 +19,9 @@ namespace STSStorage1.Controllers
             _context = context;
         }
 
-        // >>> CHANGE START: helper to persist Search->ShortEdit->CheckoutLog return path
-        private void SetSearchReturnViewBags(
-            int? fromSearch,
-            int? inventoryRecidSearch,
-            string? storageLocation,
-            int? ownerIDNum,
-            string? partNumber,
-            string? partDescription,
-            int? customerRecID,
-            string? programName,
-            string? model_Variant,
-            int? programPhaseID,
-            int? itemStatusID,
-            string? ltStorageNum,
-            int? binNum,
-            int? shelfRecid,
-            string? serialNumber,
-            string? uutNumber,
-            DateTime? beginDate,
-            DateTime? endDate,
-            string? generalComment
-        )
-        {
-            ViewBag.FromSearch = fromSearch ?? 0;
-
-            ViewBag.Search_inventoryRecid = inventoryRecidSearch;
-            ViewBag.Search_storageLocation = storageLocation;
-            ViewBag.Search_ownerIDNum = ownerIDNum;
-            ViewBag.Search_partNumber = partNumber;
-            ViewBag.Search_partDescription = partDescription;
-            ViewBag.Search_customerRecID = customerRecID;
-            ViewBag.Search_programName = programName;
-            ViewBag.Search_model_Variant = model_Variant;
-            ViewBag.Search_programPhaseID = programPhaseID;
-            ViewBag.Search_itemStatusID = itemStatusID;
-            ViewBag.Search_ltStorageNum = ltStorageNum;
-            ViewBag.Search_binNum = binNum;
-            ViewBag.Search_shelfRecid = shelfRecid;
-            ViewBag.Search_serialNumber = serialNumber;
-            ViewBag.Search_uutNumber = uutNumber;
-            ViewBag.Search_beginDate = beginDate;
-            ViewBag.Search_endDate = endDate;
-            ViewBag.Search_generalComment = generalComment;
-        }
-        // <<< CHANGE END
-
         // GET: CheckOut/CheckoutLog
         // Display all checkout/checkin history for a specific InventoryRecid
-        public async Task<IActionResult> CheckoutLog(
-            int inventoryRecid,
-
-            // >>> CHANGE START: preserve return params + search context (optional)
-            int? returnPage = null,
-            int? returnPageSize = null,
-            string? returnSortOrder = null,
-            string? returnSortDir = null,
-
-            int? fromSearch = null,
-
-            int? inventoryRecidSearch = null,
-            string? storageLocation = null,
-            int? ownerIDNum = null,
-            string? partNumber = null,
-            string? partDescription = null,
-            int? customerRecID = null,
-            string? programName = null,
-            string? model_Variant = null,
-            int? programPhaseID = null,
-            int? itemStatusID = null,
-            string? ltStorageNum = null,
-            int? binNum = null,
-            int? shelfRecid = null,
-            string? serialNumber = null,
-            string? uutNumber = null,
-            DateTime? beginDate = null,
-            DateTime? endDate = null,
-            string? generalComment = null
-        // <<< CHANGE END
-        )
+        public async Task<IActionResult> CheckoutLog(int inventoryRecid)
         {
             if (inventoryRecid <= 0)
             {
@@ -132,35 +56,6 @@ namespace STSStorage1.Controllers
 
             // Get target duration from first record if available
             ViewBag.TargetDuration = items.FirstOrDefault()?.TargetDuration ?? 0;
-
-            // >>> CHANGE START: expose context to the view
-            ViewBag.ReturnPage = returnPage ?? 1;
-            ViewBag.ReturnPageSize = returnPageSize ?? 10;
-            ViewBag.ReturnSortOrder = returnSortOrder ?? "InventoryRecid";
-            ViewBag.ReturnSortDir = returnSortDir ?? "desc";
-
-            SetSearchReturnViewBags(
-                fromSearch,
-                inventoryRecidSearch,
-                storageLocation,
-                ownerIDNum,
-                partNumber,
-                partDescription,
-                customerRecID,
-                programName,
-                model_Variant,
-                programPhaseID,
-                itemStatusID,
-                ltStorageNum,
-                binNum,
-                shelfRecid,
-                serialNumber,
-                uutNumber,
-                beginDate,
-                endDate,
-                generalComment
-            );
-            // <<< CHANGE END
 
             return View("~/Views/CheckOut/CheckoutLog.cshtml", items);
         }
@@ -273,37 +168,7 @@ namespace STSStorage1.Controllers
         /// <summary>
         /// Displays the edit form for a specific checkout log entry in a modal
         /// </summary>
-        public async Task<IActionResult> EditCheckOutLog(
-            int checkOutRecid,
-
-            // >>> CHANGE START: accept context so we can round-trip it through the modal
-            int? returnPage = null,
-            int? returnPageSize = null,
-            string? returnSortOrder = null,
-            string? returnSortDir = null,
-
-            int? fromSearch = null,
-
-            int? inventoryRecidSearch = null,
-            string? storageLocation = null,
-            int? ownerIDNum = null,
-            string? partNumber = null,
-            string? partDescription = null,
-            int? customerRecID = null,
-            string? programName = null,
-            string? model_Variant = null,
-            int? programPhaseID = null,
-            int? itemStatusID = null,
-            string? ltStorageNum = null,
-            int? binNum = null,
-            int? shelfRecid = null,
-            string? serialNumber = null,
-            string? uutNumber = null,
-            DateTime? beginDate = null,
-            DateTime? endDate = null,
-            string? generalComment = null
-        // <<< CHANGE END
-        )
+        public async Task<IActionResult> EditCheckOutLog(int checkOutRecid)
         {
             try
             {
@@ -388,35 +253,6 @@ namespace STSStorage1.Controllers
 
                 ViewBag.CheckOutRecid = checkOutRecid;
 
-                // >>> CHANGE START: store context in ViewBag so the partial can render hidden inputs
-                ViewBag.ReturnPage = returnPage ?? 1;
-                ViewBag.ReturnPageSize = returnPageSize ?? 10;
-                ViewBag.ReturnSortOrder = returnSortOrder ?? "InventoryRecid";
-                ViewBag.ReturnSortDir = returnSortDir ?? "desc";
-
-                SetSearchReturnViewBags(
-                    fromSearch,
-                    inventoryRecidSearch,
-                    storageLocation,
-                    ownerIDNum,
-                    partNumber,
-                    partDescription,
-                    customerRecID,
-                    programName,
-                    model_Variant,
-                    programPhaseID,
-                    itemStatusID,
-                    ltStorageNum,
-                    binNum,
-                    shelfRecid,
-                    serialNumber,
-                    uutNumber,
-                    beginDate,
-                    endDate,
-                    generalComment
-                );
-                // <<< CHANGE END
-
                 return PartialView("~/Views/CheckOut/EditCheckOutLog.cshtml", editModel);  // RETURN editModel NOT item!
             }
             catch (Exception ex)
@@ -431,40 +267,7 @@ namespace STSStorage1.Controllers
         // POST: CheckOut/EditCheckOutLog
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditCheckOutLog(
-            InvCheckOutEditModel model,
-            int? ItemStatusID,
-            int? Balance,
-            DateTime? NeedDate,
-
-            // >>> CHANGE START: accept context from hidden inputs and include it in redirect
-            int? returnPage = null,
-            int? returnPageSize = null,
-            string? returnSortOrder = null,
-            string? returnSortDir = null,
-
-            int? fromSearch = null,
-
-            int? inventoryRecidSearch = null,
-            string? storageLocation = null,
-            int? ownerIDNum = null,
-            string? partNumber = null,
-            string? partDescription = null,
-            int? customerRecID = null,
-            string? programName = null,
-            string? model_Variant = null,
-            int? programPhaseID = null,
-            int? itemStatusID = null,
-            string? ltStorageNum = null,
-            int? binNum = null,
-            int? shelfRecid = null,
-            string? serialNumber = null,
-            string? uutNumber = null,
-            DateTime? beginDate = null,
-            DateTime? endDate = null,
-            string? generalComment = null
-        // <<< CHANGE END
-        )
+        public async Task<IActionResult> EditCheckOutLog(InvCheckOutEditModel model, int? ItemStatusID, int? Balance, DateTime? NeedDate)
         {
             try
             {
@@ -507,38 +310,8 @@ namespace STSStorage1.Controllers
                         @ItemStatusID, @LTSTorageNum, @ShelfRecid, @BinNum",
                     parameters);
 
-                // >>> CHANGE START: Redirect back to CheckoutLog but preserve search/return context
-                return RedirectToAction("CheckoutLog", new
-                {
-                    inventoryRecid = model.InventoryRecid,
-
-                    returnPage,
-                    returnPageSize,
-                    returnSortOrder,
-                    returnSortDir,
-
-                    fromSearch,
-
-                    inventoryRecidSearch,
-                    storageLocation,
-                    ownerIDNum,
-                    partNumber,
-                    partDescription,
-                    customerRecID,
-                    programName,
-                    model_Variant,
-                    programPhaseID,
-                    itemStatusID,
-                    ltStorageNum,
-                    binNum,
-                    shelfRecid,
-                    serialNumber,
-                    uutNumber,
-                    beginDate,
-                    endDate,
-                    generalComment
-                });
-                // <<< CHANGE END
+                // Redirect back to CheckoutLog with no success message
+                return RedirectToAction("CheckoutLog", new { inventoryRecid = model.InventoryRecid });
             }
             catch (Exception ex)
             {
@@ -548,35 +321,6 @@ namespace STSStorage1.Controllers
                 await LoadCheckOutDropdownOptions(model);
                 ViewBag.CheckOutRecid = model.CheckOutRecid;
                 ModelState.AddModelError("", $"Error updating record: {ex.Message}");
-
-                // >>> CHANGE START: repopulate ViewBags for hidden fields on re-render
-                ViewBag.ReturnPage = returnPage ?? 1;
-                ViewBag.ReturnPageSize = returnPageSize ?? 10;
-                ViewBag.ReturnSortOrder = returnSortOrder ?? "InventoryRecid";
-                ViewBag.ReturnSortDir = returnSortDir ?? "desc";
-
-                SetSearchReturnViewBags(
-                    fromSearch,
-                    inventoryRecidSearch,
-                    storageLocation,
-                    ownerIDNum,
-                    partNumber,
-                    partDescription,
-                    customerRecID,
-                    programName,
-                    model_Variant,
-                    programPhaseID,
-                    itemStatusID,
-                    ltStorageNum,
-                    binNum,
-                    shelfRecid,
-                    serialNumber,
-                    uutNumber,
-                    beginDate,
-                    endDate,
-                    generalComment
-                );
-                // <<< CHANGE END
 
                 return PartialView("~/Views/CheckOut/EditCheckOutLog.cshtml", model);
             }

@@ -7,43 +7,6 @@
     // Variables from ViewBag that would come from controller
     int inventoryRecid = ViewBag.InventoryRecid ?? 0;
     int finalQty = ViewBag.FinalQty ?? 0;
-
-    // >>> CHANGE START: preserve return/search context for Back + modal edit
-    bool fromSearch = ((int?)ViewBag.FromSearch ?? 0) == 1;
-
-    // Return to list (ShortIndex paging/sorting) OR back to search page index/sort
-    int returnPage = ViewBag.ReturnPage ?? 1;
-    int returnPageSize = ViewBag.ReturnPageSize ?? 10;
-    string returnSortOrder = ViewBag.ReturnSortOrder ?? "InventoryRecid";
-    string returnSortDir = ViewBag.ReturnSortDir ?? "desc";
-
-    // Build query-string for EditCheckOutLog modal (so modal GET/POST can keep the path)
-    string ctx =
-        "&returnPage=" + returnPage +
-        "&returnPageSize=" + returnPageSize +
-        "&returnSortOrder=" + Uri.EscapeDataString(returnSortOrder) +
-        "&returnSortDir=" + Uri.EscapeDataString(returnSortDir) +
-        "&fromSearch=" + (((int?)ViewBag.FromSearch) ?? 0) +
-
-        "&inventoryRecidSearch=" + (((int?)ViewBag.Search_inventoryRecid) ?? 0) +
-        "&storageLocation=" + Uri.EscapeDataString((string?)ViewBag.Search_storageLocation ?? "") +
-        "&ownerIDNum=" + (((int?)ViewBag.Search_ownerIDNum) ?? 0) +
-        "&partNumber=" + Uri.EscapeDataString((string?)ViewBag.Search_partNumber ?? "") +
-        "&partDescription=" + Uri.EscapeDataString((string?)ViewBag.Search_partDescription ?? "") +
-        "&customerRecID=" + (((int?)ViewBag.Search_customerRecID) ?? 0) +
-        "&programName=" + Uri.EscapeDataString((string?)ViewBag.Search_programName ?? "") +
-        "&model_Variant=" + Uri.EscapeDataString((string?)ViewBag.Search_model_Variant ?? "") +
-        "&programPhaseID=" + (((int?)ViewBag.Search_programPhaseID) ?? 0) +
-        "&itemStatusID=" + (((int?)ViewBag.Search_itemStatusID) ?? 0) +
-        "&ltStorageNum=" + Uri.EscapeDataString((string?)ViewBag.Search_ltStorageNum ?? "") +
-        "&binNum=" + (((int?)ViewBag.Search_binNum) ?? 0) +
-        "&shelfRecid=" + (((int?)ViewBag.Search_shelfRecid) ?? 0) +
-        "&serialNumber=" + Uri.EscapeDataString((string?)ViewBag.Search_serialNumber ?? "") +
-        "&uutNumber=" + Uri.EscapeDataString((string?)ViewBag.Search_uutNumber ?? "") +
-        "&beginDate=" + Uri.EscapeDataString(((DateTime?)ViewBag.Search_beginDate)?.ToString("yyyy-MM-dd") ?? "") +
-        "&endDate=" + Uri.EscapeDataString(((DateTime?)ViewBag.Search_endDate)?.ToString("yyyy-MM-dd") ?? "") +
-        "&generalComment=" + Uri.EscapeDataString((string?)ViewBag.Search_generalComment ?? "");
-    // <<< CHANGE END
 }
 
 <table style="width:100%">
@@ -57,56 +20,11 @@
         <td colspan="3">
             <!-- Action Buttons Row - separate from table, no header background -->
             <div style="padding: 10px 0; text-align: left;">
-                <!-- >>> CHANGE START: Back button preserves Search path -->
-                @if (fromSearch)
-                {
-                    <a asp-controller="ShortTerm"
-                       asp-action="ShortEdit"
-                       asp-route-id="@inventoryRecid"
-                       asp-route-fromSearch="1"
-                       asp-route-inventoryRecid="@ViewBag.Search_inventoryRecid"
-                       asp-route-storageLocation="@ViewBag.Search_storageLocation"
-                       asp-route-ownerIDNum="@ViewBag.Search_ownerIDNum"
-                       asp-route-partNumber="@ViewBag.Search_partNumber"
-                       asp-route-partDescription="@ViewBag.Search_partDescription"
-                       asp-route-customerRecID="@ViewBag.Search_customerRecID"
-                       asp-route-programName="@ViewBag.Search_programName"
-                       asp-route-model_Variant="@ViewBag.Search_model_Variant"
-                       asp-route-programPhaseID="@ViewBag.Search_programPhaseID"
-                       asp-route-itemStatusID="@ViewBag.Search_itemStatusID"
-                       asp-route-ltStorageNum="@ViewBag.Search_ltStorageNum"
-                       asp-route-binNum="@ViewBag.Search_binNum"
-                       asp-route-shelfRecid="@ViewBag.Search_shelfRecid"
-                       asp-route-serialNumber="@ViewBag.Search_serialNumber"
-                       asp-route-uutNumber="@ViewBag.Search_uutNumber"
-                       asp-route-beginDate="@(ViewBag.Search_beginDate?.ToString("yyyy-MM-dd"))"
-                       asp-route-endDate="@(ViewBag.Search_endDate?.ToString("yyyy-MM-dd"))"
-                       asp-route-generalComment="@ViewBag.Search_generalComment"
-                       asp-route-returnPage="@returnPage"
-                       asp-route-returnPageSize="@returnPageSize"
-                       asp-route-returnSortOrder="@returnSortOrder"
-                       asp-route-returnSortDir="@returnSortDir"
-                       class="btn btn-sm btn-secondary"
-                       title="Back to Item Detail">
-                        ← Back to Item Detail
-                    </a>
-                }
-                else
-                {
-                    <a asp-controller="ShortTerm"
-                       asp-action="ShortEdit"
-                       asp-route-id="@inventoryRecid"
-                       asp-route-returnPage="@returnPage"
-                       asp-route-returnPageSize="@returnPageSize"
-                       asp-route-returnSortOrder="@returnSortOrder"
-                       asp-route-returnSortDir="@returnSortDir"
-                       class="btn btn-sm btn-secondary"
-                       title="Back to Item Detail">
-                        ← Back to Item Detail
-                    </a>
-                }
-                <!-- <<< CHANGE END -->
-
+                <a href="@Url.Action("ShortEdit", "ShortTerm", new { id = inventoryRecid })"
+                   class="btn btn-sm btn-secondary"
+                   title="Back to Item Detail">
+                    ← Back to Item Detail
+                </a>
                 <button type="button" class="btn btn-sm btn-primary"
                         onclick="window.open('@Url.Action("RetrieveItemRequest", "CheckOut", new { InventoryRecId = inventoryRecid, RequestFormType = "Retrieve" })', 'NewAction', 'toolbar=yes,resizable=yes,location=no,scrollbars=yes,status=yes,width=1024,height=768')">
                     Retrieve Item
@@ -155,7 +73,7 @@
                                 <td style="text-align: left;">
                                     <a href="#" class="btn btn-link p-0"
                                        data-bs-toggle="modal"
-                                       onclick="RenderActions('/CheckOut/EditCheckOutLog?checkOutRecid=' + @item.CheckOutRecid + '@Html.Raw(ctx)'); return false;"
+                                       onclick="RenderActions('/CheckOut/EditCheckOutLog?checkOutRecid=' + @item.CheckOutRecid); return false;"
                                        data-bs-target="#modalEditCheckOut"
                                        title="Edit CheckOut Record @item.CheckOutRecid">
                                         @item.CheckOutRecid

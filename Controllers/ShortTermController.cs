@@ -256,7 +256,7 @@ namespace STSStorage1.Controllers
             }
         }
 
-        // Helper method to load all dropdown options for CREATE model.
+        // Helper method to load all dropdown options for CREATE (model-based like Edit)
         private async Task LoadCreateDropdownOptions(InvShortTermCreateModel model)
         {
             // Classifications
@@ -327,53 +327,6 @@ namespace STSStorage1.Controllers
             );
         }
 
-        // >>> CHANGE START: helper for EDIT only (Search -> ShortEdit -> Back to Search)
-        // Keep this helper close to the Edit functions as requested.
-        private void SetEditSearchReturnViewBags(
-            int? fromSearch,
-            int? inventoryRecid,
-            string? storageLocation,
-            int? ownerIDNum,
-            string? partNumber,
-            string? partDescription,
-            int? customerRecID,
-            string? programName,
-            string? model_Variant,
-            int? programPhaseID,
-            int? itemStatusID,
-            string? ltStorageNum,
-            int? binNum,
-            int? shelfRecid,
-            string? serialNumber,
-            string? uutNumber,
-            DateTime? beginDate,
-            DateTime? endDate,
-            string? generalComment
-        )
-        {
-            ViewBag.FromSearch = fromSearch ?? 0;
-
-            ViewBag.Search_inventoryRecid = inventoryRecid;
-            ViewBag.Search_storageLocation = storageLocation;
-            ViewBag.Search_ownerIDNum = ownerIDNum;
-            ViewBag.Search_partNumber = partNumber;
-            ViewBag.Search_partDescription = partDescription;
-            ViewBag.Search_customerRecID = customerRecID;
-            ViewBag.Search_programName = programName;
-            ViewBag.Search_model_Variant = model_Variant;
-            ViewBag.Search_programPhaseID = programPhaseID;
-            ViewBag.Search_itemStatusID = itemStatusID;
-            ViewBag.Search_ltStorageNum = ltStorageNum;
-            ViewBag.Search_binNum = binNum;
-            ViewBag.Search_shelfRecid = shelfRecid;
-            ViewBag.Search_serialNumber = serialNumber;
-            ViewBag.Search_uutNumber = uutNumber;
-            ViewBag.Search_beginDate = beginDate;
-            ViewBag.Search_endDate = endDate;
-            ViewBag.Search_generalComment = generalComment;
-        }
-        // <<< CHANGE END
-
 
 
         // __________________________________________________________________
@@ -381,34 +334,12 @@ namespace STSStorage1.Controllers
         // GET: ShortTerm/ShortEdit/5
         // ============================
         public async Task<IActionResult> ShortEdit(
-            int id,
-            int? returnPage = null,
-            int? returnPageSize = null,
-            string? returnSortOrder = null,
-            string? returnSortDir = null,
-            int? fromSearch = null,   // NEW
-
-            // >>> CHANGE START: accept original Search criteria (only used when fromSearch=1)
-            int? inventoryRecid = null,
-            string? storageLocation = null,
-            int? ownerIDNum = null,
-            string? partNumber = null,
-            string? partDescription = null,
-            int? customerRecID = null,
-            string? programName = null,
-            string? model_Variant = null,
-            int? programPhaseID = null,
-            int? itemStatusID = null,
-            string? ltStorageNum = null,
-            int? binNum = null,
-            int? shelfRecid = null,
-            string? serialNumber = null,
-            string? uutNumber = null,
-            DateTime? beginDate = null,
-            DateTime? endDate = null,
-            string? generalComment = null
-        // <<< CHANGE END
-        )
+     int id,
+     int? returnPage = null,
+     int? returnPageSize = null,
+     string? returnSortOrder = null,
+     string? returnSortDir = null,
+     int? fromSearch = null)   // NEW
         {
             bool includeInactive = (fromSearch.HasValue && fromSearch.Value == 1);
 
@@ -434,30 +365,6 @@ namespace STSStorage1.Controllers
             ViewBag.ReturnSortOrder = returnSortOrder ?? "InventoryRecid";
             ViewBag.ReturnSortDir = returnSortDir ?? "desc";
 
-            // >>> CHANGE START: set ViewBag items used by ShortEdit.cshtml Back-to-Search button + hidden fields
-            SetEditSearchReturnViewBags(
-                fromSearch,
-                inventoryRecid,
-                storageLocation,
-                ownerIDNum,
-                partNumber,
-                partDescription,
-                customerRecID,
-                programName,
-                model_Variant,
-                programPhaseID,
-                itemStatusID,
-                ltStorageNum,
-                binNum,
-                shelfRecid,
-                serialNumber,
-                uutNumber,
-                beginDate,
-                endDate,
-                generalComment
-            );
-            // <<< CHANGE END
-
             return View(model);
         }
 
@@ -471,30 +378,7 @@ namespace STSStorage1.Controllers
             int? returnPage = null,
             int? returnPageSize = null,
             string? returnSortOrder = null,
-            string? returnSortDir = null
-
-            // >>> CHANGE START: accept criteria from hidden inputs so Back-to-Search still works after POST
-            , int? fromSearch = null
-            , int? inventoryRecid = null
-            , string? storageLocation = null
-            , int? ownerIDNum = null
-            , string? partNumber = null
-            , string? partDescription = null
-            , int? customerRecID = null
-            , string? programName = null
-            , string? model_Variant = null
-            , int? programPhaseID = null
-            , int? itemStatusID = null
-            , string? ltStorageNum = null
-            , int? binNum = null
-            , int? shelfRecid = null
-            , string? serialNumber = null
-            , string? uutNumber = null
-            , DateTime? beginDate = null
-            , DateTime? endDate = null
-            , string? generalComment = null
-        // <<< CHANGE END
-        )
+            string? returnSortDir = null)
         {
             // basic sanity checks
             if (model == null || model.InventoryRecid == 0)
@@ -510,31 +394,8 @@ namespace STSStorage1.Controllers
                 ViewBag.ReturnSortOrder = returnSortOrder ?? "InventoryRecid";
                 ViewBag.ReturnSortDir = returnSortDir ?? "asc";
 
-                // >>> CHANGE START
-                SetEditSearchReturnViewBags(
-                    fromSearch,
-                    inventoryRecid,
-                    storageLocation,
-                    ownerIDNum,
-                    partNumber,
-                    partDescription,
-                    customerRecID,
-                    programName,
-                    model_Variant,
-                    programPhaseID,
-                    itemStatusID,
-                    ltStorageNum,
-                    binNum,
-                    shelfRecid,
-                    serialNumber,
-                    uutNumber,
-                    beginDate,
-                    endDate,
-                    generalComment
-                );
-                // <<< CHANGE END
-
                 return View(model);
+
             }
 
             if (!ModelState.IsValid)
@@ -547,30 +408,6 @@ namespace STSStorage1.Controllers
                 ViewBag.ReturnPageSize = returnPageSize ?? 10;
                 ViewBag.ReturnSortOrder = returnSortOrder ?? "InventoryRecid";
                 ViewBag.ReturnSortDir = returnSortDir ?? "asc";
-
-                // >>> CHANGE START
-                SetEditSearchReturnViewBags(
-                    fromSearch,
-                    inventoryRecid,
-                    storageLocation,
-                    ownerIDNum,
-                    partNumber,
-                    partDescription,
-                    customerRecID,
-                    programName,
-                    model_Variant,
-                    programPhaseID,
-                    itemStatusID,
-                    ltStorageNum,
-                    binNum,
-                    shelfRecid,
-                    serialNumber,
-                    uutNumber,
-                    beginDate,
-                    endDate,
-                    generalComment
-                );
-                // <<< CHANGE END
 
                 return View(model);
             }
@@ -633,38 +470,16 @@ namespace STSStorage1.Controllers
                 }
                 // Reload all drop down boxes for the updated view
                 await LoadDropdownOptions(updated);
-
+               
                 // Preserve return parameters
                 ViewBag.ReturnPage = returnPage ?? 1;
                 ViewBag.ReturnPageSize = returnPageSize ?? 10;
                 ViewBag.ReturnSortOrder = returnSortOrder ?? "InventoryRecid";
                 ViewBag.ReturnSortDir = returnSortDir ?? "asc";
 
-                // >>> CHANGE START: keep Back-to-Search working after a successful update (since you return View(updated))
-                SetEditSearchReturnViewBags(
-                    fromSearch,
-                    inventoryRecid,
-                    storageLocation,
-                    ownerIDNum,
-                    partNumber,
-                    partDescription,
-                    customerRecID,
-                    programName,
-                    model_Variant,
-                    programPhaseID,
-                    itemStatusID,
-                    ltStorageNum,
-                    binNum,
-                    shelfRecid,
-                    serialNumber,
-                    uutNumber,
-                    beginDate,
-                    endDate,
-                    generalComment
-                );
-                // <<< CHANGE END
-
                 // return the DB-populated model to the view
+                // Set TempData AND ViewBag (as backup)
+                //TempData["Success"] = "Record Updated";
                 ViewBag.SuccessMessage = "Record Updated";
                 return View(updated);
             }
@@ -672,36 +487,11 @@ namespace STSStorage1.Controllers
             {
                 ModelState.AddModelError(string.Empty, "Unable to save changes to the database.");
                 await LoadDropdownOptions(model);
-
                 // Preserve return parameters
                 ViewBag.ReturnPage = returnPage ?? 1;
                 ViewBag.ReturnPageSize = returnPageSize ?? 10;
                 ViewBag.ReturnSortOrder = returnSortOrder ?? "InventoryRecid";
                 ViewBag.ReturnSortDir = returnSortDir ?? "asc";
-
-                // >>> CHANGE START
-                SetEditSearchReturnViewBags(
-                    fromSearch,
-                    inventoryRecid,
-                    storageLocation,
-                    ownerIDNum,
-                    partNumber,
-                    partDescription,
-                    customerRecID,
-                    programName,
-                    model_Variant,
-                    programPhaseID,
-                    itemStatusID,
-                    ltStorageNum,
-                    binNum,
-                    shelfRecid,
-                    serialNumber,
-                    uutNumber,
-                    beginDate,
-                    endDate,
-                    generalComment
-                );
-                // <<< CHANGE END
 
                 return View(model);
             }
@@ -709,37 +499,11 @@ namespace STSStorage1.Controllers
             {
                 ModelState.AddModelError(string.Empty, $"An unexpected error occurred. {ex.Message}");
                 await LoadDropdownOptions(model);
-
                 // Preserve return parameters
                 ViewBag.ReturnPage = returnPage ?? 1;
                 ViewBag.ReturnPageSize = returnPageSize ?? 10;
                 ViewBag.ReturnSortOrder = returnSortOrder ?? "InventoryRecid";
                 ViewBag.ReturnSortDir = returnSortDir ?? "asc";
-
-                // >>> CHANGE START
-                SetEditSearchReturnViewBags(
-                    fromSearch,
-                    inventoryRecid,
-                    storageLocation,
-                    ownerIDNum,
-                    partNumber,
-                    partDescription,
-                    customerRecID,
-                    programName,
-                    model_Variant,
-                    programPhaseID,
-                    itemStatusID,
-                    ltStorageNum,
-                    binNum,
-                    shelfRecid,
-                    serialNumber,
-                    uutNumber,
-                    beginDate,
-                    endDate,
-                    generalComment
-                );
-                // <<< CHANGE END
-
                 return View(model);
             }
         }
@@ -806,3 +570,4 @@ namespace STSStorage1.Controllers
         }
     }
 }
+
