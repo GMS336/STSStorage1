@@ -334,12 +334,31 @@ namespace STSStorage1.Controllers
         // GET: ShortTerm/ShortEdit/5
         // ============================
         public async Task<IActionResult> ShortEdit(
-     int id,
-     int? returnPage = null,
-     int? returnPageSize = null,
-     string? returnSortOrder = null,
-     string? returnSortDir = null,
-     int? fromSearch = null)   // NEW
+            int id,
+            int? returnPage = null,
+            int? returnPageSize = null,
+            string? returnSortOrder = null,
+            string? returnSortDir = null,
+            int? fromSearch = null,
+            // Search criteria passed from SearchIndex for return navigation
+            int? inventoryRecid = null,
+            string? storageLocation = null,
+            int? ownerIDNum = null,
+            string? partNumber = null,
+            string? partDescription = null,
+            int? customerRecID = null,
+            string? programName = null,
+            string? model_Variant = null,
+            int? programPhaseID = null,
+            int? itemStatusID = null,
+            string? ltStorageNum = null,
+            int? binNum = null,
+            int? shelfRecid = null,
+            string? serialNumber = null,
+            string? uutNumber = null,
+            DateTime? beginDate = null,
+            DateTime? endDate = null,
+            string? generalComment = null)
         {
             bool includeInactive = (fromSearch.HasValue && fromSearch.Value == 1);
 
@@ -365,6 +384,27 @@ namespace STSStorage1.Controllers
             ViewBag.ReturnSortOrder = returnSortOrder ?? "InventoryRecid";
             ViewBag.ReturnSortDir = returnSortDir ?? "desc";
 
+            // Navigation source and search criteria for conditional back button
+            ViewBag.FromSearch = fromSearch ?? 0;
+            ViewBag.SrchInventoryRecid = inventoryRecid;
+            ViewBag.SrchStorageLocation = storageLocation;
+            ViewBag.SrchOwnerIDNum = ownerIDNum;
+            ViewBag.SrchPartNumber = partNumber;
+            ViewBag.SrchPartDescription = partDescription;
+            ViewBag.SrchCustomerRecID = customerRecID;
+            ViewBag.SrchProgramName = programName;
+            ViewBag.SrchModel_Variant = model_Variant;
+            ViewBag.SrchProgramPhaseID = programPhaseID;
+            ViewBag.SrchItemStatusID = itemStatusID;
+            ViewBag.SrchLtStorageNum = ltStorageNum;
+            ViewBag.SrchBinNum = binNum;
+            ViewBag.SrchShelfRecid = shelfRecid;
+            ViewBag.SrchSerialNumber = serialNumber;
+            ViewBag.SrchUutNumber = uutNumber;
+            ViewBag.SrchBeginDate = beginDate?.ToString("yyyy-MM-dd");
+            ViewBag.SrchEndDate = endDate?.ToString("yyyy-MM-dd");
+            ViewBag.SrchGeneralComment = generalComment;
+
             return View(model);
         }
 
@@ -378,8 +418,49 @@ namespace STSStorage1.Controllers
             int? returnPage = null,
             int? returnPageSize = null,
             string? returnSortOrder = null,
-            string? returnSortDir = null)
+            string? returnSortDir = null,
+            int? fromSearch = null,
+            // Search criteria (prefixed with srch_ to avoid model binding conflicts)
+            int? srch_inventoryRecid = null,
+            string? srch_storageLocation = null,
+            int? srch_ownerIDNum = null,
+            string? srch_partNumber = null,
+            string? srch_partDescription = null,
+            int? srch_customerRecID = null,
+            string? srch_programName = null,
+            string? srch_model_Variant = null,
+            int? srch_programPhaseID = null,
+            int? srch_itemStatusID = null,
+            string? srch_ltStorageNum = null,
+            int? srch_binNum = null,
+            int? srch_shelfRecid = null,
+            string? srch_serialNumber = null,
+            string? srch_uutNumber = null,
+            string? srch_beginDate = null,
+            string? srch_endDate = null,
+            string? srch_generalComment = null)
         {
+            // Set search navigation ViewBag values once for all return paths
+            ViewBag.FromSearch = fromSearch ?? 0;
+            ViewBag.SrchInventoryRecid = srch_inventoryRecid;
+            ViewBag.SrchStorageLocation = srch_storageLocation;
+            ViewBag.SrchOwnerIDNum = srch_ownerIDNum;
+            ViewBag.SrchPartNumber = srch_partNumber;
+            ViewBag.SrchPartDescription = srch_partDescription;
+            ViewBag.SrchCustomerRecID = srch_customerRecID;
+            ViewBag.SrchProgramName = srch_programName;
+            ViewBag.SrchModel_Variant = srch_model_Variant;
+            ViewBag.SrchProgramPhaseID = srch_programPhaseID;
+            ViewBag.SrchItemStatusID = srch_itemStatusID;
+            ViewBag.SrchLtStorageNum = srch_ltStorageNum;
+            ViewBag.SrchBinNum = srch_binNum;
+            ViewBag.SrchShelfRecid = srch_shelfRecid;
+            ViewBag.SrchSerialNumber = srch_serialNumber;
+            ViewBag.SrchUutNumber = srch_uutNumber;
+            ViewBag.SrchBeginDate = string.IsNullOrEmpty(srch_beginDate) ? null : srch_beginDate;
+            ViewBag.SrchEndDate = string.IsNullOrEmpty(srch_endDate) ? null : srch_endDate;
+            ViewBag.SrchGeneralComment = srch_generalComment;
+
             // basic sanity checks
             if (model == null || model.InventoryRecid == 0)
             {

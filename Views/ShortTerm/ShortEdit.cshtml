@@ -23,17 +23,51 @@
                 <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center">
                     <div class="d-flex gap-2 align-items-center">
                         
-                        <!-- Back to List button -->
-                        <a asp-controller="ShortTerm"
-                           asp-action="ShortIndex"
-                           asp-route-page="@ViewBag.ReturnPage"
-                           asp-route-pageSize="@ViewBag.ReturnPageSize"
-                           asp-route-sortOrder="@ViewBag.ReturnSortOrder"
-                           asp-route-sortDir="@ViewBag.ReturnSortDir"
-                           class="btn btn-secondary btn-sm"
-                           title="Back to List">
-                            ← Back to List
-                        </a>
+                        <!-- Back button: returns to ShortIndex or SearchIndex depending on entry point -->
+                        @if (ViewBag.FromSearch == 1)
+                        {
+                            <a asp-controller="Search"
+                               asp-action="SearchIndex"
+                               asp-route-inventoryRecid="@ViewBag.SrchInventoryRecid"
+                               asp-route-storageLocation="@ViewBag.SrchStorageLocation"
+                               asp-route-ownerIDNum="@ViewBag.SrchOwnerIDNum"
+                               asp-route-partNumber="@ViewBag.SrchPartNumber"
+                               asp-route-partDescription="@ViewBag.SrchPartDescription"
+                               asp-route-customerRecID="@ViewBag.SrchCustomerRecID"
+                               asp-route-programName="@ViewBag.SrchProgramName"
+                               asp-route-model_Variant="@ViewBag.SrchModel_Variant"
+                               asp-route-programPhaseID="@ViewBag.SrchProgramPhaseID"
+                               asp-route-itemStatusID="@ViewBag.SrchItemStatusID"
+                               asp-route-ltStorageNum="@ViewBag.SrchLtStorageNum"
+                               asp-route-binNum="@ViewBag.SrchBinNum"
+                               asp-route-shelfRecid="@ViewBag.SrchShelfRecid"
+                               asp-route-serialNumber="@ViewBag.SrchSerialNumber"
+                               asp-route-uutNumber="@ViewBag.SrchUutNumber"
+                               asp-route-beginDate="@ViewBag.SrchBeginDate"
+                               asp-route-endDate="@ViewBag.SrchEndDate"
+                               asp-route-generalComment="@ViewBag.SrchGeneralComment"
+                               asp-route-page="@ViewBag.ReturnPage"
+                               asp-route-pageSize="@ViewBag.ReturnPageSize"
+                               asp-route-sortOrder="@ViewBag.ReturnSortOrder"
+                               asp-route-sortDir="@ViewBag.ReturnSortDir"
+                               class="btn btn-secondary btn-sm"
+                               title="Return to Search">
+                                ← Return to Search
+                            </a>
+                        }
+                        else
+                        {
+                            <a asp-controller="ShortTerm"
+                               asp-action="ShortIndex"
+                               asp-route-page="@ViewBag.ReturnPage"
+                               asp-route-pageSize="@ViewBag.ReturnPageSize"
+                               asp-route-sortOrder="@ViewBag.ReturnSortOrder"
+                               asp-route-sortDir="@ViewBag.ReturnSortDir"
+                               class="btn btn-secondary btn-sm"
+                               title="Back to List">
+                                ← Back to List
+                            </a>
+                        }
 
                         <!-- Update button (submits the inner form with id="shortEditForm") -->
                         <button type="submit" class="btn btn-light btn-sm" title="Update" form="shortEditForm">
@@ -70,6 +104,26 @@
                 <input type="hidden" name="returnPageSize" value="@ViewBag.ReturnPageSize" />
                 <input type="hidden" name="returnSortOrder" value="@ViewBag.ReturnSortOrder" />
                 <input type="hidden" name="returnSortDir" value="@ViewBag.ReturnSortDir" />
+                @* Navigation source and search criteria (prefixed with srch_ to avoid model binding conflicts) *@
+                <input type="hidden" name="fromSearch" value="@ViewBag.FromSearch" />
+                <input type="hidden" name="srch_inventoryRecid" value="@ViewBag.SrchInventoryRecid" />
+                <input type="hidden" name="srch_storageLocation" value="@ViewBag.SrchStorageLocation" />
+                <input type="hidden" name="srch_ownerIDNum" value="@ViewBag.SrchOwnerIDNum" />
+                <input type="hidden" name="srch_partNumber" value="@ViewBag.SrchPartNumber" />
+                <input type="hidden" name="srch_partDescription" value="@ViewBag.SrchPartDescription" />
+                <input type="hidden" name="srch_customerRecID" value="@ViewBag.SrchCustomerRecID" />
+                <input type="hidden" name="srch_programName" value="@ViewBag.SrchProgramName" />
+                <input type="hidden" name="srch_model_Variant" value="@ViewBag.SrchModel_Variant" />
+                <input type="hidden" name="srch_programPhaseID" value="@ViewBag.SrchProgramPhaseID" />
+                <input type="hidden" name="srch_itemStatusID" value="@ViewBag.SrchItemStatusID" />
+                <input type="hidden" name="srch_ltStorageNum" value="@ViewBag.SrchLtStorageNum" />
+                <input type="hidden" name="srch_binNum" value="@ViewBag.SrchBinNum" />
+                <input type="hidden" name="srch_shelfRecid" value="@ViewBag.SrchShelfRecid" />
+                <input type="hidden" name="srch_serialNumber" value="@ViewBag.SrchSerialNumber" />
+                <input type="hidden" name="srch_uutNumber" value="@ViewBag.SrchUutNumber" />
+                <input type="hidden" name="srch_beginDate" value="@ViewBag.SrchBeginDate" />
+                <input type="hidden" name="srch_endDate" value="@ViewBag.SrchEndDate" />
+                <input type="hidden" name="srch_generalComment" value="@ViewBag.SrchGeneralComment" />
                 
                 @* Toast-style success message in top-right corner *@
                 @if (ViewBag.SuccessMessage != null)
