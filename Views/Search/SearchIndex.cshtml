@@ -30,36 +30,36 @@
     }
 
     object rv(int? page = null, int? pageSizeOverride = null, string? sortOrderOverride = null, string? sortDirOverride = null)
+{
+    return new
     {
-        return new
-        {
-            // ===== Preserve criteria =====
-            inventoryRecid = criteria.InventoryRecid,
-            storageLocation = criteria.StorageLocation,
-            ownerIDNum = criteria.OwnerIDNum,
-            partNumber = criteria.PartNumber,
-            partDescription = criteria.PartDescription,
-            customerRecID = criteria.CustomerRecID,
-            programName = criteria.ProgramName,
-            model_Variant = criteria.Model_Variant,
-            programPhaseID = criteria.ProgramPhaseID,
-            itemStatusID = criteria.ItemStatusID,
-            ltStorageNum = criteria.LTStorageNum,
-            binNum = criteria.BinNum,
-            shelfRecid = criteria.ShelfRecid,
-            serialNumber = criteria.SerialNumber,
-            uutNumber = criteria.UUTNumber,
-            beginDate = criteria.BeginDate,
-            endDate = criteria.EndDate,
-            generalComment = criteria.GeneralComment,
+        // ===== Preserve criteria (sc_*) =====
+        sc_inventoryRecid = criteria.InventoryRecid,
+        sc_storageLocation = criteria.StorageLocation,
+        sc_ownerIDNum = criteria.OwnerIDNum,
+        sc_partNumber = criteria.PartNumber,
+        sc_partDescription = criteria.PartDescription,
+        sc_customerRecID = criteria.CustomerRecID,
+        sc_programName = criteria.ProgramName,
+        sc_model_Variant = criteria.Model_Variant,
+        sc_programPhaseID = criteria.ProgramPhaseID,
+        sc_itemStatusID = criteria.ItemStatusID,
+        sc_ltStorageNum = criteria.LTStorageNum,
+        sc_binNum = criteria.BinNum,
+        sc_shelfRecid = criteria.ShelfRecid,
+        sc_serialNumber = criteria.SerialNumber,
+        sc_uutNumber = criteria.UUTNumber,
+        sc_beginDate = criteria.BeginDate,
+        sc_endDate = criteria.EndDate,
+        sc_generalComment = criteria.GeneralComment,
 
-            // ===== paging/sorting =====
-            sortOrder = sortOrderOverride ?? sortOrder,
-            sortDir = sortDirOverride ?? sortDir,
-            page = page ?? currentPage,
-            pageSize = pageSizeOverride ?? pageSize
-        };
-    }
+        // ===== paging/sorting =====
+        sortOrder = sortOrderOverride ?? sortOrder,
+        sortDir = sortDirOverride ?? sortDir,
+        page = page ?? currentPage,
+        pageSize = pageSizeOverride ?? pageSize
+    };
+}
 
     bool Has(string? s) => !string.IsNullOrWhiteSpace(s);
     bool HasInt(int? v) => v.HasValue && v.Value != 0;
@@ -324,36 +324,38 @@
                         {
                             <tr>
                                 <td>
-                                    @* CHANGED: pass ALL search criteria into ShortEdit so Back-to-Search can restore it *@
-                                    <a asp-controller="ShortTerm"
-                                       asp-action="ShortEdit"
-                                       asp-route-id="@item.InventoryRecid"
-                                       asp-route-fromSearch="1"
+                                    @* Pass ALL search criteria + paging/sorting into ShortEdit so Return-to-Search can restore it *@
+                                   <a class="btn btn-link p-0"
+                                       href="@Url.Action("ShortEdit", "ShortTerm", new {
+                                            id = item.InventoryRecid,
 
-                                       asp-route-inventoryRecid="@criteria.InventoryRecid"
-                                       asp-route-storageLocation="@criteria.StorageLocation"
-                                       asp-route-ownerIDNum="@criteria.OwnerIDNum"
-                                       asp-route-partNumber="@criteria.PartNumber"
-                                       asp-route-partDescription="@criteria.PartDescription"
-                                       asp-route-customerRecID="@criteria.CustomerRecID"
-                                       asp-route-programName="@criteria.ProgramName"
-                                       asp-route-model_Variant="@criteria.Model_Variant"
-                                       asp-route-programPhaseID="@criteria.ProgramPhaseID"
-                                       asp-route-itemStatusID="@criteria.ItemStatusID"
-                                       asp-route-ltStorageNum="@criteria.LTStorageNum"
-                                       asp-route-binNum="@criteria.BinNum"
-                                       asp-route-shelfRecid="@criteria.ShelfRecid"
-                                       asp-route-serialNumber="@criteria.SerialNumber"
-                                       asp-route-uutNumber="@criteria.UUTNumber"
-                                       asp-route-beginDate="@(criteria.BeginDate?.ToString("yyyy-MM-dd"))"
-                                       asp-route-endDate="@(criteria.EndDate?.ToString("yyyy-MM-dd"))"
-                                       asp-route-generalComment="@criteria.GeneralComment"
+                                            returnController = "Search",
+                                            returnAction = "SearchIndex",
 
-                                       asp-route-returnPage="@ViewBag.CurrentPage"
-                                       asp-route-returnPageSize="@ViewBag.PageSize"
-                                       asp-route-returnSortOrder="@ViewBag.SortOrder"
-                                       asp-route-returnSortDir="@ViewBag.SortDir"
-                                       class="btn btn-link p-0"
+                                            sc_inventoryRecid = criteria.InventoryRecid,
+                                            sc_storageLocation = criteria.StorageLocation,
+                                            sc_ownerIDNum = criteria.OwnerIDNum,
+                                            sc_partNumber = criteria.PartNumber,
+                                            sc_partDescription = criteria.PartDescription,
+                                            sc_customerRecID = criteria.CustomerRecID,
+                                            sc_programName = criteria.ProgramName,
+                                            sc_model_Variant = criteria.Model_Variant,
+                                            sc_programPhaseID = criteria.ProgramPhaseID,
+                                            sc_itemStatusID = criteria.ItemStatusID,
+                                            sc_ltStorageNum = criteria.LTStorageNum,
+                                            sc_binNum = criteria.BinNum,
+                                            sc_shelfRecid = criteria.ShelfRecid,
+                                            sc_serialNumber = criteria.SerialNumber,
+                                            sc_uutNumber = criteria.UUTNumber,
+                                            sc_beginDate = criteria.BeginDate,
+                                            sc_endDate = criteria.EndDate,
+                                            sc_generalComment = criteria.GeneralComment,
+
+                                            page = currentPage,
+                                            pageSize = pageSize,
+                                            sortOrder = sortOrder,
+                                            sortDir = sortDir
+                                       })"
                                        title="Edit record @item.InventoryRecid">
                                         @item.InventoryRecid
                                     </a>
@@ -423,25 +425,24 @@
                 <input type="hidden" name="pageSize" value="@pageSize" />
                 <input type="hidden" name="sortOrder" value="@sortOrder" />
                 <input type="hidden" name="sortDir" value="@sortDir" />
-
-                <input type="hidden" name="inventoryrecid" value="@criteria.InventoryRecid" />
-                <input type="hidden" name="storagelocation" value="@criteria.StorageLocation" />
-                <input type="hidden" name="owneridnum" value="@criteria.OwnerIDNum" />
-                <input type="hidden" name="partnumber" value="@criteria.PartNumber" />
-                <input type="hidden" name="partdescription" value="@criteria.PartDescription" />
-                <input type="hidden" name="customerrecid" value="@criteria.CustomerRecID" />
-                <input type="hidden" name="programname" value="@criteria.ProgramName" />
-                <input type="hidden" name="model_variant" value="@criteria.Model_Variant" />
-                <input type="hidden" name="programphaseid" value="@criteria.ProgramPhaseID" />
-                <input type="hidden" name="itemstatusid" value="@criteria.ItemStatusID" />
-                <input type="hidden" name="ltstoragenum" value="@criteria.LTStorageNum" />
-                <input type="hidden" name="binnum" value="@criteria.BinNum" />
-                <input type="hidden" name="shelfrecid" value="@criteria.ShelfRecid" />
-                <input type="hidden" name="serialnumber" value="@criteria.SerialNumber" />
-                <input type="hidden" name="uutnumber" value="@criteria.UUTNumber" />
-                <input type="hidden" name="begindate" value="@(criteria.BeginDate?.ToString("yyyy-MM-dd"))" />
-                <input type="hidden" name="enddate" value="@(criteria.EndDate?.ToString("yyyy-MM-dd"))" />
-                <input type="hidden" name="generalcomment" value="@criteria.GeneralComment" />
+                <input type="hidden" name="sc_inventoryRecid" value="@criteria.InventoryRecid" />
+                <input type="hidden" name="sc_storageLocation" value="@criteria.StorageLocation" />
+                <input type="hidden" name="sc_ownerIDNum" value="@criteria.OwnerIDNum" />
+                <input type="hidden" name="sc_partNumber" value="@criteria.PartNumber" />
+                <input type="hidden" name="sc_partDescription" value="@criteria.PartDescription" />
+                <input type="hidden" name="sc_customerRecID" value="@criteria.CustomerRecID" />
+                <input type="hidden" name="sc_programName" value="@criteria.ProgramName" />
+                <input type="hidden" name="sc_model_Variant" value="@criteria.Model_Variant" />
+                <input type="hidden" name="sc_programPhaseID" value="@criteria.ProgramPhaseID" />
+                <input type="hidden" name="sc_itemStatusID" value="@criteria.ItemStatusID" />
+                <input type="hidden" name="sc_ltStorageNum" value="@criteria.LTStorageNum" />
+                <input type="hidden" name="sc_binNum" value="@criteria.BinNum" />
+                <input type="hidden" name="sc_shelfRecid" value="@criteria.ShelfRecid" />
+                <input type="hidden" name="sc_serialNumber" value="@criteria.SerialNumber" />
+                <input type="hidden" name="sc_uutNumber" value="@criteria.UUTNumber" />
+                <input type="hidden" name="sc_beginDate" value="@(criteria.BeginDate?.ToString("yyyy-MM-dd"))" />
+                <input type="hidden" name="sc_endDate" value="@(criteria.EndDate?.ToString("yyyy-MM-dd"))" />
+                <input type="hidden" name="sc_generalComment" value="@criteria.GeneralComment" />
 
                 <button type="submit" class="btn btn-primary btn-sm ms-1 px-2">Go</button>
             </form>
@@ -470,24 +471,24 @@
                 <input type="hidden" name="sortOrder" value="@sortOrder" />
                 <input type="hidden" name="sortDir" value="@sortDir" />
 
-                <input type="hidden" name="inventoryRecid" value="@criteria.InventoryRecid" />
-                <input type="hidden" name="storageLocation" value="@criteria.StorageLocation" />
-                <input type="hidden" name="ownerIDNum" value="@criteria.OwnerIDNum" />
-                <input type="hidden" name="partNumber" value="@criteria.PartNumber" />
-                <input type="hidden" name="partDescription" value="@criteria.PartDescription" />
-                <input type="hidden" name="customerRecID" value="@criteria.CustomerRecID" />
-                <input type="hidden" name="programName" value="@criteria.ProgramName" />
-                <input type="hidden" name="model_Variant" value="@criteria.Model_Variant" />
-                <input type="hidden" name="programPhaseID" value="@criteria.ProgramPhaseID" />
-                <input type="hidden" name="itemStatusID" value="@criteria.ItemStatusID" />
-                <input type="hidden" name="ltStorageNum" value="@criteria.LTStorageNum" />
-                <input type="hidden" name="binNum" value="@criteria.BinNum" />
-                <input type="hidden" name="shelfrecid" value="@criteria.ShelfRecid" />
-                <input type="hidden" name="serialNumber" value="@criteria.SerialNumber" />
-                <input type="hidden" name="uutNumber" value="@criteria.UUTNumber" />
-                <input type="hidden" name="beginDate" value="@(criteria.BeginDate?.ToString("yyyy-MM-dd"))" />
-                <input type="hidden" name="endDate" value="@(criteria.EndDate?.ToString("yyyy-MM-dd"))" />
-                <input type="hidden" name="generalComment" value="@criteria.GeneralComment" />
+                <input type="hidden" name="sc_inventoryRecid" value="@criteria.InventoryRecid" />
+                <input type="hidden" name="sc_storageLocation" value="@criteria.StorageLocation" />
+                <input type="hidden" name="sc_ownerIDNum" value="@criteria.OwnerIDNum" />
+                <input type="hidden" name="sc_partNumber" value="@criteria.PartNumber" />
+                <input type="hidden" name="sc_partDescription" value="@criteria.PartDescription" />
+                <input type="hidden" name="sc_customerRecID" value="@criteria.CustomerRecID" />
+                <input type="hidden" name="sc_programName" value="@criteria.ProgramName" />
+                <input type="hidden" name="sc_model_Variant" value="@criteria.Model_Variant" />
+                <input type="hidden" name="sc_programPhaseID" value="@criteria.ProgramPhaseID" />
+                <input type="hidden" name="sc_itemStatusID" value="@criteria.ItemStatusID" />
+                <input type="hidden" name="sc_ltStorageNum" value="@criteria.LTStorageNum" />
+                <input type="hidden" name="sc_binNum" value="@criteria.BinNum" />
+                <input type="hidden" name="sc_shelfRecid" value="@criteria.ShelfRecid" />
+                <input type="hidden" name="sc_serialNumber" value="@criteria.SerialNumber" />
+                <input type="hidden" name="sc_uutNumber" value="@criteria.UUTNumber" />
+                <input type="hidden" name="sc_beginDate" value="@(criteria.BeginDate?.ToString("yyyy-MM-dd"))" />
+                <input type="hidden" name="sc_endDate" value="@(criteria.EndDate?.ToString("yyyy-MM-dd"))" />
+                <input type="hidden" name="sc_generalComment" value="@criteria.GeneralComment" />
             </form>
         </div>
     }

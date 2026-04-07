@@ -21,16 +21,84 @@ namespace STSStorage1.Controllers
 
         // GET: CheckOut/CheckoutLog
         // Display all checkout/checkin history for a specific InventoryRecid
-        public async Task<IActionResult> CheckoutLog(int inventoryRecid)
+        public async Task<IActionResult> CheckoutLog(int inventoryRecid,
+                // back-to-item contract (so CheckoutLog can return to ShortEdit)
+                string? itemController = null,
+                string? itemAction = null,
+                int? itemId = null,
+
+                // return-to-search contract (so ShortEdit can return to SearchIndex)
+                string? returnController = null,
+                string? returnAction = null,
+
+                // Search criteria (prefixed sc_ to avoid collisions with models)
+                int? sc_inventoryRecid = null,
+                string? sc_storageLocation = null,
+                int? sc_ownerIDNum = null,
+                string? sc_partNumber = null,
+                string? sc_partDescription = null,
+                int? sc_customerRecID = null,
+                string? sc_programName = null,
+                string? sc_model_Variant = null,
+                int? sc_programPhaseID = null,
+                int? sc_itemStatusID = null,
+                string? sc_ltStorageNum = null,
+                int? sc_binNum = null,
+                int? sc_shelfRecid = null,
+                string? sc_serialNumber = null,
+                string? sc_uutNumber = null,
+                DateTime? sc_beginDate = null,
+                DateTime? sc_endDate = null,
+                string? sc_generalComment = null,
+
+                // Search paging/sort
+                int? page = null,
+                int? pageSize = null,
+                string? sortOrder = null,
+                string? sortDir = null
+            )
         {
             if (inventoryRecid <= 0)
             {
                 return BadRequest("Invalid Inventory Record ID");
             }
+            // Persist context for the view (buttons/links)
+            ViewBag.InventoryRecid = inventoryRecid;
+
+            ViewBag.ItemController = itemController ?? "ShortTerm";
+            ViewBag.ItemAction = itemAction ?? "ShortEdit";
+            ViewBag.ItemId = itemId ?? inventoryRecid;
+
+            ViewBag.ReturnController = returnController;
+            ViewBag.ReturnAction = returnAction;
+
+            // Keep Search context for "Back to Item" -> ShortEdit -> "Return to Search"
+            ViewBag.InventoryRecid_sc = sc_inventoryRecid;
+            ViewBag.StorageLocation_sc = sc_storageLocation;
+            ViewBag.OwnerIDNum_sc = sc_ownerIDNum;
+            ViewBag.PartNumber_sc = sc_partNumber;
+            ViewBag.PartDescription_sc = sc_partDescription;
+            ViewBag.CustomerRecID_sc = sc_customerRecID;
+            ViewBag.ProgramName_sc = sc_programName;
+            ViewBag.Model_Variant_sc = sc_model_Variant;
+            ViewBag.ProgramPhaseID_sc = sc_programPhaseID;
+            ViewBag.ItemStatusID_sc = sc_itemStatusID;
+            ViewBag.LTStorageNum_sc = sc_ltStorageNum;
+            ViewBag.BinNum_sc = sc_binNum;
+            ViewBag.ShelfRecid_sc = sc_shelfRecid;
+            ViewBag.SerialNumber_sc = sc_serialNumber;
+            ViewBag.UUTNumber_sc = sc_uutNumber;
+            ViewBag.BeginDate_sc = sc_beginDate;
+            ViewBag.EndDate_sc = sc_endDate;
+            ViewBag.GeneralComment_sc = sc_generalComment;
+
+            ViewBag.Page = page;
+            ViewBag.PageSize = pageSize;
+            ViewBag.SortOrder = sortOrder;
+            ViewBag.SortDir = sortDir;
 
             // Increase the command timeout to 4 minutes (240 seconds)
             _context.Database.SetCommandTimeout(240);
-
             var sw = new Stopwatch();
             sw.Start();
 
@@ -45,7 +113,6 @@ namespace STSStorage1.Controllers
             sw.Stop();
             ViewBag.DataFetchTime = sw.ElapsedMilliseconds;
             ViewBag.ItemsCount = items.Count;
-            ViewBag.InventoryRecid = inventoryRecid;
 
             // Calculate all computed fields
             CalculateComputedFields(items);
@@ -152,14 +219,14 @@ namespace STSStorage1.Controllers
         }
 
         // GET: CheckOut/EditCheckOutItem (OLD - keeping for now in case referenced elsewhere)
-        public async Task<IActionResult> EditCheckOutItem(int inventoryRecid, int checkOutRecid)
-        {
-            // Placeholder for edit checkout item
-            // You'll implement this later with the appropriate model and view
-            ViewBag.InventoryRecid = inventoryRecid;
-            ViewBag.CheckOutRecid = checkOutRecid;
-            return View();
-        }
+        //public async Task<IActionResult> EditCheckOutItem(int inventoryRecid, int checkOutRecid)
+        //{
+        //    // Placeholder for edit checkout item
+        //    // You'll implement this later with the appropriate model and view
+        //    ViewBag.InventoryRecid = inventoryRecid;
+        //    ViewBag.CheckOutRecid = checkOutRecid;
+        //    return View();
+        //}
 
         //________________________________________________________________________________
         // ===== NEW: Edit CheckOut Log Entry =====
@@ -168,7 +235,45 @@ namespace STSStorage1.Controllers
         /// <summary>
         /// Displays the edit form for a specific checkout log entry in a modal
         /// </summary>
-        public async Task<IActionResult> EditCheckOutLog(int checkOutRecid)
+        public async Task<IActionResult> EditCheckOutLog(
+            int checkOutRecid,
+              int inventoryRecid,
+
+                // back-to-item contract
+                string? itemController = null,
+                string? itemAction = null,
+                int? itemId = null,
+
+                // return-to-search contract
+                string? returnController = null,
+                string? returnAction = null,
+
+                // Search criteria (prefixed)
+                int? sc_inventoryRecid = null,
+                string? sc_storageLocation = null,
+                int? sc_ownerIDNum = null,
+                string? sc_partNumber = null,
+                string? sc_partDescription = null,
+                int? sc_customerRecID = null,
+                string? sc_programName = null,
+                string? sc_model_Variant = null,
+                int? sc_programPhaseID = null,
+                int? sc_itemStatusID = null,
+                string? sc_ltStorageNum = null,
+                int? sc_binNum = null,
+                int? sc_shelfRecid = null,
+                string? sc_serialNumber = null,
+                string? sc_uutNumber = null,
+                DateTime? sc_beginDate = null,
+                DateTime? sc_endDate = null,
+                string? sc_generalComment = null,
+
+                // Search paging/sort
+                int? page = null,
+                int? pageSize = null,
+                string? sortOrder = null,
+                string? sortDir = null
+            )
         {
             try
             {
@@ -176,8 +281,40 @@ namespace STSStorage1.Controllers
                 {
                     return BadRequest("Invalid CheckOut Record ID");
                 }
+                // Persist context for partial view (hidden inputs + back buttons)
+                ViewBag.InventoryRecid = inventoryRecid;
+                ViewBag.CheckOutRecid = checkOutRecid;
 
-                Console.WriteLine($"EditCheckOutLog GET: Loading data for CheckOutRecid={checkOutRecid}");
+                ViewBag.ItemController = itemController ?? "ShortTerm";
+                ViewBag.ItemAction = itemAction ?? "ShortEdit";
+                ViewBag.ItemId = itemId ?? inventoryRecid;
+
+                ViewBag.ReturnController = returnController;
+                ViewBag.ReturnAction = returnAction;
+
+                ViewBag.InventoryRecid_sc = sc_inventoryRecid;
+                ViewBag.StorageLocation_sc = sc_storageLocation;
+                ViewBag.OwnerIDNum_sc = sc_ownerIDNum;
+                ViewBag.PartNumber_sc = sc_partNumber;
+                ViewBag.PartDescription_sc = sc_partDescription;
+                ViewBag.CustomerRecID_sc = sc_customerRecID;
+                ViewBag.ProgramName_sc = sc_programName;
+                ViewBag.Model_Variant_sc = sc_model_Variant;
+                ViewBag.ProgramPhaseID_sc = sc_programPhaseID;
+                ViewBag.ItemStatusID_sc = sc_itemStatusID;
+                ViewBag.LTStorageNum_sc = sc_ltStorageNum;
+                ViewBag.BinNum_sc = sc_binNum;
+                ViewBag.ShelfRecid_sc = sc_shelfRecid;
+                ViewBag.SerialNumber_sc = sc_serialNumber;
+                ViewBag.UUTNumber_sc = sc_uutNumber;
+                ViewBag.BeginDate_sc = sc_beginDate;
+                ViewBag.EndDate_sc = sc_endDate;
+                ViewBag.GeneralComment_sc = sc_generalComment;
+
+                ViewBag.Page = page;
+                ViewBag.PageSize = pageSize;
+                ViewBag.SortOrder = sortOrder;
+                ViewBag.SortDir = sortDir;
 
                 // Fetch the specific checkout record using existing SP
                 var checkOutRecidParam = new SqlParameter("@CheckOutRecid", checkOutRecid);
@@ -249,10 +386,6 @@ namespace STSStorage1.Controllers
                 // Load dropdown options
                 await LoadCheckOutDropdownOptions(editModel);
 
-                Console.WriteLine($"EditModel created - ItemStatusID: {editModel.ItemStatusID}");
-
-                ViewBag.CheckOutRecid = checkOutRecid;
-
                 return PartialView("~/Views/CheckOut/EditCheckOutLog.cshtml", editModel);  // RETURN editModel NOT item!
             }
             catch (Exception ex)
@@ -267,7 +400,46 @@ namespace STSStorage1.Controllers
         // POST: CheckOut/EditCheckOutLog
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditCheckOutLog(InvCheckOutEditModel model, int? ItemStatusID, int? Balance, DateTime? NeedDate)
+        public async Task<IActionResult> EditCheckOutLog(
+            InvCheckOutEditModel model, 
+            int? ItemStatusID, 
+            int? Balance, 
+            DateTime? NeedDate,
+            // back-to-item contract
+            string? itemController = null,
+            string? itemAction = null,
+            int? itemId = null,
+
+            // return-to-search contract
+            string? returnController = null,
+            string? returnAction = null,
+
+            // Search criteria (prefixed)
+            int? sc_inventoryRecid = null,
+            string? sc_storageLocation = null,
+            int? sc_ownerIDNum = null,
+            string? sc_partNumber = null,
+            string? sc_partDescription = null,
+            int? sc_customerRecID = null,
+            string? sc_programName = null,
+            string? sc_model_Variant = null,
+            int? sc_programPhaseID = null,
+            int? sc_itemStatusID = null,
+            string? sc_ltStorageNum = null,
+            int? sc_binNum = null,
+            int? sc_shelfRecid = null,
+            string? sc_serialNumber = null,
+            string? sc_uutNumber = null,
+            DateTime? sc_beginDate = null,
+            DateTime? sc_endDate = null,
+            string? sc_generalComment = null,
+
+            // Search paging/sort
+            int? page = null,
+            int? pageSize = null,
+            string? sortOrder = null,
+            string? sortDir = null
+            )
         {
             try
             {
@@ -311,7 +483,40 @@ namespace STSStorage1.Controllers
                     parameters);
 
                 // Redirect back to CheckoutLog with no success message
-                return RedirectToAction("CheckoutLog", new { inventoryRecid = model.InventoryRecid });
+                return RedirectToAction("CheckoutLog", new 
+                { 
+                    inventoryRecid = model.InventoryRecid,
+                    itemController,
+                    itemAction,
+                    itemId,
+
+                    returnController,
+                    returnAction,
+
+                    sc_inventoryRecid,
+                    sc_storageLocation,
+                    sc_ownerIDNum,
+                    sc_partNumber,
+                    sc_partDescription,
+                    sc_customerRecID,
+                    sc_programName,
+                    sc_model_Variant,
+                    sc_programPhaseID,
+                    sc_itemStatusID,
+                    sc_ltStorageNum,
+                    sc_binNum,
+                    sc_shelfRecid,
+                    sc_serialNumber,
+                    sc_uutNumber,
+                    sc_beginDate,
+                    sc_endDate,
+                    sc_generalComment,
+
+                    page,
+                    pageSize,
+                    sortOrder,
+                    sortDir
+                });
             }
             catch (Exception ex)
             {

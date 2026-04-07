@@ -32,7 +32,7 @@ namespace STSStorage1.Controllers
             sortDir = (sortDir ?? "desc").ToLower() == "desc" ? "desc" : "asc";
 
             // Increase the command timeout to 10 seconds
-            _context.Database.SetCommandTimeout(10);
+            _context.Database.SetCommandTimeout(40);
 
             var sw = new System.Diagnostics.Stopwatch();
             sw.Start();
@@ -334,14 +334,48 @@ namespace STSStorage1.Controllers
         // GET: ShortTerm/ShortEdit/5
         // ============================
         public async Task<IActionResult> ShortEdit(
-     int id,
-     int? returnPage = null,
-     int? returnPageSize = null,
-     string? returnSortOrder = null,
-     string? returnSortDir = null,
-     int? fromSearch = null)   // NEW
+            int id,
+            int? returnPage = null,
+            int? returnPageSize = null,
+            string? returnSortOrder = null,
+            string? returnSortDir = null,
+
+            int? fromSearch = null,   // keep
+
+            // NEW: explicit return target contract
+            string? returnController = null,
+            string? returnAction = null,
+
+            // NEW: SearchIndex criteria
+            int? sc_inventoryRecid = null,
+            string? sc_storageLocation = null,
+            int? sc_ownerIDNum = null,
+            string? sc_partNumber = null,
+            string? sc_partDescription = null,
+            int? sc_customerRecID = null,
+            string? sc_programName = null,
+            string? sc_model_Variant = null,
+            int? sc_programPhaseID = null,
+            int? sc_itemStatusID = null,
+            string? sc_ltStorageNum = null,
+            int? sc_binNum = null,
+            int? sc_shelfRecid = null,
+            string? sc_serialNumber = null,
+            string? sc_uutNumber = null,
+            DateTime? sc_beginDate = null,
+            DateTime? sc_endDate = null,
+            string? sc_generalComment = null,
+
+            // NEW: SearchIndex paging/sort
+            int? page = null,
+            int? pageSize = null,
+            string? sortOrder = null,
+            string? sortDir = null
+        )
         {
-            bool includeInactive = (fromSearch.HasValue && fromSearch.Value == 1);
+            bool includeInactive =
+                (fromSearch.HasValue && fromSearch.Value == 1) ||
+                string.Equals(returnAction, "SearchIndex", StringComparison.OrdinalIgnoreCase);
 
             var p1 = new SqlParameter("@InventoryRecid", id);
             var p2 = new SqlParameter("@IncludeInactive", includeInactive);
@@ -365,6 +399,36 @@ namespace STSStorage1.Controllers
             ViewBag.ReturnSortOrder = returnSortOrder ?? "InventoryRecid";
             ViewBag.ReturnSortDir = returnSortDir ?? "desc";
 
+            // NEW: return target for ShortEdit view
+            ViewBag.ReturnAction = returnAction;
+            ViewBag.ReturnController = returnController;
+
+            // NEW: Search criteria for Return-to-SearchIndex
+            ViewBag.InventoryRecid = sc_inventoryRecid;
+            ViewBag.StorageLocation = sc_storageLocation;
+            ViewBag.OwnerIDNum = sc_ownerIDNum;
+            ViewBag.PartNumber = sc_partNumber;
+            ViewBag.PartDescription = sc_partDescription;
+            ViewBag.CustomerRecID = sc_customerRecID;
+            ViewBag.ProgramName = sc_programName;
+            ViewBag.Model_Variant = sc_model_Variant;
+            ViewBag.ProgramPhaseID = sc_programPhaseID;
+            ViewBag.ItemStatusID = sc_itemStatusID;
+            ViewBag.LTStorageNum = sc_ltStorageNum;
+            ViewBag.BinNum = sc_binNum;
+            ViewBag.ShelfRecid = sc_shelfRecid;
+            ViewBag.SerialNumber = sc_serialNumber;
+            ViewBag.UUTNumber = sc_uutNumber;
+            ViewBag.BeginDate = sc_beginDate;
+            ViewBag.EndDate = sc_endDate;
+            ViewBag.GeneralComment = sc_generalComment;
+
+            // NEW: SearchIndex paging/sort
+            ViewBag.Page = page;
+            ViewBag.PageSize = pageSize;
+            ViewBag.SortOrder = sortOrder;
+            ViewBag.SortDir = sortDir;
+
             return View(model);
         }
 
@@ -374,136 +438,174 @@ namespace STSStorage1.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ShortEdit(
+            int id,
             InvShortTermEditModel model,
+
             int? returnPage = null,
             int? returnPageSize = null,
             string? returnSortOrder = null,
-            string? returnSortDir = null)
+            string? returnSortDir = null,
+
+            // ADD THIS (so POST can compute includeInactive the same as GET)
+            int? fromSearch = null,
+
+            // explicit return target (Search vs List)
+            string? returnController = null,
+            string? returnAction = null,
+
+            // SearchIndex paging/sort
+            int? page = null,
+            int? pageSize = null,
+            string? sortOrder = null,
+            string? sortDir = null,
+
+            // SearchIndex criteria
+            int? sc_inventoryRecid = null,
+            string? sc_storageLocation = null,
+            int? sc_ownerIDNum = null,
+            string? sc_partNumber = null,
+            string? sc_partDescription = null,
+            int? sc_customerRecID = null,
+            string? sc_programName = null,
+            string? sc_model_Variant = null,
+            int? sc_programPhaseID = null,
+            int? sc_itemStatusID = null,
+            string? sc_ltStorageNum = null,
+            int? sc_binNum = null,
+            int? sc_shelfRecid = null,
+            string? sc_serialNumber = null,
+            string? sc_uutNumber = null,
+            DateTime? sc_beginDate = null,
+            DateTime? sc_endDate = null,
+            string? sc_generalComment = null
+        )
         {
-            // basic sanity checks
-            if (model == null || model.InventoryRecid == 0)
+            void SetReturnViewBags()
             {
-                ModelState.AddModelError(string.Empty, "Missing record identifier.");
-
-                // Reload all drop down boxes for the updated view
-                await LoadDropdownOptions(model);
-
-                // Preserve return parameters
+                // List return (ShortIndex)
                 ViewBag.ReturnPage = returnPage ?? 1;
                 ViewBag.ReturnPageSize = returnPageSize ?? 10;
                 ViewBag.ReturnSortOrder = returnSortOrder ?? "InventoryRecid";
-                ViewBag.ReturnSortDir = returnSortDir ?? "asc";
+                ViewBag.ReturnSortDir = returnSortDir ?? "desc"; // match GET default
 
+                // Return target (Search vs List)
+                ViewBag.ReturnController = returnController;
+                ViewBag.ReturnAction = returnAction;
+
+                // Search criteria
+                ViewBag.InventoryRecid = sc_inventoryRecid;
+                ViewBag.StorageLocation = sc_storageLocation;
+                ViewBag.OwnerIDNum = sc_ownerIDNum;
+                ViewBag.PartNumber = sc_partNumber;
+                ViewBag.PartDescription = sc_partDescription;
+                ViewBag.CustomerRecID = sc_customerRecID;
+                ViewBag.ProgramName = sc_programName;
+                ViewBag.Model_Variant = sc_model_Variant;
+                ViewBag.ProgramPhaseID = sc_programPhaseID;
+                ViewBag.ItemStatusID = sc_itemStatusID;
+                ViewBag.LTStorageNum = sc_ltStorageNum;
+                ViewBag.BinNum = sc_binNum;
+                ViewBag.ShelfRecid = sc_shelfRecid;
+                ViewBag.SerialNumber = sc_serialNumber;
+                ViewBag.UUTNumber = sc_uutNumber;
+                ViewBag.BeginDate = sc_beginDate;
+                ViewBag.EndDate = sc_endDate;
+                ViewBag.GeneralComment = sc_generalComment;
+
+                // Search paging/sort
+                ViewBag.Page = page;
+                ViewBag.PageSize = pageSize;
+                ViewBag.SortOrder = sortOrder;
+                ViewBag.SortDir = sortDir;
+
+                // Preserve fromSearch too (optional; useful for debugging)
+                ViewBag.FromSearch = fromSearch;
+            }
+
+            if (model == null)
+                model = new InvShortTermEditModel();
+
+            if (model.InventoryRecid == 0 && id != 0)
+                model.InventoryRecid = id;
+
+            if (model.InventoryRecid == 0)
+            {
+                ModelState.AddModelError(string.Empty, "Missing record identifier.");
+                SetReturnViewBags();
+                await LoadDropdownOptions(model);
                 return View(model);
-
             }
 
             if (!ModelState.IsValid)
             {
-                // Reload all drop down boxes for the updated view
+                SetReturnViewBags();
                 await LoadDropdownOptions(model);
-
-                // Preserve return parameters
-                ViewBag.ReturnPage = returnPage ?? 1;
-                ViewBag.ReturnPageSize = returnPageSize ?? 10;
-                ViewBag.ReturnSortOrder = returnSortOrder ?? "InventoryRecid";
-                ViewBag.ReturnSortDir = returnSortDir ?? "asc";
-
                 return View(model);
             }
 
             try
             {
-                // NOTE: stored procedure name and parameter list must match your DB.
-                const string sp = "EXEC dbo.spUPDATEItem " +
-                                  "@InventoryRecid, @PartNumber, @PartDescription, @TargetDuration, " +
-                                  "@Model_Variant, @RevLevel, @ProgramName, @UM, @SerialNumber, @UUTNumber, " +
-                                  "@FirstDateIn, @GeneralComment, @ClassificationID";
-
-                var parameters = new[]
-                {
-                    new SqlParameter("@InventoryRecid", SqlDbType.Int) { Value = model.InventoryRecid },
-                    new SqlParameter("@PartNumber", SqlDbType.NVarChar, 100) { Value = (object)model.PartNumber ?? DBNull.Value },
-                    new SqlParameter("@PartDescription", SqlDbType.NVarChar, 500) { Value = (object)model.PartDescription ?? DBNull.Value },
-                    new SqlParameter("@TargetDuration", SqlDbType.Int) { Value = (object)model.TargetDuration ?? DBNull.Value },
-                    new SqlParameter("@Model_Variant", SqlDbType.NVarChar, 100) { Value = (object)model.Model_Variant ?? DBNull.Value },
-                    new SqlParameter("@RevLevel", SqlDbType.NVarChar, 50) { Value = (object)model.RevLevel ?? DBNull.Value },
-                    new SqlParameter("@ProgramName", SqlDbType.NVarChar, 100) { Value = (object)model.ProgramName ?? DBNull.Value },
-                    new SqlParameter("@UM", SqlDbType.NVarChar, 10) { Value = (object)model.UM ?? DBNull.Value },
-                    new SqlParameter("@SerialNumber", SqlDbType.NVarChar, 100) { Value = (object)model.SerialNumber ?? DBNull.Value },
-                    new SqlParameter("@UUTNumber", SqlDbType.NVarChar, 100) { Value = (object)model.UUTNumber ?? DBNull.Value },
-                    new SqlParameter("@FirstDateIn", SqlDbType.DateTime2) { Value = (object)model.FirstDateIn ?? DBNull.Value },
-                    new SqlParameter("@GeneralComment", SqlDbType.NVarChar, -1) { Value = (object)model.GeneralComment ?? DBNull.Value },
-                    new SqlParameter("@ClassificationID", SqlDbType.Int) { Value = model.ClassificationID }
-                };
-
                 await _context.Database.ExecuteSqlInterpolatedAsync(
                     $@"EXEC dbo.spUPDATEItem
-                    @InventoryRecid = {model.InventoryRecid},
-                    @PartNumber = {model.PartNumber},
-                    @PartDescription = {model.PartDescription},
-                    @TargetDuration = {model.TargetDuration},
-                    @Model_Variant = {model.Model_Variant},
-                    @RevLevel = {model.RevLevel},
-                    @ProgramName = {model.ProgramName},
-                    @UM = {model.UM},
-                    @SerialNumber = {model.SerialNumber},
-                    @UUTNumber = {model.UUTNumber},
-                    @FirstDateIn = {model.FirstDateIn},
-                    @GeneralComment = {model.GeneralComment},
-                    @ClassificationID = {model.ClassificationID},
-                    @CustomerRecID = {model.CustomerRecID},
-                    @ProgramPhaseID = {model.ProgramPhaseID},
-                    @OwnerIDNum = {model.OwnerIDNum}");
+             @InventoryRecid = {model.InventoryRecid},
+             @PartNumber = {model.PartNumber},
+             @PartDescription = {model.PartDescription},
+             @TargetDuration = {model.TargetDuration},
+             @Model_Variant = {model.Model_Variant},
+             @RevLevel = {model.RevLevel},
+             @ProgramName = {model.ProgramName},
+             @UM = {model.UM},
+             @SerialNumber = {model.SerialNumber},
+             @UUTNumber = {model.UUTNumber},
+             @FirstDateIn = {model.FirstDateIn},
+             @GeneralComment = {model.GeneralComment},
+             @ClassificationID = {model.ClassificationID},
+             @CustomerRecID = {model.CustomerRecID},
+             @ProgramPhaseID = {model.ProgramPhaseID},
+             @OwnerIDNum = {model.OwnerIDNum}");
 
-                // reload the record from the DB via the keyless projection to reflect any DB-side changes
-                // FIX: Add ToListAsync() first, then get FirstOrDefault
+                // IMPORTANT: same includeInactive logic as GET
+                bool includeInactive =
+                    (fromSearch.HasValue && fromSearch.Value == 1) ||
+                    string.Equals(returnAction, "SearchIndex", StringComparison.OrdinalIgnoreCase);
+
+                var p1 = new SqlParameter("@InventoryRecid", model.InventoryRecid);
+                var p2 = new SqlParameter("@IncludeInactive", includeInactive);
+
                 var rows = await _context.InvShortTermEdit
-                    .FromSqlInterpolated($"EXEC dbo.spGETShortTermById @InventoryRecid={model.InventoryRecid}")
+                    .FromSqlRaw("EXEC dbo.spGETShortTermById @InventoryRecid, @IncludeInactive", p1, p2)
                     .AsNoTracking()
-                    .ToListAsync();  // ✅ Changed: Get all results first
-                var updated = rows.FirstOrDefault();  // ✅ Then get first item in memory  
+                    .ToListAsync();
 
+                var updated = rows.FirstOrDefault();
                 if (updated == null)
-                {
                     return NotFound();
-                }
-                // Reload all drop down boxes for the updated view
-                await LoadDropdownOptions(updated);
-               
-                // Preserve return parameters
-                ViewBag.ReturnPage = returnPage ?? 1;
-                ViewBag.ReturnPageSize = returnPageSize ?? 10;
-                ViewBag.ReturnSortOrder = returnSortOrder ?? "InventoryRecid";
-                ViewBag.ReturnSortDir = returnSortDir ?? "asc";
 
-                // return the DB-populated model to the view
-                // Set TempData AND ViewBag (as backup)
-                //TempData["Success"] = "Record Updated";
+                // Preserve LogbookCount if proc reload drops it to 0/null
+                if (updated.LogbookCount == 0 && model.LogbookCount > 0)
+                    updated.LogbookCount = model.LogbookCount;
+
+                // Repopulate dropdowns (this is what makes the view look “full” again)
+                await LoadDropdownOptions(updated);
+
+                // Preserve return/search context for the Return button(s)
+                SetReturnViewBags();
+
                 ViewBag.SuccessMessage = "Record Updated";
                 return View(updated);
             }
             catch (DbUpdateException)
             {
                 ModelState.AddModelError(string.Empty, "Unable to save changes to the database.");
+                SetReturnViewBags();
                 await LoadDropdownOptions(model);
-                // Preserve return parameters
-                ViewBag.ReturnPage = returnPage ?? 1;
-                ViewBag.ReturnPageSize = returnPageSize ?? 10;
-                ViewBag.ReturnSortOrder = returnSortOrder ?? "InventoryRecid";
-                ViewBag.ReturnSortDir = returnSortDir ?? "asc";
-
                 return View(model);
             }
             catch (Exception ex)
             {
                 ModelState.AddModelError(string.Empty, $"An unexpected error occurred. {ex.Message}");
+                SetReturnViewBags();
                 await LoadDropdownOptions(model);
-                // Preserve return parameters
-                ViewBag.ReturnPage = returnPage ?? 1;
-                ViewBag.ReturnPageSize = returnPageSize ?? 10;
-                ViewBag.ReturnSortOrder = returnSortOrder ?? "InventoryRecid";
-                ViewBag.ReturnSortDir = returnSortDir ?? "asc";
                 return View(model);
             }
         }

@@ -4,9 +4,44 @@
 @{
     ViewData["Title"] = "Check-in / Check-out History";
 
-    // Variables from ViewBag that would come from controller
+    // Base values
     int inventoryRecid = ViewBag.InventoryRecid ?? 0;
     int finalQty = ViewBag.FinalQty ?? 0;
+
+    // Back-to-item contract (defaults set in controller)
+    string itemController = (string?)ViewBag.ItemController ?? "ShortTerm";
+    string itemAction = (string?)ViewBag.ItemAction ?? "ShortEdit";
+    int itemId = ViewBag.ItemId ?? inventoryRecid;
+
+    // Return-to-search contract
+    string? returnController = (string?)ViewBag.ReturnController;
+    string? returnAction = (string?)ViewBag.ReturnAction;
+
+    // Search context (stored in ViewBag with *_sc keys by controller)
+    var sc_inventoryRecid = ViewBag.InventoryRecid_sc;
+    var sc_storageLocation = ViewBag.StorageLocation_sc;
+    var sc_ownerIDNum = ViewBag.OwnerIDNum_sc;
+    var sc_partNumber = ViewBag.PartNumber_sc;
+    var sc_partDescription = ViewBag.PartDescription_sc;
+    var sc_customerRecID = ViewBag.CustomerRecID_sc;
+    var sc_programName = ViewBag.ProgramName_sc;
+    var sc_model_Variant = ViewBag.Model_Variant_sc;
+    var sc_programPhaseID = ViewBag.ProgramPhaseID_sc;
+    var sc_itemStatusID = ViewBag.ItemStatusID_sc;
+    var sc_ltStorageNum = ViewBag.LTStorageNum_sc;
+    var sc_binNum = ViewBag.BinNum_sc;
+    var sc_shelfRecid = ViewBag.ShelfRecid_sc;
+    var sc_serialNumber = ViewBag.SerialNumber_sc;
+    var sc_uutNumber = ViewBag.UUTNumber_sc;
+    var sc_beginDate = ViewBag.BeginDate_sc;
+    var sc_endDate = ViewBag.EndDate_sc;
+    var sc_generalComment = ViewBag.GeneralComment_sc;
+
+    // Search paging/sort
+    var searchPage = ViewBag.Page;
+    var searchPageSize = ViewBag.PageSize;
+    var searchSortOrder = ViewBag.SortOrder;
+    var searchSortDir = ViewBag.SortDir;
 }
 
 <table style="width:100%">
@@ -18,21 +53,54 @@
     </tr>
     <tr>
         <td colspan="3">
-            <!-- Action Buttons Row - separate from table, no header background -->
+            <!-- Action Buttons Row -->
             <div style="padding: 10px 0; text-align: left;">
-                <a href="@Url.Action("ShortEdit", "ShortTerm", new { id = inventoryRecid })"
+
+                <!-- Back to Item Detail (preserve return/search workflow) -->
+                <a asp-controller="@itemController"
+                   asp-action="@itemAction"
+                   asp-route-id="@itemId"
+                   asp-route-returnController="@returnController"
+                   asp-route-returnAction="@returnAction"
+
+                   asp-route-sc_inventoryRecid="@sc_inventoryRecid"
+                   asp-route-sc_storageLocation="@sc_storageLocation"
+                   asp-route-sc_ownerIDNum="@sc_ownerIDNum"
+                   asp-route-sc_partNumber="@sc_partNumber"
+                   asp-route-sc_partDescription="@sc_partDescription"
+                   asp-route-sc_customerRecID="@sc_customerRecID"
+                   asp-route-sc_programName="@sc_programName"
+                   asp-route-sc_model_Variant="@sc_model_Variant"
+                   asp-route-sc_programPhaseID="@sc_programPhaseID"
+                   asp-route-sc_itemStatusID="@sc_itemStatusID"
+                   asp-route-sc_ltStorageNum="@sc_ltStorageNum"
+                   asp-route-sc_binNum="@sc_binNum"
+                   asp-route-sc_shelfRecid="@sc_shelfRecid"
+                   asp-route-sc_serialNumber="@sc_serialNumber"
+                   asp-route-sc_uutNumber="@sc_uutNumber"
+                   asp-route-sc_beginDate="@sc_beginDate"
+                   asp-route-sc_endDate="@sc_endDate"
+                   asp-route-sc_generalComment="@sc_generalComment"
+                   
+                   asp-route-page="@searchPage"
+                   asp-route-pageSize="@searchPageSize"
+                   asp-route-sortOrder="@searchSortOrder"
+                   asp-route-sortDir="@searchSortDir"
                    class="btn btn-sm btn-secondary"
                    title="Back to Item Detail">
                     ← Back to Item Detail
                 </a>
+
                 <button type="button" class="btn btn-sm btn-primary"
                         onclick="window.open('@Url.Action("RetrieveItemRequest", "CheckOut", new { InventoryRecId = inventoryRecid, RequestFormType = "Retrieve" })', 'NewAction', 'toolbar=yes,resizable=yes,location=no,scrollbars=yes,status=yes,width=1024,height=768')">
                     Retrieve Item
                 </button>
+
                 <button type="button" class="btn btn-sm btn-warning"
                         onclick="window.open('@Url.Action("ReturnItemRequest", "CheckOut", new { InventoryRecId = inventoryRecid, RequestFormType = "Return" })', 'NewAction', 'toolbar=yes,resizable=yes,location=no,scrollbars=yes,status=yes,width=1024,height=768')">
                     Return Item
                 </button>
+
                 <span style="float: right; font-weight: bold;">
                     Current Qty: <span style="font-size: 1.1em;">@finalQty</span>
                 </span>
@@ -40,7 +108,6 @@
 
             <table class="table table-striped table-bordered d-md-table standard-table" id="CheckoutLogTable">
                 <thead>
-                    <!-- Single Header Row -->
                     <tr>
                         <th style="text-align:center">RecID</th>
                         <th style="text-align:center">Request Date</th>
@@ -56,6 +123,7 @@
                         <th style="text-align:center">Comments</th>
                     </tr>
                 </thead>
+
                 <tbody>
                     @if (Model == null || !Model.Any())
                     {
@@ -67,15 +135,50 @@
                     }
                     else
                     {
-                        @foreach (var item in Model)
+                        foreach (var item in Model)
                         {
                             <tr>
                                 <td style="text-align: left;">
                                     <a href="#" class="btn btn-link p-0"
                                        data-bs-toggle="modal"
-                                       onclick="RenderActions('/CheckOut/EditCheckOutLog?checkOutRecid=' + @item.CheckOutRecid); return false;"
                                        data-bs-target="#modalEditCheckOut"
-                                       title="Edit CheckOut Record @item.CheckOutRecid">
+                                       title="Edit CheckOut Record @item.CheckOutRecid"
+                                       onclick="RenderActions('@Url.Action("EditCheckOutLog", "CheckOut", new {
+
+                                            checkOutRecid = item.CheckOutRecid,
+                                            inventoryRecid = inventoryRecid,
+
+                                            itemController = itemController,
+                                            itemAction = itemAction,
+                                            itemId = itemId,
+
+                                            returnController = returnController,
+                                            returnAction = returnAction,
+
+                                            sc_inventoryRecid = sc_inventoryRecid,
+                                            sc_storageLocation = sc_storageLocation,
+                                            sc_ownerIDNum = sc_ownerIDNum,
+                                            sc_partNumber = sc_partNumber,
+                                            sc_partDescription = sc_partDescription,
+                                            sc_customerRecID = sc_customerRecID,
+                                            sc_programName = sc_programName,
+                                            sc_model_Variant = sc_model_Variant,
+                                            sc_programPhaseID = sc_programPhaseID,
+                                            sc_itemStatusID = sc_itemStatusID,
+                                            sc_ltStorageNum = sc_ltStorageNum,
+                                            sc_binNum = sc_binNum,
+                                            sc_shelfRecid = sc_shelfRecid,
+                                            sc_serialNumber = sc_serialNumber,
+                                            sc_uutNumber = sc_uutNumber,
+                                            sc_beginDate = sc_beginDate,
+                                            sc_endDate = sc_endDate,
+                                            sc_generalComment = sc_generalComment,
+
+                                               page = searchPage,
+                                               pageSize = searchPageSize,
+                                               sortOrder = searchSortOrder,
+                                               sortDir = searchSortDir
+                                       })'); return false;">
                                         @item.CheckOutRecid
                                     </a>
                                 </td>
@@ -98,6 +201,7 @@
         </td>
     </tr>
 </table>
+
 <!-- Modal for editing checkout log entry -->
 <div id="modalEditCheckOut" class="modal fade" role="dialog" data-backdrop="false">
     <div class="modal-dialog modal-lg">

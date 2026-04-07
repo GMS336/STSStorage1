@@ -2,6 +2,42 @@
 
 @{
     int checkOutRecid = ViewBag.CheckOutRecid ?? 0;
+
+    // Context needed for redirect
+    int inventoryRecid = ViewBag.InventoryRecid ?? Model.InventoryRecid;
+
+    string itemController = (string?)ViewBag.ItemController ?? "ShortTerm";
+    string itemAction = (string?)ViewBag.ItemAction ?? "ShortEdit";
+    int itemId = ViewBag.ItemId ?? inventoryRecid;
+
+    string? returnController = (string?)ViewBag.ReturnController;
+    string? returnAction = (string?)ViewBag.ReturnAction;
+
+    // Search context (stored by controller)
+    var sc_inventoryRecid = ViewBag.InventoryRecid_sc;
+    var sc_storageLocation = ViewBag.StorageLocation_sc;
+    var sc_ownerIDNum = ViewBag.OwnerIDNum_sc;
+    var sc_partNumber = ViewBag.PartNumber_sc;
+    var sc_partDescription = ViewBag.PartDescription_sc;
+    var sc_customerRecID = ViewBag.CustomerRecID_sc;
+    var sc_programName = ViewBag.ProgramName_sc;
+    var sc_model_Variant = ViewBag.Model_Variant_sc;
+    var sc_programPhaseID = ViewBag.ProgramPhaseID_sc;
+    var sc_itemStatusID = ViewBag.ItemStatusID_sc;
+    var sc_ltStorageNum = ViewBag.LTStorageNum_sc;
+    var sc_binNum = ViewBag.BinNum_sc;
+    var sc_shelfRecid = ViewBag.ShelfRecid_sc;
+    var sc_serialNumber = ViewBag.SerialNumber_sc;
+    var sc_uutNumber = ViewBag.UUTNumber_sc;
+    var sc_beginDate = ViewBag.BeginDate_sc;
+    var sc_endDate = ViewBag.EndDate_sc;
+    var sc_generalComment = ViewBag.GeneralComment_sc;
+
+    // Search paging/sort
+    var searchPage = ViewBag.Page;
+    var searchPageSize = ViewBag.PageSize;
+    var searchSortOrder = ViewBag.SortOrder;
+    var searchSortDir = ViewBag.SortDir;
 }
 
 <div class="modal-header">
@@ -11,8 +47,44 @@
 
 <form asp-action="EditCheckOutLog" asp-controller="CheckOut" method="post" id="editCheckOutForm">
     @Html.AntiForgeryToken()
+
+    <!-- Keys -->
     <input type="hidden" asp-for="CheckOutRecid" />
     <input type="hidden" asp-for="InventoryRecid" />
+
+    <!-- Hidden workflow context for redirect-back -->
+    <input type="hidden" name="itemController" value="@itemController" />
+    <input type="hidden" name="itemAction" value="@itemAction" />
+    <input type="hidden" name="itemId" value="@itemId" />
+
+    <input type="hidden" name="returnController" value="@returnController" />
+    <input type="hidden" name="returnAction" value="@returnAction" />
+
+    <input type="hidden" name="sc_inventoryRecid" value="@sc_inventoryRecid" />
+    <input type="hidden" name="sc_storageLocation" value="@sc_storageLocation" />
+    <input type="hidden" name="sc_ownerIDNum" value="@sc_ownerIDNum" />
+    <input type="hidden" name="sc_partNumber" value="@sc_partNumber" />
+    <input type="hidden" name="sc_partDescription" value="@sc_partDescription" />
+    <input type="hidden" name="sc_customerRecID" value="@sc_customerRecID" />
+    <input type="hidden" name="sc_programName" value="@sc_programName" />
+    <input type="hidden" name="sc_model_Variant" value="@sc_model_Variant" />
+    <input type="hidden" name="sc_programPhaseID" value="@sc_programPhaseID" />
+    <input type="hidden" name="sc_itemStatusID" value="@sc_itemStatusID" />
+    <input type="hidden" name="sc_ltStorageNum" value="@sc_ltStorageNum" />
+    <input type="hidden" name="sc_binNum" value="@sc_binNum" />
+    <input type="hidden" name="sc_shelfRecid" value="@sc_shelfRecid" />
+    <input type="hidden" name="sc_serialNumber" value="@sc_serialNumber" />
+    <input type="hidden" name="sc_uutNumber" value="@sc_uutNumber" />
+    <input type="hidden" name="sc_beginDate" value="@sc_beginDate" />
+    <input type="hidden" name="sc_endDate" value="@sc_endDate" />
+    <input type="hidden" name="sc_generalComment" value="@sc_generalComment" />
+
+    <input type="hidden" name="page" value="@searchPage" />
+    <input type="hidden" name="pageSize" value="@searchPageSize" />
+    <input type="hidden" name="sortOrder" value="@searchSortOrder" />
+    <input type="hidden" name="sortDir" value="@searchSortDir" />
+
+    <!-- Balance helpers -->
     <input type="hidden" id="CurrentBalance" value="@Model.RunningBalance" />
     <input type="hidden" id="QtyInOld" value="@(Model.QtyIn ?? 0)" />
     <input type="hidden" id="QtyOutOld" value="@(Model.QtyOut ?? 0)" />
@@ -92,7 +164,6 @@
                 <h6 class="mb-0 fw-bold text-center">Storage Location Information</h6>
             </div>
             <div class="card-body">
-                <!-- Current Storage Location -->
                 <div class="row mb-3">
                     <div class="col-12">
                         <label asp-for="LocationHistory" class="form-label fw-bold">Current Storage Location:</label>
@@ -106,7 +177,6 @@
                 </div>
 
                 <div class="row">
-                    <!-- Short Term Locator -->
                     <div class="col-md-6">
                         <div class="card bg-info bg-opacity-10">
                             <div class="card-header bg-info text-white text-center py-1">
@@ -131,7 +201,6 @@
                         </div>
                     </div>
 
-                    <!-- Long Term Locator -->
                     <div class="col-md-6">
                         <div class="card bg-info bg-opacity-10">
                             <div class="card-header bg-info text-white text-center py-1">
@@ -253,7 +322,6 @@
 
 <script>
     $(document).ready(function() {
-        // Real-time balance calculation (matching original ASP logic)
         $('#QtyIn, #QtyOut').on('keyup change', function() {
             var qtyIn = parseInt($('#QtyIn').val()) || 0;
             var qtyInOld = parseInt($('#QtyInOld').val()) || 0;
