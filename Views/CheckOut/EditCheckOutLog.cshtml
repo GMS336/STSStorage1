@@ -41,7 +41,9 @@
 }
 
 <div class="modal-header">
-    <h5 class="modal-title">Edit CheckOut Item Detail - Record #@checkOutRecid</h5>
+    <h5 class="modal-title">
+        Edit CheckOut Item Detail - @((string?)ViewBag.PartDescription ?? $"Record #{checkOutRecid}")
+    </h5>
     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 </div>
 
@@ -85,7 +87,7 @@
     <input type="hidden" name="sortDir" value="@searchSortDir" />
 
     <!-- Balance helpers -->
-    <input type="hidden" id="CurrentBalance" value="@Model.RunningBalance" />
+@*     <input type="hidden" id="CurrentBalance" value="@Model.RunningBalance" /> *@
     <input type="hidden" id="QtyInOld" value="@(Model.QtyIn ?? 0)" />
     <input type="hidden" id="QtyOutOld" value="@(Model.QtyOut ?? 0)" />
 
@@ -101,20 +103,20 @@
                 </ul>
             </div>
         }
-
-        <!-- Record Number and LT Storage -->
-        <div class="row mb-3">
-            <div class="col-md-6">
-                <div class="card bg-info bg-opacity-10 border-info">
-                    <div class="card-body text-center">
+        <!-- Record Number, Duration, and Oil Drained (3 columns) -->
+        <div class="row g-2 mb-2">
+            <div class="col-md-4">
+                <div class="card bg-info bg-opacity-10 border-info h-100">
+                    <div class="card-body text-center py-2">
                         <strong>Record Number:</strong><br />
                         <span class="fs-4">@Model.CheckOutRecid</span>
                     </div>
                 </div>
             </div>
-            <div class="col-md-6">
-                <div class="card bg-info bg-opacity-10 border-info">
-                    <div class="card-body text-center">
+
+            <div class="col-md-4">
+                <div class="card bg-info bg-opacity-10 border-info h-100">
+                    <div class="card-body text-center py-2">
                         <strong>Current Duration in Storage:</strong><br />
                         @if (Model.DateIn.HasValue)
                         {
@@ -124,26 +126,50 @@
                     </div>
                 </div>
             </div>
+
+            <div class="col-md-4">
+                <div class="card bg-warning bg-opacity-25 h-100">
+                    <div class="card-body py-2">
+                        <label class="form-label fw-bold text-center d-block mb-2">Oil Drained?</label>
+                        <div class="d-flex justify-content-center gap-4">
+                            <div class="form-check mb-0">
+                                <input class="form-check-input" type="radio" name="OilCheck" id="OilCheckYes" value="Yes"
+                                       @(Model.OilCheck == "Yes" ? "checked" : "")>
+                                <label class="form-check-label" for="OilCheckYes">YES</label>
+                            </div>
+                            <div class="form-check mb-0">
+                                <input class="form-check-input" type="radio" name="OilCheck" id="OilCheckNo" value="No"
+                                       @(Model.OilCheck != "Yes" ? "checked" : "")>
+                                <label class="form-check-label" for="OilCheckNo">NO</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <!-- Requestor and Request Date -->
-        <div class="row mb-3">
-            <div class="col-md-8">
+        <!-- Requestor, Request Date, Need Date -->
+        <div class="row g-2 mb-2 align-items-end">
+            <div class="col-lg-7">
                 <label class="form-label fw-bold">Change Requestor Name:</label>
                 <select asp-for="RequestorIDNum" asp-items="Model.RequestorOptions" class="form-select">
                     <option value="">--Select Requestor--</option>
                 </select>
                 <span asp-validation-for="RequestorIDNum" class="text-danger"></span>
             </div>
-            <div class="col-md-4">
+            <div class="col-lg-3 col-md-6">
                 <label asp-for="RequestDate" class="form-label fw-bold">Request Date:</label>
                 <input asp-for="RequestDate" type="date" class="form-control" />
             </div>
+            <div class="col-lg-2 col-md-6">
+                <label class="form-label fw-bold">Date Needed:</label>
+                <input type="date" name="NeedDate" class="form-control" />
+            </div>
         </div>
 
-        <!-- Request Form Type and Need Date -->
-        <div class="row mb-3">
-            <div class="col-md-8">
+        <!-- Request Form Type + Item Status (same row) -->
+        <div class="row g-2 mb-2 align-items-end">
+            <div class="col-lg-8">
                 <label asp-for="RequestFormType" class="form-label fw-bold">Change Request Form Type:</label>
                 <select asp-for="RequestFormType" class="form-select">
                     <option value="@Model.RequestFormType" selected>@Model.RequestFormType</option>
@@ -152,21 +178,26 @@
                     <option value="Return">Return to Inventory</option>
                 </select>
             </div>
-            <div class="col-md-4">
-                <label class="form-label fw-bold">Date Needed:</label>
-                <input type="date" name="NeedDate" class="form-control" />
+
+            <div class="col-lg-4">
+                <label class="form-label fw-bold">Item Status:</label>
+                <select asp-for="ItemStatusID" asp-items="Model.ItemStatusOptions" class="form-select">
+                    <option value="">--Select Status--</option>
+                </select>
+                <span asp-validation-for="ItemStatusID" class="text-danger"></span>
             </div>
         </div>
 
         <!-- Storage Location Section -->
-        <div class="card mb-3 border-warning">
-            <div class="card-header bg-warning bg-opacity-25">
+        <div class="card mb-2 border-warning">
+            <div class="card-header bg-warning bg-opacity-25 py-2">
                 <h6 class="mb-0 fw-bold text-center">Storage Location Information</h6>
             </div>
             <div class="card-body">
-                <div class="row mb-3">
-                    <div class="col-12">
-                        <label asp-for="LocationHistory" class="form-label fw-bold">Current Storage Location:</label>
+                <div class="row g-2">
+                    <!-- Current Storage Location (narrow column) -->
+                    <div class="col-lg-3">
+                        <label asp-for="LocationHistory" class="form-label fw-bold">Current Location:</label>
                         <select asp-for="LocationHistory" class="form-select">
                             <option value="@Model.LocationHistory" selected>@Model.LocationHistory</option>
                             <option value="" class="text-danger">--Select Location if Blank--</option>
@@ -174,24 +205,23 @@
                             <option value="LongTerm">LongTerm Storage</option>
                         </select>
                     </div>
-                </div>
 
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="card bg-info bg-opacity-10">
+                    <!-- Short Term -->
+                    <div class="col-lg-5">
+                        <div class="card bg-info bg-opacity-10 h-100">
                             <div class="card-header bg-info text-white text-center py-1">
                                 <strong>Short Term (Locator)</strong>
                             </div>
-                            <div class="card-body">
+                            <div class="card-body py-2">
                                 <div class="mb-2">
-                                    <label class="form-label fw-bold">Storage Shelf Number:</label>
+                                    <label class="form-label fw-bold">Shelf:</label>
                                     <select asp-for="ShelfRecid" asp-items="Model.ShelfOptions" class="form-select">
                                         <option value="">--Select Shelf--</option>
                                     </select>
                                     <span asp-validation-for="ShelfRecid" class="text-danger"></span>
                                 </div>
                                 <div>
-                                    <label asp-for="BinNum" class="form-label fw-bold">Storage Bin Number:</label>
+                                    <label asp-for="BinNum" class="form-label fw-bold">Bin:</label>
                                     <select asp-for="BinNum" asp-items="Model.BinOptions" class="form-select">
                                         <option value="">--Select Bin--</option>
                                     </select>
@@ -201,14 +231,16 @@
                         </div>
                     </div>
 
-                    <div class="col-md-6">
-                        <div class="card bg-info bg-opacity-10">
+                    <!-- Long Term -->
+                    <div class="col-lg-4">
+                        <div class="card bg-info bg-opacity-10 h-100">
                             <div class="card-header bg-info text-white text-center py-1">
                                 <strong>Long Term (Locator)</strong>
                             </div>
-                            <div class="card-body d-flex align-items-center justify-content-center" style="min-height: 150px;">
+                            <div class="card-body d-flex align-items-center justify-content-center py-2">
                                 <div class="w-100">
-                                    <input asp-for="LTStorageNum" type="text" class="form-control text-center" placeholder="LT Storage Number" />
+                                    <input asp-for="LTStorageNum" type="text" class="form-control text-center"
+                                           placeholder="LT Storage Number" />
                                 </div>
                             </div>
                         </div>
@@ -218,95 +250,53 @@
         </div>
 
         <!-- Check Items INTO Storage -->
-        <div class="card mb-3 border-success">
-            <div class="card-header bg-success bg-opacity-25">
+        <div class="card mb-2 border-success">
+            <div class="card-header bg-success bg-opacity-25 py-2">
                 <h6 class="mb-0 fw-bold text-center">Check Items INTO the Storage System</h6>
             </div>
             <div class="card-body">
-                <div class="row mb-3">
-                    <div class="col-md-4">
-                        <label asp-for="DateIn" class="form-label fw-bold">Date Checked In:</label>
+                <div class="row g-2 align-items-end">
+                    <div class="col-lg-3">
+                        <label asp-for="DateIn" class="form-label fw-bold">Date In:</label>
                         <input asp-for="DateIn" type="date" class="form-control" />
                     </div>
-                    <div class="col-md-2">
+                    <div class="col-lg-2">
                         <label asp-for="QtyIn" class="form-label fw-bold">Qty In:</label>
                         <input asp-for="QtyIn" type="number" class="form-control" id="QtyIn" />
                     </div>
-                    <div class="col-md-6">
-                        <label asp-for="CommentsStored" class="form-label fw-bold">Comment for Check-In:</label>
-                        <textarea asp-for="CommentsStored" class="form-control" rows="2"></textarea>
+                    <div class="col-lg-7">
+                        <label asp-for="CommentsStored" class="form-label fw-bold">Check-In Comment:</label>
+                        <textarea asp-for="CommentsStored" class="form-control" rows="1"></textarea>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- Check Items OUT OF Storage -->
-        <div class="card mb-3 border-danger">
-            <div class="card-header bg-danger bg-opacity-25">
+        <div class="card mb-2 border-danger">
+            <div class="card-header bg-danger bg-opacity-25 py-2">
                 <h6 class="mb-0 fw-bold text-center">Check Items OUT OF the Storage System</h6>
             </div>
             <div class="card-body">
-                <div class="row mb-3">
-                    <div class="col-md-4">
-                        <label asp-for="DateOut" class="form-label fw-bold">Date Checked Out:</label>
+                <div class="row g-2 align-items-end">
+                    <div class="col-lg-3">
+                        <label asp-for="DateOut" class="form-label fw-bold">Date Out:</label>
                         <input asp-for="DateOut" type="date" class="form-control" />
                     </div>
-                    <div class="col-md-2">
+                    <div class="col-lg-2">
                         <label asp-for="QtyOut" class="form-label fw-bold">Qty Out:</label>
                         <input asp-for="QtyOut" type="number" class="form-control" id="QtyOut" />
                     </div>
-                    <div class="col-md-6">
-                        <label asp-for="CommentRetrieval" class="form-label fw-bold">Comment for Check-Out:</label>
-                        <textarea asp-for="CommentRetrieval" class="form-control" rows="2"></textarea>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Balance, Status, and Oil Check -->
-        <div class="row mb-3">
-            <div class="col-md-3">
-                <div class="card bg-warning bg-opacity-25">
-                    <div class="card-body text-center">
-                        <label class="form-label fw-bold mb-1">Current Balance:</label>
-                        <div class="fs-5">@Model.RunningBalance</div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="card bg-warning bg-opacity-25">
-                    <div class="card-body text-center">
-                        <label class="form-label fw-bold mb-1">New Balance:</label>
-                        <input type="number" id="Balance" name="Balance" class="form-control text-center fw-bold" value="@Model.RunningBalance" readonly />
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <label class="form-label fw-bold">Item Status:</label>
-                <select asp-for="ItemStatusID" asp-items="Model.ItemStatusOptions" class="form-select">
-                    <option value="">--Select Status--</option>
-                </select>
-                <span asp-validation-for="ItemStatusID" class="text-danger"></span>
-            </div>
-            <div class="col-md-3">
-                <div class="card bg-warning bg-opacity-25">
-                    <div class="card-body">
-                        <label class="form-label fw-bold text-center d-block mb-2">Oil Drained?</label>
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="OilCheck" id="OilCheckYes" value="Yes" @(Model.OilCheck == "Yes" ? "checked" : "")>
-                            <label class="form-check-label" for="OilCheckYes">YES</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="OilCheck" id="OilCheckNo" value="No" @(Model.OilCheck != "Yes" ? "checked" : "")>
-                            <label class="form-check-label" for="OilCheckNo">NO</label>
-                        </div>
+                    <div class="col-lg-7">
+                        <label asp-for="CommentRetrieval" class="form-label fw-bold">Check-Out Comment:</label>
+                        <textarea asp-for="CommentRetrieval" class="form-control" rows="1"></textarea>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- Work Orders -->
-        <div class="row mb-3">
+        <div class="row mb-2">
             <div class="col-12">
                 <label asp-for="WONum" class="form-label fw-bold">Associated Work Orders (TR, EN, WO):</label>
                 <input asp-for="WONum" type="text" class="form-control" maxlength="25" />

@@ -386,6 +386,28 @@ namespace STSStorage1.Controllers
                 // Load dropdown options
                 await LoadCheckOutDropdownOptions(editModel);
 
+                // ✅ ADD THIS BLOCK RIGHT HERE (display header context; NOT sc_partDescription)
+                try
+                {
+                    var pInv = new SqlParameter("@InventoryRecid", editModel.InventoryRecid);
+                    var pInc = new SqlParameter("@IncludeInactive", true);
+
+                    var invRows = await _context.InvShortTermEdit
+                        .FromSqlRaw("EXEC dbo.spGETShortTermById @InventoryRecid, @IncludeInactive", pInv, pInc)
+                        .AsNoTracking()
+                        .ToListAsync();
+
+                    ViewBag.PartDescription = invRows.FirstOrDefault()?.PartDescription;
+                }
+                catch
+                {
+                    ViewBag.PartDescription = null;
+                }
+
+
+
+
+
                 return PartialView("~/Views/CheckOut/EditCheckOutLog.cshtml", editModel);  // RETURN editModel NOT item!
             }
             catch (Exception ex)
